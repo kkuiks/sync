@@ -4,17 +4,25 @@
  * sync
  * OpenAPI spec version: 0.0.1
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import { api } from '../../../lib/server';
 import type { ErrorType } from '../../../lib/server';
-import type { LoginRequest, RegisterRequest } from '../types';
+import type { CsrfToken, LoginRequest, RegisterRequest } from '../types';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -301,3 +309,148 @@ export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
 > => {
   return useMutation(getRegisterMutationOptions(options), queryClient);
 };
+/**
+ * CSRF 토큰을 쿠키로 발급하고 요청 헤더 정보를 반환합니다.
+ * @summary Get CSRF Token
+ */
+export type getCsrfTokenResponse200 = {
+  data: CsrfToken;
+  status: 200;
+};
+
+export type getCsrfTokenResponseSuccess = getCsrfTokenResponse200 & {
+  headers: Headers;
+};
+export type getCsrfTokenResponse = getCsrfTokenResponseSuccess;
+
+export const getGetCsrfTokenUrl = () => {
+  return `/csrf`;
+};
+
+export const getCsrfToken = async (
+  options?: RequestInit,
+): Promise<getCsrfTokenResponse> => {
+  return api<getCsrfTokenResponse>(getGetCsrfTokenUrl(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getGetCsrfTokenQueryKey = () => {
+  return [`/csrf`] as const;
+};
+
+export const getGetCsrfTokenQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCsrfToken>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof api>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCsrfTokenQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCsrfToken>>> = ({
+    signal,
+  }) => getCsrfToken({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCsrfToken>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCsrfTokenQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCsrfToken>>
+>;
+export type GetCsrfTokenQueryError = ErrorType<unknown>;
+
+export function useGetCsrfToken<
+  TData = Awaited<ReturnType<typeof getCsrfToken>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof getCsrfToken>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCsrfToken<
+  TData = Awaited<ReturnType<typeof getCsrfToken>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof getCsrfToken>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCsrfToken<
+  TData = Awaited<ReturnType<typeof getCsrfToken>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get CSRF Token
+ */
+
+export function useGetCsrfToken<
+  TData = Awaited<ReturnType<typeof getCsrfToken>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCsrfTokenQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

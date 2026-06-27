@@ -219,6 +219,24 @@ paths:
       responses:
         "204":
           description: "204"
+  /csrf:
+    get:
+      tags:
+      - auth
+      summary: Get CSRF Token
+      description: CSRF 토큰을 쿠키로 발급하고 요청 헤더 정보를 반환합니다.
+      operationId: GetCsrfToken
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfToken"
+              examples:
+                GetCsrfToken:
+                  value: "{\"headerName\":\"X-CSRF-TOKEN\",\"parameterName\":\"_csrf\"\
+                    ,\"token\":\"039356f2-38a1-47ab-a567-332be3923626\"}"
   /feed/recent:
     get:
       tags:
@@ -1899,6 +1917,23 @@ components:
         handle:
           type: string
           description: 생성된 프로젝트 핸들
+    CsrfToken:
+      title: CsrfToken
+      required:
+      - headerName
+      - parameterName
+      - token
+      type: object
+      properties:
+        headerName:
+          type: string
+          description: CSRF 토큰 요청 헤더 이름
+        parameterName:
+          type: string
+          description: CSRF 토큰 요청 파라미터 이름
+        token:
+          type: string
+          description: CSRF 토큰 값
     GetCommentsResponse:
       title: GetCommentsResponse
       required:

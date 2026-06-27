@@ -13,6 +13,31 @@ interface ErrorResponse {
   code: ErrorCode;
 }
 
+const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+const CSRF_TOKEN_URL = `${env.NEXT_PUBLIC_BACKEND_URL}/csrf`;
+
+let csrfTokenRequest: Promise<void> | null = null;
+
+async function ensureCsrfToken() {
+  if (isServer() || (await getCsrfToken())) {
+    return;
+  }
+
+  csrfTokenRequest ??= fetch(CSRF_TOKEN_URL, {
+    credentials: 'include',
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('CSRF 토큰을 발급받지 못했습니다.');
+      }
+    })
+    .finally(() => {
+      csrfTokenRequest = null;
+    });
+
+  await csrfTokenRequest;
+}
+
 export const server = ky.extend({
   prefixUrl: env.NEXT_PUBLIC_BACKEND_URL,
   credentials: 'include',
@@ -32,7 +57,9 @@ export const server = ky.extend({
         }
       },
       async (request) => {
-        if (request.method !== 'GET' && request.method !== 'HEAD') {
+        if (UNSAFE_METHODS.has(request.method)) {
+          await ensureCsrfToken();
+
           const csrfToken = await getCsrfToken();
           if (csrfToken) {
             request.headers.set('X-XSRF-TOKEN', csrfToken);

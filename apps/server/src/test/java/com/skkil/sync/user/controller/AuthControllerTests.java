@@ -8,7 +8,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.mo
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,6 +53,33 @@ class AuthControllerTests {
   @Autowired private JsonMapper jsonMapper;
 
   @MockitoBean private AuthService authService;
+
+  @Test
+  @DisplayName("[getCsrfToken] API 문서화 테스트")
+  void getCsrfToken() throws Exception {
+    mockMvc
+        .perform(get("/csrf"))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "GetCsrfToken",
+                ResourceSnippetParameters.builder()
+                    .tag("auth")
+                    .summary("Get CSRF Token")
+                    .description("CSRF 토큰을 쿠키로 발급하고 요청 헤더 정보를 반환합니다.")
+                    .responseSchema(schema("CsrfToken")),
+                null,
+                null,
+                Function.identity(),
+                responseFields(
+                    fieldWithPath("headerName")
+                        .type(JsonFieldType.STRING)
+                        .description("CSRF 토큰 요청 헤더 이름"),
+                    fieldWithPath("parameterName")
+                        .type(JsonFieldType.STRING)
+                        .description("CSRF 토큰 요청 파라미터 이름"),
+                    fieldWithPath("token").type(JsonFieldType.STRING).description("CSRF 토큰 값"))));
+  }
 
   @Test
   @DisplayName("[login] API 문서화 테스트")
