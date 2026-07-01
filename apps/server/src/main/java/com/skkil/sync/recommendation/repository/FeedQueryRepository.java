@@ -6,6 +6,8 @@ import static com.skkil.sync.jooq.tables.Projects.PROJECTS;
 import static com.skkil.sync.jooq.tables.Users.USERS;
 
 import com.skkil.sync.common.util.pagination.interfaces.CursorPaginationDataFetcher;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostVisibility;
 import com.skkil.sync.recommendation.dto.data.FeedDto;
 import org.jooq.DSLContext;
@@ -44,7 +46,11 @@ public class FeedQueryRepository {
           .on(POSTS.AUTHOR_ID.eq(USERS.ID))
           .leftJoin(PROJECTS)
           .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
-          .where(condition.and(POSTS.VISIBILITY.eq(PostVisibility.VISIBLE.name())))
+          .where(
+              condition
+                  .and(POSTS.VISIBILITY.eq(PostVisibility.VISIBLE.name()))
+                  .and(POSTS.SCOPE.eq(PostScope.PUBLIC.name()))
+                  .and(POSTS.STATUS.eq(PostStatus.PUBLISHED.name())))
           .orderBy(orderFields)
           .limit(size)
           .fetchInto(FeedDto.class);

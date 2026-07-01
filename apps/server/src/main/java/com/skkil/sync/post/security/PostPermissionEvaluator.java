@@ -34,7 +34,7 @@ public class PostPermissionEvaluator implements CustomPermissionEvaluator {
     }
 
     return switch (permission) {
-      case READ -> post.isVisible();
+      case READ -> canRead(user, post);
       case EDIT -> canEdit(user, post);
       case DELETE -> canDelete(user, post);
 
@@ -43,6 +43,18 @@ public class PostPermissionEvaluator implements CustomPermissionEvaluator {
         yield false;
       }
     };
+  }
+
+  private boolean canRead(AuthenticatedUser user, Post post) {
+    if (!post.isVisible()) {
+      return false;
+    }
+
+    if (post.isPublished() && post.isPublic()) {
+      return true;
+    }
+
+    return user != null && user.userId().equals(post.getAuthor().getId());
   }
 
   private boolean canEdit(AuthenticatedUser user, Post post) {

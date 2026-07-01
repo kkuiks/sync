@@ -262,40 +262,21 @@ paths:
                 $ref: "#/components/schemas/GetFeedResponse"
               examples:
                 GetRecentFeed:
-                  value: |-
-                    {
-                      "items" : {
-                        "pageInfo" : {
-                          "size" : 1,
-                          "hasNextPage" : false,
-                          "hasPreviousPage" : false,
-                          "startCursor" : "start-cursor",
-                          "endCursor" : "end-cursor"
-                        },
-                        "nodes" : [ {
-                          "cursor" : "cursor",
-                          "content" : {
-                            "id" : 1,
-                            "slug" : "test-slug",
-                            "author" : {
-                              "id" : 1,
-                              "handle" : "user_handle",
-                              "name" : "User Name",
-                              "profileImageUrl" : "https://example.com/profile.jpg"
-                            },
-                            "content" : "This is a feed item content",
-                            "project" : {
-                              "handle" : "project_handle",
-                              "name" : "name"
-                            },
-                            "likeCount" : 10,
-                            "commentCount" : 5,
-                            "bookmarked" : true,
-                            "createdAt" : "2026-05-04T12:00:00Z"
-                          }
-                        } ]
-                      }
-                    }
+                  value: "{\r\n  \"items\" : {\r\n    \"pageInfo\" : {\r\n      \"\
+                    size\" : 1,\r\n      \"hasNextPage\" : false,\r\n      \"hasPreviousPage\"\
+                    \ : false,\r\n      \"startCursor\" : \"start-cursor\",\r\n  \
+                    \    \"endCursor\" : \"end-cursor\"\r\n    },\r\n    \"nodes\"\
+                    \ : [ {\r\n      \"cursor\" : \"cursor\",\r\n      \"content\"\
+                    \ : {\r\n        \"id\" : 1,\r\n        \"slug\" : \"test-slug\"\
+                    ,\r\n        \"author\" : {\r\n          \"id\" : 1,\r\n     \
+                    \     \"handle\" : \"user_handle\",\r\n          \"name\" : \"\
+                    User Name\",\r\n          \"profileImageUrl\" : \"https://example.com/profile.jpg\"\
+                    \r\n        },\r\n        \"content\" : \"This is a feed item\
+                    \ content\",\r\n        \"project\" : {\r\n          \"handle\"\
+                    \ : \"project_handle\",\r\n          \"name\" : \"name\"\r\n \
+                    \       },\r\n        \"likeCount\" : 10,\r\n        \"commentCount\"\
+                    \ : 5,\r\n        \"bookmarked\" : true,\r\n        \"createdAt\"\
+                    \ : \"2026-05-04T12:00:00Z\"\r\n      }\r\n    } ]\r\n  }\r\n}"
   /media:
     post:
       tags:
@@ -321,12 +302,8 @@ paths:
                 $ref: "#/components/schemas/UploadMediaResponse"
               examples:
                 UploadMedia:
-                  value: |-
-                    {
-                      "mediaId" : "1",
-                      "uploadUrl" : "https://example.com/upload",
-                      "expiresAt" : "1970-01-01T00:00:00"
-                    }
+                  value: "{\r\n  \"mediaId\" : \"1\",\r\n  \"uploadUrl\" : \"https://example.com/upload\"\
+                    ,\r\n  \"expiresAt\" : \"1970-01-01T00:00:00\"\r\n}"
   /posts:
     get:
       tags:
@@ -373,7 +350,8 @@ paths:
                   value: "{\"posts\":{\"pageInfo\":{\"size\":1,\"hasNextPage\":false,\"\
                     hasPreviousPage\":false,\"startCursor\":\"start-cursor\",\"endCursor\"\
                     :\"end-cursor\"},\"nodes\":[{\"cursor\":\"cursor\",\"content\"\
-                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"author\"\
+                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"scope\"\
+                    :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
                     :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
@@ -390,10 +368,11 @@ paths:
               $ref: "#/components/schemas/CreatePostRequest"
             examples:
               CreatePost:
-                value: "{\"title\":\"title\",\"type\":\"SHORT\",\"content\":{\"text\"\
-                  :\"This is a post content.\",\"json\":\"{\\\"text\\\": \\\"This\
-                  \ is a post content.\\\"}\",\"mediaIds\":[1,2]},\"tags\":[\"java\"\
-                  ,\"spring\"],\"project\":{\"handle\":\"project-handle\"}}"
+                value: "{\"title\":\"title\",\"type\":\"SHORT\",\"scope\":\"WORKSPACE\"\
+                  ,\"status\":\"PUBLISHED\",\"content\":{\"text\":\"This is a post\
+                  \ content.\",\"json\":\"{\\\"text\\\": \\\"This is a post content.\\\
+                  \"}\",\"mediaIds\":[1,2]},\"tags\":[\"java\",\"spring\"],\"project\"\
+                  :{\"handle\":\"project-handle\"}}"
       responses:
         "201":
           description: "201"
@@ -403,10 +382,7 @@ paths:
                 $ref: "#/components/schemas/CreatePostResponse"
               examples:
                 CreatePost:
-                  value: |-
-                    {
-                      "slug" : "slug"
-                    }
+                  value: "{\r\n  \"slug\" : \"slug\"\r\n}"
   /posts/{postId}:
     delete:
       tags:
@@ -471,7 +447,8 @@ paths:
                 $ref: "#/components/schemas/GetPostResponse"
               examples:
                 GetPostBySlug:
-                  value: "{\"id\":1,\"type\":\"SHORT\",\"slug\":\"test-slug\",\"author\"\
+                  value: "{\"id\":1,\"type\":\"SHORT\",\"scope\":\"PUBLIC\",\"status\"\
+                    :\"PUBLISHED\",\"slug\":\"test-slug\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"Author Name\",\"handle\":\"author-handle\"},\"project\"\
                     :{\"handle\":\"project-handle\",\"name\":\"Project Name\"},\"\
                     content\":{\"json\":\"Post Content\",\"media\":[{\"id\":1,\"url\"\
@@ -921,7 +898,8 @@ paths:
                   value: "{\"posts\":{\"pageInfo\":{\"size\":1,\"hasNextPage\":false,\"\
                     hasPreviousPage\":false,\"startCursor\":\"start-cursor\",\"endCursor\"\
                     :\"end-cursor\"},\"nodes\":[{\"cursor\":\"cursor\",\"content\"\
-                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"author\"\
+                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"scope\"\
+                    :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
                     :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
@@ -1156,7 +1134,8 @@ paths:
                   value: "{\"posts\":{\"pageInfo\":{\"size\":1,\"hasNextPage\":false,\"\
                     hasPreviousPage\":false,\"startCursor\":\"start-cursor\",\"endCursor\"\
                     :\"end-cursor\"},\"nodes\":[{\"cursor\":\"cursor\",\"content\"\
-                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"author\"\
+                    :{\"id\":1,\"slug\":\"test-slug\",\"type\":\"SHORT\",\"scope\"\
+                    :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
                     :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
@@ -1468,6 +1447,114 @@ components:
         slug:
           type: string
           description: Post Slug
+    GetPostResponse:
+      title: GetPostResponse
+      required:
+      - author
+      - bookmarked
+      - commentCount
+      - content
+      - createdAt
+      - id
+      - likeCount
+      - scope
+      - slug
+      - status
+      - type
+      type: object
+      properties:
+        bookmarked:
+          type: boolean
+          description: Whether the current user bookmarked this post
+        author:
+          required:
+          - handle
+          - name
+          type: object
+          properties:
+            name:
+              type: string
+              description: Author Name
+            handle:
+              type: string
+              description: Author Handle
+          description: Author Information
+        project:
+          required:
+          - handle
+          - name
+          type: object
+          properties:
+            name:
+              type: string
+              description: Project Name
+            handle:
+              type: string
+              description: Project Handle
+          description: Project Information
+        likeCount:
+          type: number
+          description: Number of Likes
+        title:
+          type: string
+          description: Post Title
+          nullable: true
+        type:
+          type: string
+          description: Post Type
+          enum:
+          - SHORT
+          - LONG
+          - QUESTION
+        content:
+          required:
+          - json
+          - media
+          type: object
+          properties:
+            json:
+              type: string
+              description: Post Content JSON
+            media:
+              type: array
+              description: Media attached to the post
+              items:
+                required:
+                - id
+                - url
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Media ID
+                  url:
+                    type: string
+                    description: Media URL
+          description: Post Content
+        commentCount:
+          type: number
+          description: Number of Comments
+        createdAt:
+          type: string
+          description: Creation Timestamp
+        scope:
+          type: string
+          description: Post Scope
+          enum:
+          - PUBLIC
+          - WORKSPACE
+        id:
+          type: number
+          description: Post ID
+        slug:
+          type: string
+          description: Post Slug
+        status:
+          type: string
+          description: Post Status
+          enum:
+          - DRAFT
+          - PUBLISHED
     UploadMediaRequest:
       title: UploadMediaRequest
       required:
@@ -1485,66 +1572,6 @@ components:
         mediaType:
           type: string
           description: Media Type
-    CreatePostRequest:
-      title: CreatePostRequest
-      required:
-      - content
-      - type
-      type: object
-      properties:
-        project:
-          required:
-          - handle
-          type: object
-          properties:
-            handle:
-              type: string
-              description: 프로젝트 핸들
-          description: 프로젝트
-        type:
-          type: string
-          description: Post Type
-          enum:
-          - SHORT
-          - LONG
-          - QUESTION
-        title:
-          type: string
-          description: Title
-          nullable: true
-        content:
-          required:
-          - json
-          - text
-          type: object
-          properties:
-            json:
-              type: string
-              description: JSON Content
-            mediaIds:
-              type: array
-              description: 사용된 미디어 ID 목록
-              nullable: true
-              items:
-                oneOf:
-                - type: object
-                - type: boolean
-                - type: string
-                - type: number
-            text:
-              type: string
-              description: Text Content
-          description: Content
-        tags:
-          type: array
-          description: 태그 목록
-          nullable: true
-          items:
-            oneOf:
-            - type: object
-            - type: boolean
-            - type: string
-            - type: number
     GetBookmarkedPostsResponse:
       title: GetBookmarkedPostsResponse
       type: object
@@ -1683,6 +1710,79 @@ components:
                 type: string
                 description: 팀원 프로필 이미지 URL
                 nullable: true
+    CreatePostRequest:
+      title: CreatePostRequest
+      required:
+      - content
+      - type
+      type: object
+      properties:
+        scope:
+          type: string
+          description: Post Scope
+          nullable: true
+          enum:
+          - PUBLIC
+          - WORKSPACE
+        project:
+          type: object
+          properties:
+            handle:
+              type: string
+              description: 프로젝트 핸들
+              nullable: true
+          description: 프로젝트
+        type:
+          type: string
+          description: Post Type
+          enum:
+          - SHORT
+          - LONG
+          - QUESTION
+        title:
+          type: string
+          description: Title
+          nullable: true
+        content:
+          required:
+          - json
+          - text
+          type: object
+          properties:
+            json:
+              type: string
+              description: JSON Content
+            mediaIds:
+              type: array
+              description: 사용된 미디어 ID 목록
+              nullable: true
+              items:
+                oneOf:
+                - type: object
+                - type: boolean
+                - type: string
+                - type: number
+            text:
+              type: string
+              description: Text Content
+          description: Content
+        tags:
+          type: array
+          description: 태그 목록
+          nullable: true
+          items:
+            oneOf:
+            - type: object
+            - type: boolean
+            - type: string
+            - type: number
+        status:
+          type: string
+          description: Post Status
+          nullable: true
+          enum:
+          - DRAFT
+          - PUBLISHED
     UpdateCommentRequest:
       title: UpdateCommentRequest
       required:
@@ -1692,109 +1792,6 @@ components:
         content:
           type: string
           description: Comment content
-    GetPostsResponse:
-      title: GetPostsResponse
-      type: object
-      properties:
-        posts:
-          required:
-          - nodes
-          - pageInfo
-          type: object
-          properties:
-            nodes:
-              type: array
-              description: Nodes
-              items:
-                required:
-                - content
-                - cursor
-                type: object
-                properties:
-                  cursor:
-                    type: string
-                    description: Node Cursor
-                  content:
-                    required:
-                    - author
-                    - content
-                    - createdAt
-                    - id
-                    - slug
-                    - type
-                    type: object
-                    properties:
-                      createdAt:
-                        type: string
-                        description: Creation Timestamp
-                      author:
-                        required:
-                        - handle
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Author Name
-                          handle:
-                            type: string
-                            description: Author Handle
-                        description: Author Information
-                      project:
-                        required:
-                        - handle
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Project Name
-                          handle:
-                            type: string
-                            description: Project Handle
-                        description: Project Information
-                      id:
-                        type: number
-                        description: Post ID
-                      type:
-                        type: string
-                        description: Post Type
-                        enum:
-                        - SHORT
-                        - LONG
-                        - QUESTION
-                      content:
-                        type: string
-                        description: Post Content
-                      slug:
-                        type: string
-                        description: Post Slug
-                    description: Node Content
-            pageInfo:
-              required:
-              - hasNextPage
-              - hasPreviousPage
-              - size
-              type: object
-              properties:
-                size:
-                  type: number
-                  description: Page Size
-                hasNextPage:
-                  type: boolean
-                  description: Has Next Page
-                hasPreviousPage:
-                  type: boolean
-                  description: Has Previous Page
-                endCursor:
-                  type: string
-                  description: End Cursor
-                  nullable: true
-                startCursor:
-                  type: string
-                  description: Start Cursor
-                  nullable: true
-              description: Page Info
     GetPostReportsResponse:
       title: GetPostReportsResponse
       type: object
@@ -1946,6 +1943,127 @@ components:
         handle:
           type: string
           description: 생성된 프로젝트 핸들
+    GetPostsResponse:
+      title: GetPostsResponse
+      type: object
+      properties:
+        posts:
+          required:
+          - nodes
+          - pageInfo
+          type: object
+          properties:
+            nodes:
+              type: array
+              description: Nodes
+              items:
+                required:
+                - content
+                - cursor
+                type: object
+                properties:
+                  cursor:
+                    type: string
+                    description: Node Cursor
+                  content:
+                    required:
+                    - author
+                    - content
+                    - createdAt
+                    - id
+                    - scope
+                    - slug
+                    - status
+                    - type
+                    type: object
+                    properties:
+                      createdAt:
+                        type: string
+                        description: Creation Timestamp
+                      author:
+                        required:
+                        - handle
+                        - name
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Author Name
+                          handle:
+                            type: string
+                            description: Author Handle
+                        description: Author Information
+                      scope:
+                        type: string
+                        description: Post Scope
+                        enum:
+                        - PUBLIC
+                        - WORKSPACE
+                      project:
+                        required:
+                        - handle
+                        - name
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Project Name
+                          handle:
+                            type: string
+                            description: Project Handle
+                        description: Project Information
+                      id:
+                        type: number
+                        description: Post ID
+                      title:
+                        type: string
+                        description: Post Title
+                        nullable: true
+                      type:
+                        type: string
+                        description: Post Type
+                        enum:
+                        - SHORT
+                        - LONG
+                        - QUESTION
+                      content:
+                        type: string
+                        description: Post Content
+                      slug:
+                        type: string
+                        description: Post Slug
+                      status:
+                        type: string
+                        description: Post Status
+                        enum:
+                        - DRAFT
+                        - PUBLISHED
+                    description: Node Content
+            pageInfo:
+              required:
+              - hasNextPage
+              - hasPreviousPage
+              - size
+              type: object
+              properties:
+                size:
+                  type: number
+                  description: Page Size
+                hasNextPage:
+                  type: boolean
+                  description: Has Next Page
+                hasPreviousPage:
+                  type: boolean
+                  description: Has Previous Page
+                endCursor:
+                  type: string
+                  description: End Cursor
+                  nullable: true
+                startCursor:
+                  type: string
+                  description: Start Cursor
+                  nullable: true
+              description: Page Info
     GetUserPreferencesResponse:
       title: GetUserPreferencesResponse
       required:
@@ -2226,96 +2344,6 @@ components:
           type: string
           description: 신고 상세 설명
           nullable: true
-    GetPostResponse:
-      title: GetPostResponse
-      required:
-      - author
-      - bookmarked
-      - commentCount
-      - content
-      - createdAt
-      - id
-      - likeCount
-      - slug
-      - type
-      type: object
-      properties:
-        createdAt:
-          type: string
-          description: Creation Timestamp
-        bookmarked:
-          type: boolean
-          description: Whether the current user bookmarked this post
-        author:
-          required:
-          - handle
-          - name
-          type: object
-          properties:
-            name:
-              type: string
-              description: Author Name
-            handle:
-              type: string
-              description: Author Handle
-          description: Author Information
-        project:
-          required:
-          - handle
-          - name
-          type: object
-          properties:
-            name:
-              type: string
-              description: Project Name
-            handle:
-              type: string
-              description: Project Handle
-          description: Project Information
-        likeCount:
-          type: number
-          description: Number of Likes
-        id:
-          type: number
-          description: Post ID
-        type:
-          type: string
-          description: Post Type
-          enum:
-          - SHORT
-          - LONG
-          - QUESTION
-        content:
-          required:
-          - json
-          - media
-          type: object
-          properties:
-            json:
-              type: string
-              description: Post Content JSON
-            media:
-              type: array
-              description: Media attached to the post
-              items:
-                required:
-                - id
-                - url
-                type: object
-                properties:
-                  id:
-                    type: number
-                    description: Media ID
-                  url:
-                    type: string
-                    description: Media URL
-          description: Post Content
-        slug:
-          type: string
-          description: Post Slug
-        commentCount:
-          type: number
-          description: Number of Comments
     SearchPostsResponse:
       title: SearchPostsResponse
       required:

@@ -7,11 +7,11 @@
 import type { GetPostResponseAuthor } from './GetPostResponseAuthor';
 import type { GetPostResponseContent } from './GetPostResponseContent';
 import type { GetPostResponseProject } from './GetPostResponseProject';
+import type { GetPostResponseScope } from './GetPostResponseScope';
+import type { GetPostResponseStatus } from './GetPostResponseStatus';
 import type { GetPostResponseType } from './GetPostResponseType';
 
 export interface GetPostResponse {
-  /** Creation Timestamp */
-  createdAt: string;
   /** Whether the current user bookmarked this post */
   bookmarked: boolean;
   /** Author Information */
@@ -20,14 +20,25 @@ export interface GetPostResponse {
   project?: GetPostResponseProject;
   /** Number of Likes */
   likeCount: number;
-  /** Post ID */
-  id: number;
+  /**
+   * Post Title
+   * @nullable
+   */
+  title?: string | null;
   /** Post Type */
   type: GetPostResponseType;
   /** Post Content */
   content: GetPostResponseContent;
-  /** Post Slug */
-  slug: string;
   /** Number of Comments */
   commentCount: number;
+  /** Creation Timestamp */
+  createdAt: string;
+  /** Post Scope */
+  scope: GetPostResponseScope;
+  /** Post ID */
+  id: number;
+  /** Post Slug */
+  slug: string;
+  /** Post Status */
+  status: GetPostResponseStatus;
 }

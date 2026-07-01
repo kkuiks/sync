@@ -7,10 +7,14 @@ import com.skkil.sync.post.dto.request.UpdatePostRequest;
 import com.skkil.sync.post.dto.request.UpdatePostSummaryRequest;
 import com.skkil.sync.post.dto.response.CreatePostResponse;
 import com.skkil.sync.post.event.PostCreatedEvent;
+import com.skkil.sync.post.exception.InvalidPostPublishRequestException;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.model.PostMediaFile;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostSummary;
+import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostLikeRepository;
 import com.skkil.sync.post.repository.PostMediaFileRepository;
 import com.skkil.sync.post.repository.PostRepository;
@@ -65,12 +69,13 @@ public class PostService {
 
   @Transactional
   public CreatePostResponse createPost(Long authorId, CreatePostRequest request) {
+    PostScope scope = resolveScope(request);
+    PostStatus status = resolveStatus(request);
+    validateCreatePostRequest(request, scope, status);
+
     User author = userDomainService.getUserReference(authorId);
 
-    String slug =
-        request.title() == null
-            ? String.format("%s-%d", author.getHandle(), System.currentTimeMillis())
-            : Slugify.slugify(request.title());
+    String slug = createSlug(author, request);
 
     List<Media> mediaFiles =
         contentMediaService.resolveMediaFilesForCreate(authorId, request.content().mediaIds());
@@ -80,6 +85,8 @@ public class PostService {
             .slug(slug)
             .author(author)
             .type(request.type())
+            .scope(scope)
+            .status(status)
             .title(request.title())
             .content(request.content().json());
 
@@ -97,12 +104,72 @@ public class PostService {
       postMediaFileRepository.save(new PostMediaFile(post, mediaFiles.get(i), i));
     }
 
-    postRepository.incrementActivityCount(
-        author.getId(), LocalDate.ofInstant(post.getCreatedAt(), ZoneId.systemDefault()));
+    if (post.isPublished()) {
+      postRepository.incrementActivityCount(
+          author.getId(), LocalDate.ofInstant(post.getCreatedAt(), ZoneId.systemDefault()));
+    }
 
-    eventPublisher.publishEvent(new PostCreatedEvent(post.getId(), request.content().text()));
+    if (post.isPublished() && post.isPublic()) {
+      eventPublisher.publishEvent(new PostCreatedEvent(post.getId(), request.content().text()));
+    }
 
     return new CreatePostResponse(post.getSlug());
+  }
+
+  private static PostScope resolveScope(CreatePostRequest request) {
+    if (request.scope() != null) {
+      return request.scope();
+    }
+
+    return request.project() == null ? PostScope.PUBLIC : PostScope.WORKSPACE;
+  }
+
+  private static PostStatus resolveStatus(CreatePostRequest request) {
+    return request.status() == null ? PostStatus.PUBLISHED : request.status();
+  }
+
+  private static void validateCreatePostRequest(
+      CreatePostRequest request, PostScope scope, PostStatus status) {
+    if (request.project() != null && scope != PostScope.WORKSPACE) {
+      throw new InvalidPostPublishRequestException("Project posts must use WORKSPACE scope.");
+    }
+
+    if (request.project() == null && scope == PostScope.WORKSPACE) {
+      throw new InvalidPostPublishRequestException("Workspace posts require a project handle.");
+    }
+
+    if (status != PostStatus.PUBLISHED) {
+      return;
+    }
+
+    if (requiresTitle(request.type()) && isBlank(request.title())) {
+      throw new InvalidPostPublishRequestException(
+          "Published article and question posts require a title.");
+    }
+
+    if (!hasPublishableTags(request.tags())) {
+      throw new InvalidPostPublishRequestException("Published posts require at least one tag.");
+    }
+  }
+
+  private static boolean requiresTitle(PostType type) {
+    return type != PostType.SHORT;
+  }
+
+  private static boolean hasPublishableTags(List<String> tags) {
+    return tags != null && tags.stream().anyMatch(tag -> tag != null && !tag.isBlank());
+  }
+
+  private static boolean isBlank(String value) {
+    return value == null || value.isBlank();
+  }
+
+  private static String createSlug(User author, CreatePostRequest request) {
+    if (isBlank(request.title())) {
+      return String.format("%s-%d", author.getHandle(), System.currentTimeMillis());
+    }
+
+    return Slugify.slugify(request.title());
   }
 
   @Transactional

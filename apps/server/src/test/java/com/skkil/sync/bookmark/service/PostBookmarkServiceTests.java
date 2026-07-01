@@ -32,7 +32,7 @@ class PostBookmarkServiceTests {
 
     postBookmarkService.bookmarkPost(userId, postId);
 
-    verify(postDomainService).getPost(postId);
+    verify(postDomainService).getPublicPublishedPost(postId);
     verify(postBookmarkRepository).insertIfAbsent(userId, postId);
   }
 
@@ -42,7 +42,9 @@ class PostBookmarkServiceTests {
     Long userId = 1L;
     Long postId = 2L;
 
-    doThrow(new PostNotFoundException(postId)).when(postDomainService).getPost(postId);
+    doThrow(new PostNotFoundException(postId))
+        .when(postDomainService)
+        .getPublicPublishedPost(postId);
 
     assertThatThrownBy(() -> postBookmarkService.bookmarkPost(userId, postId))
         .isInstanceOf(PostNotFoundException.class);

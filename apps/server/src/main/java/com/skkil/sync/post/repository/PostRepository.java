@@ -1,6 +1,8 @@
 package com.skkil.sync.post.repository;
 
 import com.skkil.sync.post.model.Post;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostVisibility;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -13,6 +15,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   Optional<Post> findBySlug(String slug);
 
   Optional<Post> findByIdAndVisibility(Long id, PostVisibility visibility);
+
+  Optional<Post> findByIdAndVisibilityAndStatusAndScope(
+      Long id, PostVisibility visibility, PostStatus status, PostScope scope);
+
+  Optional<Post> findBySlugAndVisibilityAndStatusAndScope(
+      String slug, PostVisibility visibility, PostStatus status, PostScope scope);
 
   @Modifying
   @Query(

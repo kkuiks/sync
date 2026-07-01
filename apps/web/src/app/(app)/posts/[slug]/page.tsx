@@ -20,11 +20,14 @@ export default async function Post({ params }: PostProps) {
   const { slug } = await params;
 
   const queryClient = getQueryClient();
+  let commentsEnabled = false;
 
   try {
     const { data: post } = await queryClient.fetchQuery(
       getGetPostBySlugQueryOptions(slug),
     );
+
+    commentsEnabled = post.scope === 'PUBLIC' && post.status === 'PUBLISHED';
 
     if (post.project) {
       redirect(ROUTES.PROJECT_POST(post.project.handle, post.slug));
@@ -40,13 +43,15 @@ export default async function Post({ params }: PostProps) {
     throw error;
   }
 
-  await queryClient.prefetchQuery(getGetPostCommentsQueryOptions(slug));
+  if (commentsEnabled) {
+    await queryClient.prefetchQuery(getGetPostCommentsQueryOptions(slug));
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <TwoColumnLayout
         main={<PostCardContainer slug={slug} />}
-        side={<PostComments slug={slug} />}
+        side={commentsEnabled ? <PostComments slug={slug} /> : null}
       />
     </HydrationBoundary>
   );

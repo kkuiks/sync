@@ -19,7 +19,7 @@ public class PostBookmarkService {
 
   @Transactional
   public void bookmarkPost(Long userId, Long postId) {
-    postDomainService.getPost(postId);
+    postDomainService.getPublicPublishedPost(postId);
     postBookmarkRepository.insertIfAbsent(userId, postId);
   }
 

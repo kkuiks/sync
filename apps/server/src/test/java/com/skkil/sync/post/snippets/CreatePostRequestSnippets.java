@@ -5,6 +5,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.post.dto.request.CreatePostRequest;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.util.List;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -20,6 +22,8 @@ public class CreatePostRequestSnippets {
     return CreatePostRequest.builder()
         .title("title")
         .type(PostType.SHORT)
+        .scope(PostScope.WORKSPACE)
+        .status(PostStatus.PUBLISHED)
         .content(content)
         .tags(List.of("java", "spring"))
         .project(new CreatePostRequest.Project("project-handle"))
@@ -33,6 +37,16 @@ public class CreatePostRequestSnippets {
             .type(RestDocsUtils.ENUM_TYPE)
             .description("Post Type")
             .attributes(RestDocsUtils.getEnumAttributes(PostType.class)),
+        fieldWithPath("scope")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("Post Scope")
+            .attributes(RestDocsUtils.getEnumAttributes(PostScope.class))
+            .optional(),
+        fieldWithPath("status")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("Post Status")
+            .attributes(RestDocsUtils.getEnumAttributes(PostStatus.class))
+            .optional(),
         fieldWithPath("content").type(JsonFieldType.OBJECT).description("Content"),
         fieldWithPath("content.text").type(JsonFieldType.STRING).description("Text Content"),
         fieldWithPath("content.json").type(JsonFieldType.STRING).description("JSON Content"),
@@ -42,6 +56,9 @@ public class CreatePostRequestSnippets {
             .optional(),
         fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록").optional(),
         fieldWithPath("project").type(JsonFieldType.OBJECT).description("프로젝트").optional(),
-        fieldWithPath("project.handle").type(JsonFieldType.STRING).description("프로젝트 핸들"));
+        fieldWithPath("project.handle")
+            .type(JsonFieldType.STRING)
+            .description("프로젝트 핸들")
+            .optional());
   }
 }

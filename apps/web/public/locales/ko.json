@@ -938,6 +938,14 @@
         "SHORT": "TIL",
         "LONG": "블로그",
         "QUESTION": "질문"
+      },
+      "status": {
+        "DRAFT": "임시저장",
+        "PUBLISHED": "게시됨"
+      },
+      "scope": {
+        "PUBLIC": "공개",
+        "WORKSPACE": "워크스페이스"
       }
     },
     "navigation": {
@@ -1000,6 +1008,22 @@
       },
       "submit": "게시하기",
       "posting-to": "{project}에 게시",
+      "actions": {
+        "save-draft": "임시저장",
+        "publish": "게시하기"
+      },
+      "scope": {
+        "public": "공개",
+        "workspace": "워크스페이스: {workspace}",
+        "workspace-loading": "불러오는 중"
+      },
+      "status": {
+        "ready": "초안 저장 또는 게시할 수 있습니다"
+      },
+      "validation": {
+        "title-required": "게시하려면 제목을 입력해주세요.",
+        "tags-required": "게시하려면 태그를 하나 이상 추가해주세요."
+      },
       "messages": {
         "create-success": "게시글이 작성되었습니다.",
         "create-error": "게시글 작성에 실패했습니다."

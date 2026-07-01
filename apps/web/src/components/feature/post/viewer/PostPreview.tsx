@@ -3,6 +3,7 @@
 import { DotsThreeIcon } from '@phosphor-icons/react';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useTranslations } from 'next-intl';
 import { redirect } from 'next/navigation';
 
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
@@ -22,7 +23,7 @@ import ROUTES from '@/util/routes';
 
 import { ImageNode } from '../editor/extensions/nodes/image';
 import { deserialize } from '../editor/utils/serializer';
-import { PostType } from '../types/post';
+import { PostScope, PostStatus, PostType } from '../types/post';
 import { PostCardActions } from './components/PostCardActions';
 import { PostTypeBadge } from './components/PostTypeBadge';
 import { PostBody } from './variants/PostBody';
@@ -31,6 +32,9 @@ interface PostPreviewProps {
   id: number;
   slug: string;
   type?: PostType;
+  scope?: PostScope;
+  status?: PostStatus;
+  title?: string | null;
   author: GetPostResponse['author'];
   project?: string;
   content: GetPostResponse['content'];
@@ -44,6 +48,9 @@ export default function PostPreview({
   id,
   slug,
   type,
+  scope,
+  status,
+  title,
   author,
   project,
   content,
@@ -78,6 +85,8 @@ export default function PostPreview({
       <CardHeader>
         <PostPreviewHeader
           type={type}
+          scope={scope}
+          status={status}
           author={author}
           project={project}
           createdAt={createdAt}
@@ -85,6 +94,11 @@ export default function PostPreview({
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {title && type !== PostType.SHORT && (
+          <h2 className="line-clamp-2 text-xl font-semibold leading-tight">
+            {title}
+          </h2>
+        )}
         <PostBody
           type={type}
           editor={editor}
@@ -103,11 +117,15 @@ export default function PostPreview({
 
 function PostPreviewHeader({
   type,
+  scope,
+  status,
   author,
   project,
   createdAt,
 }: {
   type?: PostType;
+  scope?: PostScope;
+  status?: PostStatus;
   author: GetPostResponse['author'];
   project?: string;
   createdAt: string;
@@ -117,10 +135,11 @@ function PostPreviewHeader({
       enabled: !!project,
     },
   });
+  const tPost = useTranslations('components.post');
 
   return (
     <div className="flex items-start justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <ProfileHoverCard
           handle={author.handle}
           name={author.name}
@@ -135,6 +154,14 @@ function PostPreviewHeader({
         </div>
 
         {type && <PostTypeBadge type={type} />}
+
+        {status === PostStatus.DRAFT && (
+          <Badge variant="outline">{tPost('status.DRAFT')}</Badge>
+        )}
+
+        {scope === PostScope.WORKSPACE && (
+          <Badge variant="outline">{tPost('scope.WORKSPACE')}</Badge>
+        )}
 
         {projectData?.data && (
           <Badge variant="secondary">{projectData.data.name}</Badge>

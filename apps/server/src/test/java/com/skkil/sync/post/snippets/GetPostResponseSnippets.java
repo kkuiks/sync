@@ -6,6 +6,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.common.util.time.DateTimeTestUtils;
 import com.skkil.sync.post.dto.response.GetPostResponse;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.util.List;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -29,7 +31,10 @@ public class GetPostResponseSnippets {
     return GetPostResponse.builder()
         .id(1L)
         .type(PostType.SHORT)
+        .scope(PostScope.PUBLIC)
+        .status(PostStatus.PUBLISHED)
         .slug("test-slug")
+        .title("title")
         .author(author)
         .project(project)
         .content(content)
@@ -47,7 +52,16 @@ public class GetPostResponseSnippets {
             .type(RestDocsUtils.ENUM_TYPE)
             .description("Post Type")
             .attributes(RestDocsUtils.getEnumAttributes(PostType.class)),
+        fieldWithPath("scope")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("Post Scope")
+            .attributes(RestDocsUtils.getEnumAttributes(PostScope.class)),
+        fieldWithPath("status")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("Post Status")
+            .attributes(RestDocsUtils.getEnumAttributes(PostStatus.class)),
         fieldWithPath("slug").type(JsonFieldType.STRING).description("Post Slug"),
+        fieldWithPath("title").type(JsonFieldType.STRING).description("Post Title").optional(),
         fieldWithPath("author").type(JsonFieldType.OBJECT).description("Author Information"),
         fieldWithPath("author.name").type(JsonFieldType.STRING).description("Author Name"),
         fieldWithPath("author.handle").type(JsonFieldType.STRING).description("Author Handle"),

@@ -2,6 +2,8 @@ package com.skkil.sync.post.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.skkil.sync.common.util.pagination.dto.response.CursorPaginationResponse;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.time.OffsetDateTime;
 import lombok.Builder;
@@ -16,6 +18,9 @@ public record GetPostsResponse(CursorPaginationResponse<Post> posts) {
       Long id,
       String slug,
       PostType type,
+      PostScope scope,
+      PostStatus status,
+      @Nullable String title,
       Author author,
       @Nullable Project project,
       String content,

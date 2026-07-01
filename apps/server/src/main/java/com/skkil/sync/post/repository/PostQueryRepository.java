@@ -7,6 +7,8 @@ import static com.skkil.sync.jooq.tables.Users.USERS;
 
 import com.skkil.sync.common.util.pagination.interfaces.CursorPaginationDataFetcher;
 import com.skkil.sync.post.dto.data.PostDto;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostVisibility;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ public class PostQueryRepository {
         .on(POSTS.AUTHOR_ID.eq(USERS.ID))
         .leftJoin(PROJECTS)
         .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
-        .where(POSTS.SLUG.eq(slug).and(visibleCondition()))
+        .where(POSTS.SLUG.eq(slug).and(readableCondition(requesterId)))
         .fetchOptional()
         .map(record -> record.into(PostDto.class));
   }
@@ -49,7 +51,7 @@ public class PostQueryRepository {
             .on(POSTS.AUTHOR_ID.eq(USERS.ID))
             .leftJoin(PROJECTS)
             .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
-            .where(condition.and(visibleCondition()))
+            .where(condition.and(publicPublishedCondition()))
             .orderBy(orderFields)
             .limit(size)
             .fetchInto(PostDto.class);
@@ -82,7 +84,7 @@ public class PostQueryRepository {
             .on(POSTS.AUTHOR_ID.eq(USERS.ID))
             .leftJoin(PROJECTS)
             .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
-            .where(POSTS.ID.in(ids).and(visibleCondition()))
+            .where(POSTS.ID.in(ids).and(publicPublishedCondition()))
             .fetchInto(PostDto.class)
             .stream()
             .collect(Collectors.toMap(PostDto::id, Function.identity()));
@@ -104,7 +106,10 @@ public class PostQueryRepository {
     return List.of(
         POSTS.ID.as("id"),
         POSTS.POST_TYPE.as("type"),
+        POSTS.SCOPE.as("scope"),
+        POSTS.STATUS.as("status"),
         POSTS.SLUG.as("slug"),
+        POSTS.TITLE.as("title"),
         POSTS.AUTHOR_ID.as("authorId"),
         USERS.FULL_NAME.as("authorName"),
         USERS.HANDLE.as("authorHandle"),
@@ -120,5 +125,20 @@ public class PostQueryRepository {
 
   private Condition visibleCondition() {
     return POSTS.VISIBILITY.eq(PostVisibility.VISIBLE.name());
+  }
+
+  private Condition publicPublishedCondition() {
+    return visibleCondition()
+        .and(POSTS.SCOPE.eq(PostScope.PUBLIC.name()))
+        .and(POSTS.STATUS.eq(PostStatus.PUBLISHED.name()));
+  }
+
+  private Condition readableCondition(Long requesterId) {
+    Condition publicPost = publicPublishedCondition();
+    if (requesterId == null) {
+      return publicPost;
+    }
+
+    return visibleCondition().and(publicPost.or(POSTS.AUTHOR_ID.eq(requesterId)));
   }
 }

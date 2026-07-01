@@ -3,10 +3,16 @@ package com.skkil.sync.post.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import com.skkil.sync.post.dto.request.CreatePostRequest;
 import com.skkil.sync.post.dto.request.UpdatePostRequest;
+import com.skkil.sync.post.exception.InvalidPostPublishRequestException;
 import com.skkil.sync.post.exception.PostNotFoundException;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
+import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostRepository;
 import com.skkil.sync.post.snippets.UpdatePostRequestSnippets;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +27,41 @@ class PostServiceTests {
   @Mock private PostRepository postRepository;
 
   @InjectMocks private PostService postService;
+
+  @Test
+  @DisplayName("[createPost] 발행 글에 태그가 없으면 InvalidPostPublishRequestException 예외 발생")
+  void createPost_publishedWithoutTags_throwsException() {
+    CreatePostRequest request =
+        createPostRequest(PostType.SHORT, null, PostStatus.PUBLISHED, List.of());
+
+    assertThatThrownBy(() -> postService.createPost(1L, request))
+        .isInstanceOf(InvalidPostPublishRequestException.class);
+  }
+
+  @Test
+  @DisplayName("[createPost] 질문 발행 글에 제목이 없으면 InvalidPostPublishRequestException 예외 발생")
+  void createPost_publishedQuestionWithoutTitle_throwsException() {
+    CreatePostRequest request =
+        createPostRequest(PostType.QUESTION, " ", PostStatus.PUBLISHED, List.of("java"));
+
+    assertThatThrownBy(() -> postService.createPost(1L, request))
+        .isInstanceOf(InvalidPostPublishRequestException.class);
+  }
+
+  @Test
+  @DisplayName("[createPost] 워크스페이스 범위에 프로젝트 핸들이 없으면 InvalidPostPublishRequestException 예외 발생")
+  void createPost_workspaceWithoutProject_throwsException() {
+    CreatePostRequest request =
+        CreatePostRequest.builder()
+            .type(PostType.SHORT)
+            .scope(PostScope.WORKSPACE)
+            .status(PostStatus.DRAFT)
+            .content(new CreatePostRequest.Content("content", "{\"text\":\"content\"}", List.of()))
+            .build();
+
+    assertThatThrownBy(() -> postService.createPost(1L, request))
+        .isInstanceOf(InvalidPostPublishRequestException.class);
+  }
 
   @Test
   @DisplayName("[updatePost] 존재하지 않는 회고를 수정하려는 경우 PostNotFoundException 예외 발생")
@@ -43,5 +84,17 @@ class PostServiceTests {
 
     assertThatThrownBy(() -> postService.deletePost(postId))
         .isInstanceOf(PostNotFoundException.class);
+  }
+
+  private static CreatePostRequest createPostRequest(
+      PostType type, String title, PostStatus status, List<String> tags) {
+    return CreatePostRequest.builder()
+        .title(title)
+        .type(type)
+        .scope(PostScope.PUBLIC)
+        .status(status)
+        .content(new CreatePostRequest.Content("content", "{\"text\":\"content\"}", List.of()))
+        .tags(tags)
+        .build();
   }
 }

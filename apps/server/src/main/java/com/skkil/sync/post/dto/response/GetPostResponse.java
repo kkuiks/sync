@@ -1,6 +1,8 @@
 package com.skkil.sync.post.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -12,7 +14,10 @@ import org.jspecify.annotations.Nullable;
 public record GetPostResponse(
     Long id,
     PostType type,
+    PostScope scope,
+    PostStatus status,
     String slug,
+    @Nullable String title,
     Author author,
     @Nullable Project project,
     Content content,

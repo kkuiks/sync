@@ -6,6 +6,8 @@ import static com.skkil.sync.jooq.tables.Users.USERS;
 
 import com.skkil.sync.bookmark.dto.data.BookmarkedPostDto;
 import com.skkil.sync.common.util.pagination.interfaces.CursorPaginationDataFetcher;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostVisibility;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -45,7 +47,9 @@ public class PostBookmarkQueryRepository {
             .where(
                 condition
                     .and(POST_BOOKMARKS.USER_ID.eq(userId))
-                    .and(POSTS.VISIBILITY.eq(PostVisibility.VISIBLE.name())))
+                    .and(POSTS.VISIBILITY.eq(PostVisibility.VISIBLE.name()))
+                    .and(POSTS.SCOPE.eq(PostScope.PUBLIC.name()))
+                    .and(POSTS.STATUS.eq(PostStatus.PUBLISHED.name())))
             .orderBy(orderFields)
             .limit(size)
             .fetchInto(BookmarkedPostDto.class);

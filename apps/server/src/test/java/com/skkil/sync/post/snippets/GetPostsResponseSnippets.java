@@ -8,6 +8,8 @@ import com.skkil.sync.common.util.pagination.snippets.CursorPaginationResponseSn
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.common.util.time.DateTimeTestUtils;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
+import com.skkil.sync.post.model.PostScope;
+import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.util.List;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -24,6 +26,9 @@ public class GetPostsResponseSnippets {
             1L,
             "test-slug",
             PostType.SHORT,
+            PostScope.PUBLIC,
+            PostStatus.PUBLISHED,
+            "title",
             author,
             project,
             "Post Content",
@@ -45,6 +50,15 @@ public class GetPostsResponseSnippets {
                 .type(RestDocsUtils.ENUM_TYPE)
                 .description("Post Type")
                 .attributes(RestDocsUtils.getEnumAttributes(PostType.class)),
+            fieldWithPath(".scope")
+                .type(RestDocsUtils.ENUM_TYPE)
+                .description("Post Scope")
+                .attributes(RestDocsUtils.getEnumAttributes(PostScope.class)),
+            fieldWithPath(".status")
+                .type(RestDocsUtils.ENUM_TYPE)
+                .description("Post Status")
+                .attributes(RestDocsUtils.getEnumAttributes(PostStatus.class)),
+            fieldWithPath(".title").type(JsonFieldType.STRING).description("Post Title").optional(),
             fieldWithPath(".content").type(JsonFieldType.STRING).description("Post Content"),
             fieldWithPath(".project")
                 .type(JsonFieldType.OBJECT)

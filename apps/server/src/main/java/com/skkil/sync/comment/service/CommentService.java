@@ -44,7 +44,7 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public GetCommentsResponse getPostComments(String slug) {
-    Post post = postDomainService.getPostBySlug(slug);
+    Post post = postDomainService.getPublicPublishedPostBySlug(slug);
 
     List<Comment> comments = commentRepository.findByPost(post);
 
@@ -59,7 +59,7 @@ public class CommentService {
   public CreateCommentResponse createComment(
       Long authorId, String slug, CreateCommentRequest request) {
     User author = userDomainService.getUserReference(authorId);
-    Post post = postDomainService.getPostBySlug(slug);
+    Post post = postDomainService.getPublicPublishedPostBySlug(slug);
 
     Comment comment =
         Comment.builder().author(author).post(post).content(request.content()).build();

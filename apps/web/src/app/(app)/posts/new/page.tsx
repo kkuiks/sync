@@ -4,7 +4,7 @@ import { redirect, useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreatePost } from '@/api/__generated__/post/post';
 import PostEditor from '@/components/feature/post/editor/PostEditor';
-import { PostType } from '@/components/feature/post/types/post';
+import { PostScope, PostType } from '@/components/feature/post/types/post';
 import { isAuthenticated, isOnboarded } from '@/lib/auth';
 import { useSession } from '@/lib/auth/client';
 
@@ -21,7 +21,7 @@ export default function CreatePostPage() {
   const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
 
-  const { mutate: createPost } = useCreatePost({
+  const { mutate: createPost, isPending: isCreatingPost } = useCreatePost({
     mutation: {
       onSuccess: ({ data }) => {
         router.push(`/posts/${data.slug}`);
@@ -43,10 +43,14 @@ export default function CreatePostPage() {
     <div className="h-full">
       <PostEditor
         type={getInitialPostType(searchParams.get('type'))}
-        onSubmit={({ title, type, tags, content }) => {
+        scope={PostScope.PUBLIC}
+        isSubmitting={isCreatingPost}
+        onSubmit={({ title, type, scope, status, tags, content }) => {
           createPost({
             data: {
               type,
+              scope,
+              status,
               title,
               tags,
               content: {

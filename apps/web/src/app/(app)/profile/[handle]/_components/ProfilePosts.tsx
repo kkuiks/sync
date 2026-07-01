@@ -6,7 +6,11 @@ import { useEffect } from 'react';
 
 import { useGetUserPostsInfinite } from '@/api/__generated__/post/post';
 import { useGetProfileByHandle } from '@/api/__generated__/profile/profile';
-import { PostType } from '@/components/feature/post/types/post';
+import {
+  PostScope,
+  PostStatus,
+  PostType,
+} from '@/components/feature/post/types/post';
 import PostPreview from '@/components/feature/post/viewer/PostPreview';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
@@ -99,6 +103,9 @@ export default function ProfilePosts({ handle }: ProfilePostsProps) {
                 id={post.content.id}
                 slug={post.content.slug}
                 type={post.content.type as PostType}
+                scope={post.content.scope as PostScope}
+                status={post.content.status as PostStatus}
+                title={post.content.title}
                 author={post.content.author}
                 project={post.content.project?.handle}
                 content={{ json: post.content.content, media: [] }}

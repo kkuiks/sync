@@ -17,6 +17,8 @@ public interface PostSearchRepository extends Repository<PostEmbedding, Long> {
           """
           SELECT r.id FROM posts r
           WHERE r.visibility = 'VISIBLE'
+          AND r.scope = 'PUBLIC'
+          AND r.status = 'PUBLISHED'
           AND r.content ILIKE '%' || :query || '%'
           ORDER BY similarity(r.content, :query) DESC
           LIMIT :n

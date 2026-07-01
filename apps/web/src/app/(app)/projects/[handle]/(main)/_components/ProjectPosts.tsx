@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 import { useGetPostsByProjectInfinite } from '@/api/__generated__/post/post';
-import { PostType } from '@/components/feature/post/types/post';
+import {
+  PostScope,
+  PostStatus,
+  PostType,
+} from '@/components/feature/post/types/post';
 import PostPreview from '@/components/feature/post/viewer/PostPreview';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -86,6 +90,9 @@ export default function ProjectPosts({ handle }: ProjectPostsProps) {
                 id={post.content.id}
                 slug={post.content.slug}
                 type={post.content.type as PostType}
+                scope={post.content.scope as PostScope}
+                status={post.content.status as PostStatus}
+                title={post.content.title}
                 author={post.content.author ?? { id: 0, name: '' }}
                 project={post.content.project?.handle}
                 content={{ json: post.content.content, media: [] }}

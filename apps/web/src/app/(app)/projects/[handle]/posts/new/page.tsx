@@ -10,7 +10,7 @@ import {
 import { useCreatePost } from '@/api/__generated__/post/post';
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
 import PostEditor from '@/components/feature/post/editor/PostEditor';
-import { PostType } from '@/components/feature/post/types/post';
+import { PostScope, PostType } from '@/components/feature/post/types/post';
 import { isAuthenticated, isOnboarded } from '@/lib/auth';
 import { useSession } from '@/lib/auth/client';
 
@@ -29,7 +29,7 @@ export default function CreateProjectPostPage() {
   const { data: session, isPending } = useSession();
   const { data: projectData } = useGetProjectByHandle(handle);
 
-  const { mutate: createPost } = useCreatePost({
+  const { mutate: createPost, isPending: isCreatingPost } = useCreatePost({
     mutation: {
       onSuccess: ({ data }) => {
         router.push(`/projects/${handle}/posts/${data.slug}`);
@@ -51,13 +51,17 @@ export default function CreateProjectPostPage() {
     <div className="h-full">
       <PostEditor
         type={getInitialPostType(searchParams.get('type'))}
+        scope={PostScope.WORKSPACE}
+        isSubmitting={isCreatingPost || !projectData}
         project={
           projectData ? { handle, name: projectData.data.name } : undefined
         }
-        onSubmit={({ title, type, tags, project, content }) => {
+        onSubmit={({ title, type, scope, status, tags, project, content }) => {
           createPost({
             data: {
               type,
+              scope,
+              status,
               title,
               tags,
               project,

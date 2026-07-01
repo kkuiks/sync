@@ -9,6 +9,9 @@
  * 프로젝트
  */
 export type CreatePostRequestProject = {
-  /** 프로젝트 핸들 */
-  handle: string;
+  /**
+   * 프로젝트 핸들
+   * @nullable
+   */
+  handle?: string | null;
 };

@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { PostType } from '../types/post';
+import { PostScope, PostStatus, PostType } from '../types/post';
 import { EditorBubbleMenu } from './components/EditorBubbleMenu';
 import { EditorTemplates } from './components/EditorTemplates';
 import { TagInput } from './components/TagInput';
@@ -22,13 +22,17 @@ import { serialize } from './utils/serializer';
 
 interface PostEditorProps {
   type: PostType;
+  scope: PostScope;
   project?: {
     handle: string;
     name: string;
   };
+  isSubmitting?: boolean;
   onSubmit: (data: {
     title: string;
     type: PostType;
+    scope: PostScope;
+    status: PostStatus;
     tags: string[];
     project?: { handle: string };
     content: {
@@ -52,7 +56,9 @@ function getContentPlaceholder(
 
 export default function PostEditor({
   type: initialType,
+  scope,
   project,
+  isSubmitting = false,
   onSubmit,
 }: PostEditorProps) {
   const t = useTranslations('components.editor');
@@ -63,6 +69,9 @@ export default function PostEditor({
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [isEditorEmpty, setIsEditorEmpty] = useState(true);
+  const [validationMessage, setValidationMessage] = useState<string | null>(
+    null,
+  );
 
   const editor = useEditor({
     extensions: [
@@ -97,14 +106,32 @@ export default function PostEditor({
     }
   }, [type, editor, t]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (status: PostStatus) => {
     if (!editor) {
       return;
     }
 
+    if (
+      status === PostStatus.PUBLISHED &&
+      type !== PostType.SHORT &&
+      title.trim().length === 0
+    ) {
+      setValidationMessage(t('validation.title-required'));
+      return;
+    }
+
+    if (status === PostStatus.PUBLISHED && tags.length === 0) {
+      setValidationMessage(t('validation.tags-required'));
+      return;
+    }
+
+    setValidationMessage(null);
+
     onSubmit({
       title,
       type,
+      scope,
+      status,
       tags,
       project: project ? { handle: project.handle } : undefined,
       content: serialize(editor),
@@ -116,16 +143,42 @@ export default function PostEditor({
     type === PostType.QUESTION
       ? t('placeholders.title-question')
       : t('placeholders.title-long');
+  const scopeLabel =
+    scope === PostScope.WORKSPACE
+      ? t('scope.workspace', {
+          workspace: project?.name ?? t('scope.workspace-loading'),
+        })
+      : t('scope.public');
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto py-12 flex flex-col gap-4">
-        {project && (
-          <Badge variant="secondary" className="w-fit">
-            {t('posting-to', { project: project.name })}
+      <div className="flex flex-col gap-3 border-b px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2">
+          <Badge variant="secondary" className="shrink-0">
+            {scopeLabel}
           </Badge>
-        )}
+          <span className="truncate text-sm text-muted-foreground">
+            {t('status.ready')}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0 sm:items-center">
+          <Button
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit(PostStatus.DRAFT)}
+          >
+            {t('actions.save-draft')}
+          </Button>
+          <Button
+            disabled={isSubmitting}
+            onClick={() => handleSubmit(PostStatus.PUBLISHED)}
+          >
+            {t('actions.publish')}
+          </Button>
+        </div>
+      </div>
 
+      <div className="flex-1 overflow-y-auto py-12 flex flex-col gap-4">
         <Tabs
           value={type}
           onValueChange={(value) => {
@@ -169,9 +222,9 @@ export default function PostEditor({
 
       <div className="px-6 py-3 flex flex-col gap-3 shrink-0">
         <TagInput tags={tags} onChange={setTags} />
-        <div className="flex justify-end">
-          <Button onClick={handleSubmit}>{t('submit')}</Button>
-        </div>
+        {validationMessage && (
+          <p className="text-sm text-destructive">{validationMessage}</p>
+        )}
       </div>
     </div>
   );
