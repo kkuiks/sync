@@ -1,32 +1,31 @@
 import { useTranslations } from 'next-intl';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { SeparatorWithText } from '@/components/ui/separator';
 
+import AuthTermsNotice from '../_components/AuthTermsNotice';
 import OAuthProviders from '../_components/OAuthProviders';
 import LoginForm from './_components/LoginForm';
 
 export default function Login() {
   const t = useTranslations('pages.login');
+  const tAuth = useTranslations('pages.auth');
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>{t('title')}</CardTitle>
-        <CardDescription>{t('description')}</CardDescription>
-      </CardHeader>
+    <div className="flex flex-col gap-8">
+      <div>
+        <h1 className="text-2xl font-light mb-2">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('description')}</p>
+      </div>
 
-      <CardContent>
+      <div className="flex flex-col gap-6">
         <LoginForm />
-        <Separator className="my-3" />
+
+        <SeparatorWithText>{tAuth('or')}</SeparatorWithText>
+
         <OAuthProviders />
-      </CardContent>
-    </Card>
+
+        <AuthTermsNotice />
+      </div>
+    </div>
   );
 }

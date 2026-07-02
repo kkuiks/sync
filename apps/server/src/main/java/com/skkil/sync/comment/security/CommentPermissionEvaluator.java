@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class CommentPermissionEvaluator implements CustomPermissionEvaluator {
+public class CommentPermissionEvaluator implements CustomPermissionEvaluator<Long> {
 
   private final CommentRepository commentRepository;
 

@@ -41,6 +41,7 @@ public class GetPostResponseSnippets {
         .likeCount(1L)
         .commentCount(1L)
         .bookmarked(true)
+        .resolved(false)
         .createdAt(DateTimeTestUtils.defaultTestOffsetDateTime())
         .build();
   }
@@ -83,6 +84,9 @@ public class GetPostResponseSnippets {
         fieldWithPath("bookmarked")
             .type(JsonFieldType.BOOLEAN)
             .description("Whether the current user bookmarked this post"),
+        fieldWithPath("resolved")
+            .type(JsonFieldType.BOOLEAN)
+            .description("Whether the question post has been resolved"),
         fieldWithPath("createdAt").type(JsonFieldType.STRING).description("Creation Timestamp"));
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { GoogleLogoIcon } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
@@ -13,25 +14,35 @@ const providers: {
 }[] = [
   {
     id: 'GOOGLE',
-    icon: <GoogleLogoIcon />,
+    icon: (
+      <Image
+        src="/assets/icons/google_logo.svg"
+        alt="Google"
+        width={18}
+        height={18}
+      />
+    ),
   },
 ];
 
 export default function OAuthProviders() {
+  const t = useTranslations('components.oauth');
   const router = useRouter();
 
   return (
-    <div className="flex gap-4 w-full justify-center items-center">
+    <div className="flex flex-col gap-3 w-full">
       {providers.map((provider) => (
         <Button
           key={provider.id}
+          type="button"
           variant="outline"
-          size="icon"
+          className="w-full justify-center gap-2"
           onClick={() => {
             router.push(getOAuth2AuthorizationUrl(provider.id));
           }}
         >
           {provider.icon}
+          {t(provider.id)}
         </Button>
       ))}
     </div>

@@ -277,6 +277,84 @@ paths:
                     \       },\r\n        \"likeCount\" : 10,\r\n        \"commentCount\"\
                     \ : 5,\r\n        \"bookmarked\" : true,\r\n        \"createdAt\"\
                     \ : \"2026-05-04T12:00:00Z\"\r\n      }\r\n    } ]\r\n  }\r\n}"
+  /handles/availability:
+    get:
+      tags:
+      - user
+      summary: Get Handle Availability
+      description: 사용자 핸들의 사용 가능 여부를 확인합니다.
+      operationId: GetHandleAvailability
+      parameters:
+      - name: handle
+        in: query
+        description: 확인할 핸들
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetHandleAvailabilityResponse"
+              examples:
+                GetHandleAvailability:
+                  value: "{\"available\":true}"
+  /invitations:
+    get:
+      tags:
+      - project
+      summary: Get My Project Invitations
+      description: 내가 받은 대기 중인 프로젝트 초대 목록을 조회합니다.
+      operationId: GetMyProjectInvitations
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMyProjectInvitationsResponse"
+              examples:
+                GetMyProjectInvitations:
+                  value: "{\"invitations\":[{\"id\":1,\"token\":\"f47ac10b-58cc-4372-a567-0e02b2c3d479\"\
+                    ,\"projectHandle\":\"my-project\",\"projectName\":\"My Project\"\
+                    ,\"inviterHandle\":\"jane-doe\",\"inviterName\":\"Jane Doe\",\"\
+                    role\":\"MEMBER\",\"expiresAt\":\"2026-07-09T00:00:00Z\"}]}"
+  /invitations/{token}/accept:
+    post:
+      tags:
+      - project
+      summary: Accept Project Invitation
+      description: 프로젝트 초대를 수락합니다.
+      operationId: AcceptProjectInvitation
+      parameters:
+      - name: token
+        in: path
+        description: 초대 토큰
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: "204"
+  /invitations/{token}/decline:
+    post:
+      tags:
+      - project
+      summary: Decline Project Invitation
+      description: 프로젝트 초대를 거절합니다.
+      operationId: DeclineProjectInvitation
+      parameters:
+      - name: token
+        in: path
+        description: 초대 토큰
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: "204"
   /media:
     post:
       tags:
@@ -354,7 +432,8 @@ paths:
                     :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
-                    :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
+                    :\"Post Content\",\"resolved\":false,\"createdAt\":\"1970-01-01T00:00:00Z\"\
+                    }}]}}"
     post:
       tags:
       - post
@@ -453,7 +532,8 @@ paths:
                     :{\"handle\":\"project-handle\",\"name\":\"Project Name\"},\"\
                     content\":{\"json\":\"Post Content\",\"media\":[{\"id\":1,\"url\"\
                     :\"https://example.com/media.png\"}]},\"likeCount\":1,\"commentCount\"\
-                    :1,\"bookmarked\":true,\"createdAt\":\"1970-01-01T00:00:00Z\"}"
+                    :1,\"bookmarked\":true,\"resolved\":false,\"createdAt\":\"1970-01-01T00:00:00Z\"\
+                    }"
   /posts/{postId}/bookmarks:
     post:
       tags:
@@ -846,6 +926,56 @@ paths:
               examples:
                 GetProjectHandleAvailability:
                   value: "{\"available\":true}"
+  /projects/{handle}/invitations:
+    get:
+      tags:
+      - project
+      summary: Get Project Invitations
+      description: 프로젝트의 대기 중인 초대 목록을 조회합니다.
+      operationId: GetProjectInvitations
+      parameters:
+      - name: handle
+        in: path
+        description: 프로젝트 핸들
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProjectInvitationsResponse"
+              examples:
+                GetProjectInvitations:
+                  value: "{\"invitations\":[{\"id\":1,\"inviteeHandle\":\"john-doe\"\
+                    ,\"inviteeName\":\"John Doe\",\"role\":\"MEMBER\",\"expiresAt\"\
+                    :\"2026-07-09T00:00:00Z\"}]}"
+    post:
+      tags:
+      - project
+      summary: Create Project Invitation
+      description: 프로젝트에 팀원을 초대합니다.
+      operationId: CreateProjectInvitation
+      parameters:
+      - name: handle
+        in: path
+        description: 프로젝트 핸들
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectInvitationRequest"
+            examples:
+              CreateProjectInvitation:
+                value: "{\"inviteeHandle\":\"john-doe\",\"role\":\"MEMBER\"}"
+      responses:
+        "201":
+          description: "201"
   /projects/{handle}/posts:
     get:
       tags:
@@ -886,6 +1016,12 @@ paths:
         required: false
         schema:
           type: string
+      - name: type
+        in: query
+        description: 게시글 타입
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: "200"
@@ -902,7 +1038,8 @@ paths:
                     :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
-                    :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
+                    :\"Post Content\",\"resolved\":false,\"createdAt\":\"1970-01-01T00:00:00Z\"\
+                    }}]}}"
   /projects/{handle}/teammates:
     get:
       tags:
@@ -954,6 +1091,29 @@ paths:
       responses:
         "201":
           description: "201"
+  /projects/{handle}/invitations/{invitationId}:
+    delete:
+      tags:
+      - project
+      summary: Cancel Project Invitation
+      description: 프로젝트 초대를 취소합니다.
+      operationId: CancelProjectInvitation
+      parameters:
+      - name: handle
+        in: path
+        description: 프로젝트 핸들
+        required: true
+        schema:
+          type: string
+      - name: invitationId
+        in: path
+        description: 초대 ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: "204"
   /search/posts:
     get:
       tags:
@@ -1030,6 +1190,31 @@ paths:
                   value: "{\"tags\":[{\"name\":\"java\",\"description\":\"자바 관련 태그\
                     \",\"postCount\":10},{\"name\":\"spring\",\"description\":\"스프\
                     링 프레임워크 관련 태그\",\"postCount\":5}]}"
+  /search/users:
+    get:
+      tags:
+      - user
+      summary: Search Users
+      description: 검색어로 사용자를 검색합니다.
+      operationId: SearchUsers
+      parameters:
+      - name: query
+        in: query
+        description: 검색어
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchUsersResponse"
+              examples:
+                SearchUsers:
+                  value: "{\"users\":[{\"handle\":\"skkil\",\"name\":\"스킬\",\"profileImageUrl\"\
+                    :\"https://example.com/profile.png\"}]}"
   /search/projects/my:
     get:
       tags:
@@ -1138,7 +1323,8 @@ paths:
                     :\"PUBLIC\",\"status\":\"PUBLISHED\",\"title\":\"title\",\"author\"\
                     :{\"name\":\"User\",\"handle\":\"user-handle\"},\"project\":{\"\
                     handle\":\"project-handle\",\"name\":\"Project\"},\"content\"\
-                    :\"Post Content\",\"createdAt\":\"1970-01-01T00:00:00Z\"}}]}}"
+                    :\"Post Content\",\"resolved\":false,\"createdAt\":\"1970-01-01T00:00:00Z\"\
+                    }}]}}"
 components:
   schemas:
     GetProjectsResponse:
@@ -1166,6 +1352,54 @@ components:
               id:
                 type: number
                 description: 프로젝트 ID
+    GetMyProjectInvitationsResponse:
+      title: GetMyProjectInvitationsResponse
+      required:
+      - invitations
+      type: object
+      properties:
+        invitations:
+          type: array
+          description: 초대 목록
+          items:
+            required:
+            - expiresAt
+            - id
+            - inviterHandle
+            - inviterName
+            - projectHandle
+            - projectName
+            - role
+            - token
+            type: object
+            properties:
+              inviterHandle:
+                type: string
+                description: 초대한 유저의 핸들
+              role:
+                type: string
+                description: 초대받는 역할
+                enum:
+                - ADMIN
+                - MEMBER
+              id:
+                type: number
+                description: 초대 ID
+              projectName:
+                type: string
+                description: 프로젝트 이름
+              expiresAt:
+                type: string
+                description: 초대 만료 시각
+              inviterName:
+                type: string
+                description: 초대한 유저의 이름
+              projectHandle:
+                type: string
+                description: 프로젝트 핸들
+              token:
+                type: string
+                description: 초대 토큰
     UpdateProfileRequest:
       title: UpdateProfileRequest
       type: object
@@ -1239,6 +1473,31 @@ components:
         expiresAt:
           type: string
           description: Expiration Time
+    SearchUsersResponse:
+      title: SearchUsersResponse
+      required:
+      - users
+      type: object
+      properties:
+        users:
+          type: array
+          description: 사용자 목록
+          items:
+            required:
+            - handle
+            - name
+            - profileImageUrl
+            type: object
+            properties:
+              name:
+                type: string
+                description: 사용자 이름
+              handle:
+                type: string
+                description: 사용자 핸들
+              profileImageUrl:
+                type: string
+                description: 프로필 이미지 URL
     LoginRequest:
       title: LoginRequest
       required:
@@ -1252,15 +1511,131 @@ components:
         email:
           type: string
           description: Email
-    GetProjectHandleAvailabilityResponse:
-      title: GetProjectHandleAvailabilityResponse
-      required:
-      - available
+    GetPostsResponse:
+      title: GetPostsResponse
       type: object
       properties:
-        available:
-          type: boolean
-          description: 핸들 사용 가능 여부
+        posts:
+          required:
+          - nodes
+          - pageInfo
+          type: object
+          properties:
+            nodes:
+              type: array
+              description: Nodes
+              items:
+                required:
+                - content
+                - cursor
+                type: object
+                properties:
+                  cursor:
+                    type: string
+                    description: Node Cursor
+                  content:
+                    required:
+                    - author
+                    - content
+                    - createdAt
+                    - id
+                    - resolved
+                    - scope
+                    - slug
+                    - status
+                    - type
+                    type: object
+                    properties:
+                      createdAt:
+                        type: string
+                        description: Creation Timestamp
+                      author:
+                        required:
+                        - handle
+                        - name
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Author Name
+                          handle:
+                            type: string
+                            description: Author Handle
+                        description: Author Information
+                      scope:
+                        type: string
+                        description: Post Scope
+                        enum:
+                        - PUBLIC
+                        - WORKSPACE
+                      project:
+                        required:
+                        - handle
+                        - name
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Project Name
+                          handle:
+                            type: string
+                            description: Project Handle
+                        description: Project Information
+                      id:
+                        type: number
+                        description: Post ID
+                      title:
+                        type: string
+                        description: Post Title
+                        nullable: true
+                      type:
+                        type: string
+                        description: Post Type
+                        enum:
+                        - SHORT
+                        - LONG
+                        - QUESTION
+                      content:
+                        type: string
+                        description: Post Content
+                      slug:
+                        type: string
+                        description: Post Slug
+                      resolved:
+                        type: boolean
+                        description: Whether the question post has been resolved
+                      status:
+                        type: string
+                        description: Post Status
+                        enum:
+                        - DRAFT
+                        - PUBLISHED
+                    description: Node Content
+            pageInfo:
+              required:
+              - hasNextPage
+              - hasPreviousPage
+              - size
+              type: object
+              properties:
+                size:
+                  type: number
+                  description: Page Size
+                hasNextPage:
+                  type: boolean
+                  description: Has Next Page
+                hasPreviousPage:
+                  type: boolean
+                  description: Has Previous Page
+                endCursor:
+                  type: string
+                  description: End Cursor
+                  nullable: true
+                startCursor:
+                  type: string
+                  description: Start Cursor
+                  nullable: true
+              description: Page Info
     CreateProjectRequest:
       title: CreateProjectRequest
       required:
@@ -1282,6 +1657,51 @@ components:
         handle:
           type: string
           description: 프로젝트 핸들
+    GetProjectHandleAvailabilityResponse:
+      title: GetProjectHandleAvailabilityResponse
+      required:
+      - available
+      type: object
+      properties:
+        available:
+          type: boolean
+          description: 핸들 사용 가능 여부
+    GetProjectInvitationsResponse:
+      title: GetProjectInvitationsResponse
+      required:
+      - invitations
+      type: object
+      properties:
+        invitations:
+          type: array
+          description: 초대 목록
+          items:
+            required:
+            - expiresAt
+            - id
+            - inviteeHandle
+            - inviteeName
+            - role
+            type: object
+            properties:
+              role:
+                type: string
+                description: 초대받은 유저의 역할
+                enum:
+                - ADMIN
+                - MEMBER
+              inviteeName:
+                type: string
+                description: 초대받은 유저의 이름
+              inviteeHandle:
+                type: string
+                description: 초대받은 유저의 핸들
+              id:
+                type: number
+                description: 초대 ID
+              expiresAt:
+                type: string
+                description: 초대 만료 시각
     GetCommentsResponse:
       title: GetCommentsResponse
       required:
@@ -1438,6 +1858,15 @@ components:
           type: string
           description: 프로젝트 설명
           nullable: true
+    GetHandleAvailabilityResponse:
+      title: GetHandleAvailabilityResponse
+      required:
+      - available
+      type: object
+      properties:
+        available:
+          type: boolean
+          description: 핸들 사용 가능 여부
     CreatePostResponse:
       title: CreatePostResponse
       required:
@@ -1447,114 +1876,6 @@ components:
         slug:
           type: string
           description: Post Slug
-    GetPostResponse:
-      title: GetPostResponse
-      required:
-      - author
-      - bookmarked
-      - commentCount
-      - content
-      - createdAt
-      - id
-      - likeCount
-      - scope
-      - slug
-      - status
-      - type
-      type: object
-      properties:
-        bookmarked:
-          type: boolean
-          description: Whether the current user bookmarked this post
-        author:
-          required:
-          - handle
-          - name
-          type: object
-          properties:
-            name:
-              type: string
-              description: Author Name
-            handle:
-              type: string
-              description: Author Handle
-          description: Author Information
-        project:
-          required:
-          - handle
-          - name
-          type: object
-          properties:
-            name:
-              type: string
-              description: Project Name
-            handle:
-              type: string
-              description: Project Handle
-          description: Project Information
-        likeCount:
-          type: number
-          description: Number of Likes
-        title:
-          type: string
-          description: Post Title
-          nullable: true
-        type:
-          type: string
-          description: Post Type
-          enum:
-          - SHORT
-          - LONG
-          - QUESTION
-        content:
-          required:
-          - json
-          - media
-          type: object
-          properties:
-            json:
-              type: string
-              description: Post Content JSON
-            media:
-              type: array
-              description: Media attached to the post
-              items:
-                required:
-                - id
-                - url
-                type: object
-                properties:
-                  id:
-                    type: number
-                    description: Media ID
-                  url:
-                    type: string
-                    description: Media URL
-          description: Post Content
-        commentCount:
-          type: number
-          description: Number of Comments
-        createdAt:
-          type: string
-          description: Creation Timestamp
-        scope:
-          type: string
-          description: Post Scope
-          enum:
-          - PUBLIC
-          - WORKSPACE
-        id:
-          type: number
-          description: Post ID
-        slug:
-          type: string
-          description: Post Slug
-        status:
-          type: string
-          description: Post Status
-          enum:
-          - DRAFT
-          - PUBLISHED
     UploadMediaRequest:
       title: UploadMediaRequest
       required:
@@ -1943,127 +2264,118 @@ components:
         handle:
           type: string
           description: 생성된 프로젝트 핸들
-    GetPostsResponse:
-      title: GetPostsResponse
+    GetPostResponse:
+      title: GetPostResponse
+      required:
+      - author
+      - bookmarked
+      - commentCount
+      - content
+      - createdAt
+      - id
+      - likeCount
+      - resolved
+      - scope
+      - slug
+      - status
+      - type
       type: object
       properties:
-        posts:
+        bookmarked:
+          type: boolean
+          description: Whether the current user bookmarked this post
+        author:
           required:
-          - nodes
-          - pageInfo
+          - handle
+          - name
           type: object
           properties:
-            nodes:
+            name:
+              type: string
+              description: Author Name
+            handle:
+              type: string
+              description: Author Handle
+          description: Author Information
+        project:
+          required:
+          - handle
+          - name
+          type: object
+          properties:
+            name:
+              type: string
+              description: Project Name
+            handle:
+              type: string
+              description: Project Handle
+          description: Project Information
+        likeCount:
+          type: number
+          description: Number of Likes
+        title:
+          type: string
+          description: Post Title
+          nullable: true
+        type:
+          type: string
+          description: Post Type
+          enum:
+          - SHORT
+          - LONG
+          - QUESTION
+        content:
+          required:
+          - json
+          - media
+          type: object
+          properties:
+            json:
+              type: string
+              description: Post Content JSON
+            media:
               type: array
-              description: Nodes
+              description: Media attached to the post
               items:
                 required:
-                - content
-                - cursor
+                - id
+                - url
                 type: object
                 properties:
-                  cursor:
+                  id:
+                    type: number
+                    description: Media ID
+                  url:
                     type: string
-                    description: Node Cursor
-                  content:
-                    required:
-                    - author
-                    - content
-                    - createdAt
-                    - id
-                    - scope
-                    - slug
-                    - status
-                    - type
-                    type: object
-                    properties:
-                      createdAt:
-                        type: string
-                        description: Creation Timestamp
-                      author:
-                        required:
-                        - handle
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Author Name
-                          handle:
-                            type: string
-                            description: Author Handle
-                        description: Author Information
-                      scope:
-                        type: string
-                        description: Post Scope
-                        enum:
-                        - PUBLIC
-                        - WORKSPACE
-                      project:
-                        required:
-                        - handle
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Project Name
-                          handle:
-                            type: string
-                            description: Project Handle
-                        description: Project Information
-                      id:
-                        type: number
-                        description: Post ID
-                      title:
-                        type: string
-                        description: Post Title
-                        nullable: true
-                      type:
-                        type: string
-                        description: Post Type
-                        enum:
-                        - SHORT
-                        - LONG
-                        - QUESTION
-                      content:
-                        type: string
-                        description: Post Content
-                      slug:
-                        type: string
-                        description: Post Slug
-                      status:
-                        type: string
-                        description: Post Status
-                        enum:
-                        - DRAFT
-                        - PUBLISHED
-                    description: Node Content
-            pageInfo:
-              required:
-              - hasNextPage
-              - hasPreviousPage
-              - size
-              type: object
-              properties:
-                size:
-                  type: number
-                  description: Page Size
-                hasNextPage:
-                  type: boolean
-                  description: Has Next Page
-                hasPreviousPage:
-                  type: boolean
-                  description: Has Previous Page
-                endCursor:
-                  type: string
-                  description: End Cursor
-                  nullable: true
-                startCursor:
-                  type: string
-                  description: Start Cursor
-                  nullable: true
-              description: Page Info
+                    description: Media URL
+          description: Post Content
+        commentCount:
+          type: number
+          description: Number of Comments
+        createdAt:
+          type: string
+          description: Creation Timestamp
+        scope:
+          type: string
+          description: Post Scope
+          enum:
+          - PUBLIC
+          - WORKSPACE
+        id:
+          type: number
+          description: Post ID
+        slug:
+          type: string
+          description: Post Slug
+        resolved:
+          type: boolean
+          description: Whether the question post has been resolved
+        status:
+          type: string
+          description: Post Status
+          enum:
+          - DRAFT
+          - PUBLISHED
     GetUserPreferencesResponse:
       title: GetUserPreferencesResponse
       required:
@@ -2275,6 +2587,15 @@ components:
         email:
           type: string
           description: Email
+    AddTeammateRequest:
+      title: AddTeammateRequest
+      required:
+      - teammateHandle
+      type: object
+      properties:
+        teammateHandle:
+          type: string
+          description: 추가할 팀원의 핸들
     CreateCommentRequest:
       title: CreateCommentRequest
       required:
@@ -2293,15 +2614,6 @@ components:
         id:
           type: number
           description: Created comment ID
-    AddTeammateRequest:
-      title: AddTeammateRequest
-      required:
-      - teammateHandle
-      type: object
-      properties:
-        teammateHandle:
-          type: string
-          description: 추가할 팀원의 핸들
     GetPostActivitiesResponse:
       title: GetPostActivitiesResponse
       required:
@@ -2365,15 +2677,6 @@ components:
               content:
                 type: string
                 description: Post Content
-    UpdatePostRequest:
-      title: UpdatePostRequest
-      required:
-      - content
-      type: object
-      properties:
-        content:
-          type: string
-          description: Content
     SearchTagsResponse:
       title: SearchTagsResponse
       required:
@@ -2399,6 +2702,15 @@ components:
               description:
                 type: string
                 description: 태그 설명
+    UpdatePostRequest:
+      title: UpdatePostRequest
+      required:
+      - content
+      type: object
+      properties:
+        content:
+          type: string
+          description: Content
     SearchProjectsResponse:
       title: SearchProjectsResponse
       required:
@@ -2424,3 +2736,19 @@ components:
               id:
                 type: number
                 description: 프로젝트 ID
+    CreateProjectInvitationRequest:
+      title: CreateProjectInvitationRequest
+      required:
+      - inviteeHandle
+      - role
+      type: object
+      properties:
+        role:
+          type: string
+          description: 초대받는 유저의 역할
+          enum:
+          - ADMIN
+          - MEMBER
+        inviteeHandle:
+          type: string
+          description: 초대할 유저의 핸들

@@ -1,6 +1,7 @@
 package com.skkil.sync.user.repository;
 
 import com.skkil.sync.user.model.User;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +35,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
       WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :fullName, '%')) AND u.deletedAt IS NULL
       """)
   long countByFullNameContainingIgnoreCase(String fullName);
+
+  @Query(
+      """
+      SELECT u FROM User u
+      WHERE u.deletedAt IS NULL AND (
+        LOWER(u.handle) LIKE LOWER(CONCAT('%', :query, '%'))
+        OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))
+      )
+      LIMIT 10
+      """)
+  List<User> searchUsers(String query);
 }

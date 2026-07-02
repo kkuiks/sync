@@ -446,6 +446,14 @@
         "projects": "프로젝트"
       }
     },
+    "auth": {
+      "brand": {
+        "title": "배움을 기록하고, 함께 성장하세요",
+        "description": "sync에서 프로젝트와 학습 여정을 공유하고 동료들과 연결되세요."
+      },
+      "terms": "계속 진행하면 {appName}의 <terms>이용약관</terms> 및 <privacy>개인정보처리방침</privacy>에 동의하는 것으로 간주됩니다.",
+      "or": "또는"
+    },
     "login": {
       "title": "로그인",
       "description": "계정에 로그인하세요",
@@ -513,7 +521,61 @@
         }
       }
     },
+    "about": {
+      "nav": {
+        "login": "로그인",
+        "register": "가입하기"
+      },
+      "hero": {
+        "badge": "sync 소개",
+        "title": "배움을 기록하고, 함께 성장하세요",
+        "description": "sync는 기술팀을 위한 지식 플랫폼입니다. TIL과 블로그, 질문을 기록하고 프로젝트를 통해 동료들과 함께 성장하세요.",
+        "actions": {
+          "register": "무료로 시작하기",
+          "login": "로그인"
+        }
+      },
+      "features": {
+        "title": "sync로 할 수 있는 것",
+        "items": {
+          "record": {
+            "title": "기록",
+            "description": "TIL, 블로그, 질문 등 다양한 형태로 학습 과정을 기록하세요."
+          },
+          "collaborate": {
+            "title": "협업",
+            "description": "프로젝트를 만들고 팀원과 함께 진행 상황을 공유하세요."
+          },
+          "grow": {
+            "title": "성장",
+            "description": "동료들의 피드백과 경험을 통해 함께 성장하세요."
+          }
+        }
+      },
+      "footer": {
+        "description": "기술팀을 위한 지식 플랫폼",
+        "product": {
+          "title": "제품",
+          "home": "홈",
+          "explore": "탐색"
+        },
+        "account": {
+          "title": "계정",
+          "login": "로그인",
+          "register": "회원가입"
+        },
+        "legal": {
+          "title": "법적 고지",
+          "terms": "이용약관",
+          "privacy": "개인정보처리방침"
+        }
+      }
+    },
     "onboarding": {
+      "brand": {
+        "title": "거의 다 왔어요",
+        "description": "몇 가지만 더 알려주시면 sync를 시작할 준비가 끝나요."
+      },
       "steps": {
         "welcome": {
           "title": "sync에 오신 것을 환영합니다!",
@@ -616,6 +678,25 @@
           "end": "게시물이 더 이상 없습니다.",
           "empty": "게시물이 없습니다.",
           "error": "게시물을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도하세요."
+        }
+      },
+      "tabs": {
+        "posts": "블로그",
+        "questions": {
+          "label": "질문",
+          "empty": "아직 작성한 질문이 없습니다."
+        },
+        "feed": {
+          "label": "피드",
+          "empty": "아직 작성한 피드가 없습니다."
+        },
+        "likes": {
+          "label": "좋아요",
+          "empty": "좋아요를 누른 게시물이 없습니다."
+        },
+        "media": {
+          "label": "미디어",
+          "empty": "업로드한 미디어가 없습니다."
         }
       },
       "edit": {
@@ -933,6 +1014,9 @@
     }
   },
   "components": {
+    "oauth": {
+      "GOOGLE": "Google로 계속하기"
+    },
     "post": {
       "type": {
         "SHORT": "TIL",

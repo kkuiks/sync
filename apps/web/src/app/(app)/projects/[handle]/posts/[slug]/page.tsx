@@ -5,7 +5,7 @@ import { getGetPostCommentsQueryOptions } from '@/api/__generated__/comment/comm
 import { getGetPostBySlugQueryOptions } from '@/api/__generated__/post/post';
 import PostCardContainer from '@/components/feature/post/viewer/PostCardContainer';
 import PostComments from '@/components/feature/post/viewer/PostComments';
-import TwoColumnLayout from '@/components/layout/TwoColumnLayout';
+import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import SyncError, { ErrorCode } from '@/lib/error';
 import { getQueryClient } from '@/lib/query';
 

@@ -1,20 +1,44 @@
-import { TripleColumnLayout } from '@/components/layout/columns';
+'use client';
+
+import Link from 'next/link';
+import { useParams, usePathname } from 'next/navigation';
+
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ROUTES from '@/util/routes';
 
 interface ProjectSettingsLayoutProps {
   children: React.ReactNode;
-  left: React.ReactNode;
-  params: Promise<{
-    handle: string;
-  }>;
 }
 
-export default async function ProjectSettingsLayout({
+const TABS: {
+  label: string;
+  href: (handle: string) => string;
+}[] = [
+  { label: '워크스페이스', href: ROUTES.PROJECT_SETTINGS },
+  { label: '팀원', href: ROUTES.PROJECT_SETTINGS_TEAMMATES },
+];
+
+export default function ProjectSettingsLayout({
   children,
-  left,
 }: ProjectSettingsLayoutProps) {
+  const { handle } = useParams<{ handle: string }>();
+  const pathname = usePathname();
+
+  const activeTab = TABS.find((tab) => pathname === tab.href(handle))?.label;
+
   return (
-    <div>
-      <TripleColumnLayout left={left} right={null} main={children} />
+    <div className="flex flex-col gap-8">
+      <Tabs value={activeTab}>
+        <TabsList variant="line" className="w-full">
+          {TABS.map((tab) => (
+            <TabsTrigger key={tab.label} value={tab.label} asChild>
+              <Link href={tab.href(handle)}>{tab.label}</Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {children}
     </div>
   );
 }

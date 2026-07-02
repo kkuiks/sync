@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class JobApplicationPermissionEvaluator implements CustomPermissionEvaluator {
+public class JobApplicationPermissionEvaluator implements CustomPermissionEvaluator<Long> {
 
   private final JobApplicationRepository jobApplicationRepository;
 

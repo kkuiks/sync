@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
-public class ProviderPermissionEvaluator implements CustomPermissionEvaluator {
+public class ProviderPermissionEvaluator implements CustomPermissionEvaluator<Long> {
 
   private final ProviderRepository providerRepository;
   private final MaintainerRepository maintainerRepository;

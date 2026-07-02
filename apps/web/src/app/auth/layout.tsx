@@ -1,17 +1,22 @@
-import TopNavigationBar from '@/components/layout/navbar/TopNavigationBar';
+'use client';
+
+import { useTranslations } from 'next-intl';
+
+import { TwoColumnFullPageLayout } from '@/components/layout/TwoColumnLayout';
 
 interface AuthLayoutProps {
   children?: React.ReactNode;
 }
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
-  return (
-    <div className="w-full min-h-screen flex flex-col">
-      <div>
-        <TopNavigationBar showSidebarTrigger={false} />
-      </div>
+  const t = useTranslations('pages.auth.brand');
 
-      <div className="grow flex items-center justify-center">{children}</div>
-    </div>
+  return (
+    <TwoColumnFullPageLayout
+      brandTitle={t('title')}
+      brandDescription={t('description')}
+    >
+      {children}
+    </TwoColumnFullPageLayout>
   );
 }

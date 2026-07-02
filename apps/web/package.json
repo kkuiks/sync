@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "concurrently \"orval --config orval.config.ts --watch\" \"next dev\"",
-    "build": "rm -rf ./src/api/__generated__ && orval --config orval.config.ts && next build",
+    "build": "node -e \"require('fs').rmSync('./src/api/__generated__', { recursive: true, force: true })\" && orval --config orval.config.ts && next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

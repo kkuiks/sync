@@ -6,6 +6,7 @@ import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.mapper.PostMapper;
+import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostQueryRepository;
 import com.skkil.sync.post.repository.pagination.PostCursorPaginationProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -71,10 +72,12 @@ public class PostQueryService {
   }
 
   @Transactional(readOnly = true)
-  public GetPostsResponse getPostsByProject(String handle, CursorPaginationRequest pagination) {
+  public GetPostsResponse getPostsByProject(
+      String handle, PostType type, CursorPaginationRequest pagination) {
     var posts =
         paginationService
-            .paginate(postQueryRepository.getPostsByProject(handle), paginationProvider, pagination)
+            .paginate(
+                postQueryRepository.getPostsByProject(handle, type), paginationProvider, pagination)
             .map(postMapper::toPostResponse);
 
     return new GetPostsResponse(posts);

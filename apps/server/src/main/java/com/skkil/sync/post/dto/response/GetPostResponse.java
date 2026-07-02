@@ -24,6 +24,7 @@ public record GetPostResponse(
     Long likeCount,
     Long commentCount,
     boolean bookmarked,
+    boolean resolved,
     OffsetDateTime createdAt) {
 
   @Builder

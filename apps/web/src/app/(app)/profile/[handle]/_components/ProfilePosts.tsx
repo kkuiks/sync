@@ -78,8 +78,6 @@ export default function ProfilePosts({ handle }: ProfilePostsProps) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-base font-medium">{t('label')}</h2>
-
       {isPending && <ProfilePostsSkeleton />}
 
       {!isPending && isError && (

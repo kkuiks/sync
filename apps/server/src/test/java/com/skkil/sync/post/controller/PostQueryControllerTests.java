@@ -19,6 +19,7 @@ import com.skkil.sync.common.util.pagination.snippets.CursorPaginationRequestSni
 import com.skkil.sync.config.SecurityConfig;
 import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
+import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.service.PostQueryService;
 import com.skkil.sync.post.snippets.GetPostResponseSnippets;
 import com.skkil.sync.post.snippets.GetPostsResponseSnippets;
@@ -139,16 +140,18 @@ class PostQueryControllerTests {
   @DisplayName("[getPostsByProject] API 문서화 테스트")
   void getPostsByProject() throws Exception {
     String handle = "project";
+    PostType type = PostType.SHORT;
 
     CursorPaginationRequest pagination =
         CursorPaginationRequestSnippets.getCursorPaginationRequest();
     GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
 
-    when(postQueryService.getPostsByProject(handle, pagination)).thenReturn(response);
+    when(postQueryService.getPostsByProject(handle, type, pagination)).thenReturn(response);
 
     mockMvc
         .perform(
             get("/projects/{handle}/posts", handle)
+                .queryParam("type", type.name())
                 .queryParams(
                     CursorPaginationRequestSnippets.getCursorPaginationRequestQueryParams()))
         .andExpect(status().isOk())
@@ -164,7 +167,8 @@ class PostQueryControllerTests {
                 null,
                 Function.identity(),
                 pathParameters(parameterWithName("handle").description("프로젝트 핸들")),
-                CursorPaginationRequestSnippets.getCursorPaginationRequestParameters(),
+                CursorPaginationRequestSnippets.getCursorPaginationRequestParameters()
+                    .and(parameterWithName("type").description("게시글 타입").optional()),
                 GetPostsResponseSnippets.getPostsResponseFields()));
   }
 }

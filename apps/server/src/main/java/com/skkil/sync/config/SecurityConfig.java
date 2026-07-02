@@ -51,6 +51,8 @@ public class SecurityConfig {
                 requests
                     .requestMatchers("/admin/**")
                     .hasRole("ADMIN")
+                    .requestMatchers("/projects/*/invitations/**", "/invitations/**")
+                    .authenticated()
                     .requestMatchers(
                         HttpMethod.GET,
                         "/experiences/**",

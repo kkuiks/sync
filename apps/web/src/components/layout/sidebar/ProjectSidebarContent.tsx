@@ -6,7 +6,6 @@ import {
   GearIcon,
   PencilIcon,
   RssIcon,
-  UsersIcon,
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -103,33 +102,14 @@ export default function ProjectSidebarContent({
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Team</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === ROUTES.PROJECT_MEMBERS(handle)}
-                >
-                  <Link href={ROUTES.PROJECT_MEMBERS(handle)}>
-                    <UsersIcon />
-                    Members
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarSeparator />
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === ROUTES.PROJECT_SETTINGS(handle)}
+                  isActive={pathname.startsWith(
+                    ROUTES.PROJECT_SETTINGS(handle),
+                  )}
                 >
                   <Link href={ROUTES.PROJECT_SETTINGS(handle)}>
                     <GearIcon />

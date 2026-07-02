@@ -17,7 +17,11 @@ public interface TeammateRepository extends JpaRepository<Teammate, Long> {
 
   boolean existsByProjectIdAndUserIdAndIsOwnerTrue(Long projectId, Long userId);
 
+  boolean existsByProjectHandleAndUserIdAndIsOwnerTrue(String projectHandle, Long userId);
+
   Optional<Teammate> findByProjectIdAndUserId(Long projectId, Long userId);
+
+  Optional<Teammate> findByProjectHandleAndUserId(String projectHandle, Long userId);
 
   @EntityGraph(attributePaths = {"user"})
   Optional<Teammate> findByProjectIdAndUserHandle(Long projectId, String userHandle);

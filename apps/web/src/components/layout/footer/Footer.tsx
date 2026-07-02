@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
+import { Copyright } from '@/components/ui/copyright';
+
 export default async function Footer() {
   const t = await getTranslations('components.footer');
 
@@ -12,14 +14,6 @@ export default async function Footer() {
         </div>
         <Copyright />
       </div>
-    </div>
-  );
-}
-
-function Copyright() {
-  return (
-    <div>
-      <span>SKKiL © 2026</span>
     </div>
   );
 }

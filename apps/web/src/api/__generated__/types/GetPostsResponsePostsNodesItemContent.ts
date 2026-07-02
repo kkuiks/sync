@@ -35,6 +35,8 @@ export type GetPostsResponsePostsNodesItemContent = {
   content: string;
   /** Post Slug */
   slug: string;
+  /** Whether the question post has been resolved */
+  resolved: boolean;
   /** Post Status */
   status: GetPostsResponsePostsNodesItemContentStatus;
 };

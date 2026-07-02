@@ -39,6 +39,8 @@ export interface GetPostResponse {
   id: number;
   /** Post Slug */
   slug: string;
+  /** Whether the question post has been resolved */
+  resolved: boolean;
   /** Post Status */
   status: GetPostResponseStatus;
 }

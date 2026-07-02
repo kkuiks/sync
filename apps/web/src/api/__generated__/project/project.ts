@@ -24,10 +24,13 @@ import { api } from '../../../lib/server';
 import type { ErrorType } from '../../../lib/server';
 import type {
   AddTeammateRequest,
+  CreateProjectInvitationRequest,
   CreateProjectRequest,
   CreateProjectResponse,
+  GetMyProjectInvitationsResponse,
   GetProjectHandleAvailabilityParams,
   GetProjectHandleAvailabilityResponse,
+  GetProjectInvitationsResponse,
   GetProjectResponse,
   GetProjectTeammatesResponse,
   GetProjectsResponse,
@@ -39,6 +42,385 @@ import type {
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+/**
+ * 내가 받은 대기 중인 프로젝트 초대 목록을 조회합니다.
+ * @summary Get My Project Invitations
+ */
+export type getMyProjectInvitationsResponse200 = {
+  data: GetMyProjectInvitationsResponse;
+  status: 200;
+};
+
+export type getMyProjectInvitationsResponseSuccess =
+  getMyProjectInvitationsResponse200 & {
+    headers: Headers;
+  };
+export type getMyProjectInvitationsResponse =
+  getMyProjectInvitationsResponseSuccess;
+
+export const getGetMyProjectInvitationsUrl = () => {
+  return `/invitations`;
+};
+
+export const getMyProjectInvitations = async (
+  options?: RequestInit,
+): Promise<getMyProjectInvitationsResponse> => {
+  return api<getMyProjectInvitationsResponse>(getGetMyProjectInvitationsUrl(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getGetMyProjectInvitationsQueryKey = () => {
+  return [`/invitations`] as const;
+};
+
+export const getGetMyProjectInvitationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMyProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMyProjectInvitations>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof api>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetMyProjectInvitationsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMyProjectInvitations>>
+  > = ({ signal }) => getMyProjectInvitations({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMyProjectInvitations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMyProjectInvitationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMyProjectInvitations>>
+>;
+export type GetMyProjectInvitationsQueryError = ErrorType<unknown>;
+
+export function useGetMyProjectInvitations<
+  TData = Awaited<ReturnType<typeof getMyProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMyProjectInvitations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMyProjectInvitations>>,
+          TError,
+          Awaited<ReturnType<typeof getMyProjectInvitations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMyProjectInvitations<
+  TData = Awaited<ReturnType<typeof getMyProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMyProjectInvitations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMyProjectInvitations>>,
+          TError,
+          Awaited<ReturnType<typeof getMyProjectInvitations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMyProjectInvitations<
+  TData = Awaited<ReturnType<typeof getMyProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMyProjectInvitations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get My Project Invitations
+ */
+
+export function useGetMyProjectInvitations<
+  TData = Awaited<ReturnType<typeof getMyProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getMyProjectInvitations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMyProjectInvitationsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 프로젝트 초대를 수락합니다.
+ * @summary Accept Project Invitation
+ */
+export type acceptProjectInvitationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type acceptProjectInvitationResponseSuccess =
+  acceptProjectInvitationResponse204 & {
+    headers: Headers;
+  };
+export type acceptProjectInvitationResponse =
+  acceptProjectInvitationResponseSuccess;
+
+export const getAcceptProjectInvitationUrl = (token: string) => {
+  return `/invitations/${token}/accept`;
+};
+
+export const acceptProjectInvitation = async (
+  token: string,
+  options?: RequestInit,
+): Promise<acceptProjectInvitationResponse> => {
+  return api<acceptProjectInvitationResponse>(
+    getAcceptProjectInvitationUrl(token),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
+
+export const getAcceptProjectInvitationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof acceptProjectInvitation>>,
+    TError,
+    { token: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof api>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof acceptProjectInvitation>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  const mutationKey = ['acceptProjectInvitation'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof acceptProjectInvitation>>,
+    { token: string }
+  > = (props) => {
+    const { token } = props ?? {};
+
+    return acceptProjectInvitation(token, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AcceptProjectInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof acceptProjectInvitation>>
+>;
+
+export type AcceptProjectInvitationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Accept Project Invitation
+ */
+export const useAcceptProjectInvitation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof acceptProjectInvitation>>,
+      TError,
+      { token: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof acceptProjectInvitation>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  return useMutation(
+    getAcceptProjectInvitationMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 프로젝트 초대를 거절합니다.
+ * @summary Decline Project Invitation
+ */
+export type declineProjectInvitationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type declineProjectInvitationResponseSuccess =
+  declineProjectInvitationResponse204 & {
+    headers: Headers;
+  };
+export type declineProjectInvitationResponse =
+  declineProjectInvitationResponseSuccess;
+
+export const getDeclineProjectInvitationUrl = (token: string) => {
+  return `/invitations/${token}/decline`;
+};
+
+export const declineProjectInvitation = async (
+  token: string,
+  options?: RequestInit,
+): Promise<declineProjectInvitationResponse> => {
+  return api<declineProjectInvitationResponse>(
+    getDeclineProjectInvitationUrl(token),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
+
+export const getDeclineProjectInvitationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof declineProjectInvitation>>,
+    TError,
+    { token: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof api>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof declineProjectInvitation>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  const mutationKey = ['declineProjectInvitation'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof declineProjectInvitation>>,
+    { token: string }
+  > = (props) => {
+    const { token } = props ?? {};
+
+    return declineProjectInvitation(token, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeclineProjectInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof declineProjectInvitation>>
+>;
+
+export type DeclineProjectInvitationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Decline Project Invitation
+ */
+export const useDeclineProjectInvitation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof declineProjectInvitation>>,
+      TError,
+      { token: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof declineProjectInvitation>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  return useMutation(
+    getDeclineProjectInvitationMutationOptions(options),
+    queryClient,
+  );
+};
 /**
  * 새로운 프로젝트를 생성합니다.
  * @summary Create Project
@@ -623,6 +1005,301 @@ export function useGetProjectHandleAvailability<
 }
 
 /**
+ * 프로젝트의 대기 중인 초대 목록을 조회합니다.
+ * @summary Get Project Invitations
+ */
+export type getProjectInvitationsResponse200 = {
+  data: GetProjectInvitationsResponse;
+  status: 200;
+};
+
+export type getProjectInvitationsResponseSuccess =
+  getProjectInvitationsResponse200 & {
+    headers: Headers;
+  };
+export type getProjectInvitationsResponse =
+  getProjectInvitationsResponseSuccess;
+
+export const getGetProjectInvitationsUrl = (handle: string) => {
+  return `/projects/${handle}/invitations`;
+};
+
+export const getProjectInvitations = async (
+  handle: string,
+  options?: RequestInit,
+): Promise<getProjectInvitationsResponse> => {
+  return api<getProjectInvitationsResponse>(
+    getGetProjectInvitationsUrl(handle),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetProjectInvitationsQueryKey = (handle: string) => {
+  return [`/projects/${handle}/invitations`] as const;
+};
+
+export const getGetProjectInvitationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProjectInvitations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetProjectInvitationsQueryKey(handle);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getProjectInvitations>>
+  > = ({ signal }) =>
+    getProjectInvitations(handle, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!handle,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProjectInvitations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProjectInvitationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProjectInvitations>>
+>;
+export type GetProjectInvitationsQueryError = ErrorType<unknown>;
+
+export function useGetProjectInvitations<
+  TData = Awaited<ReturnType<typeof getProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProjectInvitations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProjectInvitations>>,
+          TError,
+          Awaited<ReturnType<typeof getProjectInvitations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProjectInvitations<
+  TData = Awaited<ReturnType<typeof getProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProjectInvitations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProjectInvitations>>,
+          TError,
+          Awaited<ReturnType<typeof getProjectInvitations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProjectInvitations<
+  TData = Awaited<ReturnType<typeof getProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProjectInvitations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Project Invitations
+ */
+
+export function useGetProjectInvitations<
+  TData = Awaited<ReturnType<typeof getProjectInvitations>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProjectInvitations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProjectInvitationsQueryOptions(handle, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 프로젝트에 팀원을 초대합니다.
+ * @summary Create Project Invitation
+ */
+export type createProjectInvitationResponse201 = {
+  data: void;
+  status: 201;
+};
+
+export type createProjectInvitationResponseSuccess =
+  createProjectInvitationResponse201 & {
+    headers: Headers;
+  };
+export type createProjectInvitationResponse =
+  createProjectInvitationResponseSuccess;
+
+export const getCreateProjectInvitationUrl = (handle: string) => {
+  return `/projects/${handle}/invitations`;
+};
+
+export const createProjectInvitation = async (
+  handle: string,
+  createProjectInvitationRequest: CreateProjectInvitationRequest,
+  options?: RequestInit,
+): Promise<createProjectInvitationResponse> => {
+  return api<createProjectInvitationResponse>(
+    getCreateProjectInvitationUrl(handle),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(createProjectInvitationRequest),
+    },
+  );
+};
+
+export const getCreateProjectInvitationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createProjectInvitation>>,
+    TError,
+    { handle: string; data: CreateProjectInvitationRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof api>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createProjectInvitation>>,
+  TError,
+  { handle: string; data: CreateProjectInvitationRequest },
+  TContext
+> => {
+  const mutationKey = ['createProjectInvitation'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createProjectInvitation>>,
+    { handle: string; data: CreateProjectInvitationRequest }
+  > = (props) => {
+    const { handle, data } = props ?? {};
+
+    return createProjectInvitation(handle, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateProjectInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createProjectInvitation>>
+>;
+export type CreateProjectInvitationMutationBody =
+  CreateProjectInvitationRequest;
+export type CreateProjectInvitationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create Project Invitation
+ */
+export const useCreateProjectInvitation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createProjectInvitation>>,
+      TError,
+      { handle: string; data: CreateProjectInvitationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createProjectInvitation>>,
+  TError,
+  { handle: string; data: CreateProjectInvitationRequest },
+  TContext
+> => {
+  return useMutation(
+    getCreateProjectInvitationMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * 프로젝트의 팀원 목록을 조회합니다.
  * @summary Get Project Teammates
  */
@@ -900,6 +1577,115 @@ export const useAddTeammate = <TError = ErrorType<unknown>, TContext = unknown>(
   TContext
 > => {
   return useMutation(getAddTeammateMutationOptions(options), queryClient);
+};
+/**
+ * 프로젝트 초대를 취소합니다.
+ * @summary Cancel Project Invitation
+ */
+export type cancelProjectInvitationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelProjectInvitationResponseSuccess =
+  cancelProjectInvitationResponse204 & {
+    headers: Headers;
+  };
+export type cancelProjectInvitationResponse =
+  cancelProjectInvitationResponseSuccess;
+
+export const getCancelProjectInvitationUrl = (
+  handle: string,
+  invitationId: string,
+) => {
+  return `/projects/${handle}/invitations/${invitationId}`;
+};
+
+export const cancelProjectInvitation = async (
+  handle: string,
+  invitationId: string,
+  options?: RequestInit,
+): Promise<cancelProjectInvitationResponse> => {
+  return api<cancelProjectInvitationResponse>(
+    getCancelProjectInvitationUrl(handle, invitationId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  );
+};
+
+export const getCancelProjectInvitationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelProjectInvitation>>,
+    TError,
+    { handle: string; invitationId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof api>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelProjectInvitation>>,
+  TError,
+  { handle: string; invitationId: string },
+  TContext
+> => {
+  const mutationKey = ['cancelProjectInvitation'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelProjectInvitation>>,
+    { handle: string; invitationId: string }
+  > = (props) => {
+    const { handle, invitationId } = props ?? {};
+
+    return cancelProjectInvitation(handle, invitationId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelProjectInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelProjectInvitation>>
+>;
+
+export type CancelProjectInvitationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Cancel Project Invitation
+ */
+export const useCancelProjectInvitation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelProjectInvitation>>,
+      TError,
+      { handle: string; invitationId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelProjectInvitation>>,
+  TError,
+  { handle: string; invitationId: string },
+  TContext
+> => {
+  return useMutation(
+    getCancelProjectInvitationMutationOptions(options),
+    queryClient,
+  );
 };
 /**
  * 검색어로 프로젝트를 검색합니다.

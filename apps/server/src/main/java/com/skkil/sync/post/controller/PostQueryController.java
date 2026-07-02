@@ -4,12 +4,14 @@ import com.skkil.sync.auth.AuthenticatedUser;
 import com.skkil.sync.common.util.pagination.dto.request.CursorPaginationRequest;
 import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
+import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.service.PostQueryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +47,9 @@ public class PostQueryController {
   @GetMapping("/projects/{handle}/posts")
   @ResponseStatus(HttpStatus.OK)
   public GetPostsResponse getPostsByProject(
-      @PathVariable String handle, @Validated CursorPaginationRequest pagination) {
-    return postQueryService.getPostsByProject(handle, pagination);
+      @PathVariable String handle,
+      @RequestParam(required = false) PostType type,
+      @Validated CursorPaginationRequest pagination) {
+    return postQueryService.getPostsByProject(handle, type, pagination);
   }
 }

@@ -9,7 +9,7 @@ import com.skkil.sync.user.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProfilePermissionEvaluator implements CustomPermissionEvaluator {
+public class ProfilePermissionEvaluator implements CustomPermissionEvaluator<Long> {
 
   private final UserRepository userRepository;
 

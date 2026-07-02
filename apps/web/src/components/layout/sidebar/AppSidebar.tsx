@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
+import { Copyright } from '@/components/ui/copyright';
 import {
   Sidebar,
   SidebarContent,
@@ -37,10 +38,8 @@ export default function AppSidebar() {
         <ProjectSidebarContent handle={handle} />
       )}
 
-      <div className="mb-4">
-        <p className="px-3 text-xs text-sidebar-foreground/40">
-          © {new Date().getFullYear()} SKKiL.
-        </p>
+      <div className="mb-4 px-3">
+        <Copyright className="text-sidebar-foreground/40" />
       </div>
     </Sidebar>
   );

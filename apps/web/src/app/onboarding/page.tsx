@@ -2,22 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useRef, useState } from 'react';
 
 import {
   getGetAuthenticatedUserQueryKey,
   useUpdateProfile,
 } from '@/api/__generated__/profile/profile';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useSession } from '@/lib/auth/client';
 
 import { ChooseHandle } from './_components/ChooseHandle';
@@ -54,11 +45,7 @@ export default function Onboarding() {
   const t = useTranslations('pages.onboarding');
 
   const router = useRouter();
-  const {
-    data: session,
-    isPending: isSessionPending,
-    refetch: refetchSession,
-  } = useSession();
+  const { refetch: refetchSession } = useSession();
 
   const contentRef = useRef<OnboardingStepContentRef | null>(null);
 
@@ -89,22 +76,6 @@ export default function Onboarding() {
     },
     [],
   );
-
-  useEffect(() => {
-    if (isSessionPending) {
-      return;
-    }
-
-    if (!session) {
-      router.push('/auth/login');
-    } else if (session && session.user.isOnboarded) {
-      router.push('/');
-    }
-  }, [session, isSessionPending, router]);
-
-  if (isSessionPending) {
-    return <Spinner />;
-  }
 
   const previousButtonClickHandler = () => {
     setStep(stepIndex - 1);
@@ -150,44 +121,54 @@ export default function Onboarding() {
   const step = steps[stepIndex];
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span>{t(`steps.${step?.id}.title`)}</span>
-          <span className="text-xs">
-            {stepIndex + 1} / {steps.length}
-          </span>
-        </CardTitle>
-        <CardDescription>{t(`steps.${step?.id}.description`)}</CardDescription>
-      </CardHeader>
+    <div className="flex flex-col gap-8">
+      <div className="flex gap-1.5">
+        {steps.map((s, index) => (
+          <div
+            key={s.id}
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              index <= stepIndex ? 'bg-primary' : 'bg-muted'
+            }`}
+          />
+        ))}
+      </div>
 
-      <CardContent>
+      <div className="flex flex-col gap-8">
+        <div>
+          <h1 className="text-2xl font-light mb-2">
+            {t(`steps.${step?.id}.title`)}
+          </h1>
+          <p className="text-muted-foreground">
+            {t(`steps.${step?.id}.description`)}
+          </p>
+        </div>
+
         {step?.content ? (
           <step.content ref={contentRef} onStateChange={handleStateChange} />
         ) : null}
-      </CardContent>
 
-      <CardFooter className="self-end flex gap-4">
-        {stepIndex > 0 && (
-          <Button variant="outline" onClick={previousButtonClickHandler}>
-            {t('actions.previous')}
-          </Button>
-        )}
+        <div className="flex justify-end gap-4">
+          {stepIndex > 0 && (
+            <Button variant="outline" onClick={previousButtonClickHandler}>
+              {t('actions.previous')}
+            </Button>
+          )}
 
-        {stepIndex === steps.length - 1 ? (
-          <Button onClick={finishedButtonClickHandler}>
-            {t('actions.finish')}
-          </Button>
-        ) : (
-          <Button
-            isPending={state.isPending}
-            disabled={!state.isValid}
-            onClick={nextButtonClickHandler}
-          >
-            {t('actions.next')}
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+          {stepIndex === steps.length - 1 ? (
+            <Button onClick={finishedButtonClickHandler}>
+              {t('actions.finish')}
+            </Button>
+          ) : (
+            <Button
+              isPending={state.isPending}
+              disabled={!state.isValid}
+              onClick={nextButtonClickHandler}
+            >
+              {t('actions.next')}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

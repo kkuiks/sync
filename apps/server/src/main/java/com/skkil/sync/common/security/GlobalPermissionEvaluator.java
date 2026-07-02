@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class GlobalPermissionEvaluator implements PermissionEvaluator {
 
-  private Map<PermissionEvaluatorType, CustomPermissionEvaluator> evaluators;
+  private Map<PermissionEvaluatorType, CustomPermissionEvaluator<?>> evaluators;
 
-  public GlobalPermissionEvaluator(List<CustomPermissionEvaluator> evaluators) {
+  public GlobalPermissionEvaluator(List<CustomPermissionEvaluator<?>> evaluators) {
     this.evaluators =
         evaluators.stream()
             .collect(Collectors.toMap(CustomPermissionEvaluator::type, Function.identity()));
@@ -53,7 +53,16 @@ public class GlobalPermissionEvaluator implements PermissionEvaluator {
       user = (AuthenticatedUser) authentication.getPrincipal();
     }
 
-    return evaluator.hasPermission(
-        user, (Long) targetId, PermissionOperation.valueOf(permission.toString()));
+    return invokeHasPermission(
+        evaluator, user, targetId, PermissionOperation.valueOf(permission.toString()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends Serializable> boolean invokeHasPermission(
+      CustomPermissionEvaluator<T> evaluator,
+      AuthenticatedUser user,
+      Serializable targetId,
+      PermissionOperation permission) {
+    return evaluator.hasPermission(user, (T) targetId, permission);
   }
 }

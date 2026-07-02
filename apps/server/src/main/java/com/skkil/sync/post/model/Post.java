@@ -58,6 +58,9 @@ public class Post extends BaseEntity {
   @Column(name = "like_count", nullable = false)
   private int likeCount = 0;
 
+  @Column(name = "resolved", nullable = false)
+  private boolean resolved = false;
+
   @Column(name = "visibility", nullable = false)
   @Enumerated(EnumType.STRING)
   private PostVisibility visibility = PostVisibility.VISIBLE;
@@ -134,5 +137,9 @@ public class Post extends BaseEntity {
     this.hiddenBy = reviewer;
     this.hiddenReason = reason;
     this.hiddenAt = Instant.now();
+  }
+
+  public void resolve() {
+    this.resolved = true;
   }
 }

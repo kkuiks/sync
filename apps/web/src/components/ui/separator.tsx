@@ -25,4 +25,18 @@ function Separator({
   );
 }
 
-export { Separator };
+interface SeparatorWithTextProps {
+  children?: React.ReactNode;
+}
+
+function SeparatorWithText({ children }: SeparatorWithTextProps) {
+  return (
+    <div className="relative flex items-center">
+      <Separator className="flex-1" />
+      <span className="px-3 text-xs text-muted-foreground">{children}</span>
+      <Separator className="flex-1" />
+    </div>
+  );
+}
+
+export { Separator, SeparatorWithText };

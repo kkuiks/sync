@@ -22,7 +22,7 @@ export default function WorkspaceSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-10">
+    <div className="space-y-7">
       <div>
         <h2 className="text-lg font-semibold">워크스페이스 설정</h2>
         <p className="text-sm text-muted-foreground">

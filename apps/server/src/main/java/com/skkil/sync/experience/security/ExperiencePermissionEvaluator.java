@@ -9,7 +9,7 @@ import com.skkil.sync.experience.repository.ExperienceRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExperiencePermissionEvaluator implements CustomPermissionEvaluator {
+public class ExperiencePermissionEvaluator implements CustomPermissionEvaluator<Long> {
 
   private final ExperienceRepository experienceRepository;
 

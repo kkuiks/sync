@@ -18,9 +18,9 @@ import {
   useUpdateProfile,
 } from '@/api/__generated__/profile/profile';
 import { uploadFileToS3 } from '@/api/s3';
+import { ContactFields } from '@/components/feature/profile/contacts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Dialog,
   DialogClose,
@@ -46,7 +46,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import { ContactFields } from '@/features/profile/util/contacts';
 import { useFollowUserMutation } from '@/features/user/api/follow-user';
 import { useUnfollowUserMutation } from '@/features/user/api/unfollow-user';
 import { useSession } from '@/lib/auth/client';
@@ -76,24 +75,28 @@ export default function ProfileOverview({ handle }: ProfileOverviewProps) {
   }, [error, isError]);
 
   if (!profile) {
-    return <Skeleton className="min-h-96 p-0" />;
+    return <Skeleton className="h-56 w-full" />;
   }
 
   return (
-    <Card className="min-h-96 p-0">
-      <CardHeader className="relative h-48 bg-muted">
-        <Avatar className="h-32 w-32 absolute left-8 -bottom-16">
+    <section className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <Avatar className="h-28 w-28 border">
           <AvatarImage src={profile.data.profileImageUrl ?? undefined} />
           <AvatarFallback></AvatarFallback>
         </Avatar>
-      </CardHeader>
 
-      {profile && (
-        <CardContent className="my-10 mx-4">
-          <div className="flex justify-between items-center">
+        <div className="flex flex-1 flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-1">
-              <h2 className="text-3xl font-bold mt-3">{profile.data.name}</h2>
-              <p>{profile.data.profession}</p>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {profile.data.name}
+              </h2>
+              {profile.data.profession && (
+                <p className="text-muted-foreground">
+                  {profile.data.profession}
+                </p>
+              )}
             </div>
 
             <div className="h-9">
@@ -114,29 +117,23 @@ export default function ProfileOverview({ handle }: ProfileOverviewProps) {
             </div>
           </div>
 
-          <div className="flex flex-col-reverse md:flex-row md:justify-between mt-2 gap-4">
-            {profile.data.bio && (
-              <div className="border-black border-l-2 p-2 w-96 text-pretty break-words">
-                {profile.data.bio}
-              </div>
-            )}
+          {profile.data.bio && (
+            <p className="max-w-2xl text-pretty break-words leading-relaxed text-foreground/90">
+              {profile.data.bio}
+            </p>
+          )}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col">
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <p>
-                    <EnvelopeIcon />
-                  </p>
-                  <p>{profile.data.email}</p>
-                </div>
-
-                <ProfileContacts handle={handle} />
-              </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <EnvelopeIcon />
+              <p>{profile.data.email}</p>
             </div>
+
+            <ProfileContacts handle={handle} />
           </div>
-        </CardContent>
-      )}
-    </Card>
+        </div>
+      </div>
+    </section>
   );
 }
 

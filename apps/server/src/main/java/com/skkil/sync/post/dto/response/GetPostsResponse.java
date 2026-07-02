@@ -24,6 +24,7 @@ public record GetPostsResponse(CursorPaginationResponse<Post> posts) {
       Author author,
       @Nullable Project project,
       String content,
+      boolean resolved,
       OffsetDateTime createdAt) {}
 
   public static record Author(String name, String handle) {}

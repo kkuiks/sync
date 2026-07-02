@@ -1,3 +1,5 @@
+// TODO: 이 파일 지우기
+
 export function TripleColumnLayout({
   left,
   right,

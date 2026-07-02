@@ -9,19 +9,18 @@ import {
   getGetAuthenticatedUserQueryKey,
   useUpdateProfile,
 } from '@/api/__generated__/profile/profile';
+import { useGetHandleAvailability } from '@/api/__generated__/user/user';
 import { FieldError } from '@/components/ui/field';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from '@/components/ui/input-group';
-import { useGetHandleAvailabilityQuery } from '@/features/user/api/get-handle-availability';
-import {
-  MAXIMUM_HANDLE_LENGTH,
-  MINIMUM_HANDLE_LENGTH,
-} from '@/features/user/constants/handle';
 
 import { OnboardingStepContentProps, OnboardingStepContentRef } from '../page';
+
+const MAXIMUM_HANDLE_LENGTH = 255;
+const MINIMUM_HANDLE_LENGTH = 6;
 
 export const ChooseHandle = forwardRef<
   OnboardingStepContentRef,
@@ -56,15 +55,25 @@ export const ChooseHandle = forwardRef<
     },
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const handle = form.watch('handle');
 
   const debouncedHandle = useDebounce(handle, 500);
 
   const {
-    data: handleAvailability,
-    isFetching: isGetHandleAvailabilityPending,
-  } = useGetHandleAvailabilityQuery(debouncedHandle);
+    data: handleAvailabilityData,
+    isPending: isGetHandleAvailabilityPending,
+  } = useGetHandleAvailability(
+    {
+      handle: debouncedHandle,
+    },
+    {
+      query: {
+        enabled:
+          debouncedHandle.length >= MINIMUM_HANDLE_LENGTH &&
+          debouncedHandle.length <= MAXIMUM_HANDLE_LENGTH,
+      },
+    },
+  );
 
   const { mutate: updateProfile } = useUpdateProfile({
     mutation: {
@@ -77,8 +86,10 @@ export const ChooseHandle = forwardRef<
   });
 
   useEffect(() => {
-    if (handleAvailability) {
-      if (!handleAvailability.available) {
+    if (handleAvailabilityData) {
+      const { available } = handleAvailabilityData.data;
+
+      if (!available) {
         form.setError('handle', {
           message: t('form.errors.handle_in_use'),
         });
@@ -88,7 +99,7 @@ export const ChooseHandle = forwardRef<
     }
 
     const isValid =
-      form.formState.isValid && handleAvailability?.available === true;
+      form.formState.isValid && handleAvailabilityData?.data.available === true;
 
     onStateChange({
       isPending: isGetHandleAvailabilityPending || handle !== debouncedHandle,
@@ -97,7 +108,7 @@ export const ChooseHandle = forwardRef<
   }, [
     t,
     isGetHandleAvailabilityPending,
-    handleAvailability,
+    handleAvailabilityData,
     form,
     handle,
     debouncedHandle,

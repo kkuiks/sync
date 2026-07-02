@@ -1,11 +1,18 @@
 'use client';
 
-import { CompassIcon, HouseIcon, NotePencilIcon } from '@phosphor-icons/react';
+import {
+  BookmarkSimpleIcon,
+  CompassIcon,
+  HouseIcon,
+  NotePencilIcon,
+  PlusIcon,
+} from '@phosphor-icons/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useSearchMyProjects } from '@/api/__generated__/project/project';
+import { Button } from '@/components/ui/button';
 import {
   SidebarContent,
   SidebarFooter,
@@ -20,6 +27,7 @@ import {
 } from '@/components/ui/sidebar';
 import { isAuthenticated } from '@/lib/auth';
 import { useSession } from '@/lib/auth/client';
+import ROUTES from '@/util/routes';
 
 import SidebarCloseButton from './SidebarCloseButton';
 
@@ -35,6 +43,12 @@ const global = [
     label: 'New Post',
     href: '/posts/new',
     icon: NotePencilIcon,
+    authenticated: true,
+  },
+  {
+    label: 'Bookmarks',
+    href: '/bookmarks',
+    icon: BookmarkSimpleIcon,
     authenticated: true,
   },
 ];
@@ -104,12 +118,20 @@ export default function PersonalSidebarContent() {
             <SidebarSeparator />
             <SidebarGroup>
               <SidebarGroupLabel asChild>
-                <Link
-                  href="/projects"
-                  className="hover:text-sidebar-foreground"
-                >
-                  Workspaces
-                </Link>
+                <div className="flex">
+                  <Link
+                    href="/projects"
+                    className="grow hover:text-sidebar-foreground"
+                  >
+                    Workspaces
+                  </Link>
+
+                  <Button variant="ghost" asChild>
+                    <Link href={ROUTES.NEW_PROJECT()}>
+                      <PlusIcon />
+                    </Link>
+                  </Button>
+                </div>
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
