@@ -157,9 +157,6 @@ export default function PostEditor({
           <Badge variant="secondary" className="shrink-0">
             {scopeLabel}
           </Badge>
-          <span className="truncate text-sm text-muted-foreground">
-            {t('status.ready')}
-          </span>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0 sm:items-center">
           <Button
