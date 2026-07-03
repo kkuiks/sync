@@ -47,9 +47,11 @@ public class PostQueryController {
   @GetMapping("/projects/{handle}/posts")
   @ResponseStatus(HttpStatus.OK)
   public GetPostsResponse getPostsByProject(
+      @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable String handle,
       @RequestParam(required = false) PostType type,
       @Validated CursorPaginationRequest pagination) {
-    return postQueryService.getPostsByProject(handle, type, pagination);
+    return postQueryService.getPostsByProject(
+        user == null ? null : user.userId(), handle, type, pagination);
   }
 }

@@ -73,11 +73,13 @@ public class PostQueryService {
 
   @Transactional(readOnly = true)
   public GetPostsResponse getPostsByProject(
-      String handle, PostType type, CursorPaginationRequest pagination) {
+      Long requesterId, String handle, PostType type, CursorPaginationRequest pagination) {
     var posts =
         paginationService
             .paginate(
-                postQueryRepository.getPostsByProject(handle, type), paginationProvider, pagination)
+                postQueryRepository.getPostsByProject(requesterId, handle, type),
+                paginationProvider,
+                pagination)
             .map(postMapper::toPostResponse);
 
     return new GetPostsResponse(posts);

@@ -23,7 +23,12 @@ import ROUTES from '@/util/routes';
 
 import { ImageNode } from '../editor/extensions/nodes/image';
 import { deserialize } from '../editor/utils/serializer';
-import { PostScope, PostStatus, PostType } from '../types/post';
+import {
+  PostScope,
+  PostStatus,
+  PostType,
+  isPublicPublishedPost,
+} from '../types/post';
 import { PostCardActions } from './components/PostCardActions';
 import { PostTypeBadge } from './components/PostTypeBadge';
 import { PostBody } from './variants/PostBody';
@@ -71,6 +76,7 @@ export default function PostPreview({
       enabled: !!project,
     },
   });
+  const showActions = isPublicPublishedPost(scope, status);
 
   const handleClickCard = () => {
     if (projectData?.data) {
@@ -104,12 +110,14 @@ export default function PostPreview({
           editor={editor}
           className={type === PostType.LONG ? 'line-clamp-6' : undefined}
         />
-        <PostCardActions
-          postId={id}
-          likeCount={likeCount}
-          commentCount={commentCount}
-          bookmarked={bookmarked}
-        />
+        {showActions && (
+          <PostCardActions
+            postId={id}
+            likeCount={likeCount}
+            commentCount={commentCount}
+            bookmarked={bookmarked}
+          />
+        )}
       </CardContent>
     </Card>
   );

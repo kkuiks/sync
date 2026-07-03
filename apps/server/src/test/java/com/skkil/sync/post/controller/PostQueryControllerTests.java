@@ -146,7 +146,7 @@ class PostQueryControllerTests {
         CursorPaginationRequestSnippets.getCursorPaginationRequest();
     GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
 
-    when(postQueryService.getPostsByProject(handle, type, pagination)).thenReturn(response);
+    when(postQueryService.getPostsByProject(null, handle, type, pagination)).thenReturn(response);
 
     mockMvc
         .perform(

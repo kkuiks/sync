@@ -17,7 +17,7 @@ public record CreatePostRequest(
     PostStatus status,
     @Valid @NotNull Content content,
     List<String> tags,
-    Project project) {
+    @Valid Project project) {
 
   public static record Content(String text, @NotBlank String json, List<Long> mediaIds) {}
 

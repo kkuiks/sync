@@ -21,7 +21,12 @@ import { RelativeTime } from '@/components/ui/relative-time';
 
 import { ImageNode } from '../editor/extensions/nodes/image';
 import { deserialize } from '../editor/utils/serializer';
-import { PostScope, PostStatus, PostType } from '../types/post';
+import {
+  PostScope,
+  PostStatus,
+  PostType,
+  isPublicPublishedPost,
+} from '../types/post';
 import { PostCardActions } from './components/PostCardActions';
 import { PostTypeBadge } from './components/PostTypeBadge';
 import { ReportPostDialog } from './components/ReportPostDialog';
@@ -62,6 +67,7 @@ export default function PostCard({
     editable: false,
     immediatelyRender: false,
   });
+  const showActions = isPublicPublishedPost(scope, status);
 
   return (
     <Card>
@@ -88,12 +94,14 @@ export default function PostCard({
           editor={editor}
           className={type === PostType.LONG ? 'line-clamp-4' : undefined}
         />
-        <PostCardActions
-          postId={id}
-          likeCount={likeCount}
-          commentCount={commentCount}
-          bookmarked={bookmarked}
-        />
+        {showActions && (
+          <PostCardActions
+            postId={id}
+            likeCount={likeCount}
+            commentCount={commentCount}
+            bookmarked={bookmarked}
+          />
+        )}
       </CardContent>
     </Card>
   );
