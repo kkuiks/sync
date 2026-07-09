@@ -1,7 +1,7 @@
 package com.skkil.sync.post.listener;
 
 import com.skkil.sync.post.dto.data.PostSummaryDto;
-import com.skkil.sync.post.event.PostCreatedEvent;
+import com.skkil.sync.post.event.PostContentChangedEvent;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.repository.PostRepository;
@@ -22,7 +22,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @Slf4j
-public class PostCreatedEventListener {
+public class PostContentChangedEventListener {
 
   private static final int MINIMUM_SUMMARIZABLE_CONTENT_LENGTH = 200;
 
@@ -32,7 +32,7 @@ public class PostCreatedEventListener {
   private final PostRepository postRepository;
   private final ChatModel chatModel;
 
-  public PostCreatedEventListener(PostRepository postRepository, ChatModel chatModel) {
+  public PostContentChangedEventListener(PostRepository postRepository, ChatModel chatModel) {
     this.postRepository = postRepository;
     this.chatModel = chatModel;
   }
@@ -40,11 +40,16 @@ public class PostCreatedEventListener {
   @Async
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   @TransactionalEventListener
-  public void createPostSummary(PostCreatedEvent event) {
-    log.debug("Handling PostCreatedEvent {}", event.getPostId());
+  public void refreshPostSummary(PostContentChangedEvent event) {
+    log.debug("Handling PostContentChangedEvent {}", event.getPostId());
 
     if (event.getContent().trim().length() <= MINIMUM_SUMMARIZABLE_CONTENT_LENGTH) {
       log.debug("Skipping summary for short post {}", event.getPostId());
+      Post post =
+          postRepository
+              .findById(event.getPostId())
+              .orElseThrow(() -> new PostNotFoundException(event.getPostId()));
+      post.updateSummary(null);
       return;
     }
 

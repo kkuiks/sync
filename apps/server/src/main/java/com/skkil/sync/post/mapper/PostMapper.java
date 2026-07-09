@@ -20,9 +20,10 @@ public interface PostMapper {
 
   @Mappings({
     @Mapping(target = "json", source = "post.content"),
+    @Mapping(target = "tags", source = "tags"),
     @Mapping(target = "media", source = "media")
   })
-  GetPostResponse.Content toContent(PostDto post, List<MediaDto> media);
+  GetPostResponse.Content toContent(PostDto post, List<String> tags, List<MediaDto> media);
 
   @Mapping(target = "handle", source = "projectHandle")
   @Mapping(target = "name", source = "projectName")

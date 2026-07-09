@@ -7,9 +7,11 @@ import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.mapper.PostAssembler;
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostQueryRepository;
 import com.skkil.sync.post.repository.pagination.PostCursorPaginationProvider;
+import com.skkil.sync.post.repository.pagination.PostUpdatedCursorPaginationProvider;
 import com.skkil.sync.user.mapper.UserAssembler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +29,7 @@ public class PostQueryService {
 
   private final PaginationService paginationService;
   private final PostCursorPaginationProvider paginationProvider;
+  private final PostUpdatedCursorPaginationProvider updatedPaginationProvider;
 
   public PostQueryService(
       PostQueryRepository postQueryRepository,
@@ -34,12 +37,14 @@ public class PostQueryService {
       PostAssembler postAssembler,
       UserAssembler userAssembler,
       PostCursorPaginationProvider paginationProvider,
+      PostUpdatedCursorPaginationProvider updatedPaginationProvider,
       PaginationService paginationService) {
     this.postQueryRepository = postQueryRepository;
     this.contentMediaService = contentMediaService;
     this.postAssembler = postAssembler;
     this.userAssembler = userAssembler;
     this.paginationProvider = paginationProvider;
+    this.updatedPaginationProvider = updatedPaginationProvider;
     this.paginationService = paginationService;
   }
 
@@ -65,8 +70,28 @@ public class PostQueryService {
             .orElseThrow(() -> new PostNotFoundException(slug));
 
     var media = contentMediaService.getMediaFilesForPost(post.id());
+    var tags = postQueryRepository.getTagNamesByPostId(post.id());
 
-    return postAssembler.toGetPostResponse(post, media, requesterId);
+    return postAssembler.toGetPostResponse(post, tags, media, requesterId);
+  }
+
+  @Transactional(readOnly = true)
+  @PreAuthorize("isAuthenticated()")
+  public GetPostsResponse getDrafts(
+      Long requesterId, PostType type, PostScope scope, CursorPaginationRequest pagination) {
+    var posts =
+        paginationService
+            .paginate(
+                postQueryRepository.getDraftsByAuthor(requesterId, type, scope),
+                updatedPaginationProvider,
+                pagination)
+            .mapWithLookup(
+                PostDto::authorId,
+                userAssembler::toUserSummaries,
+                (post, authors) ->
+                    postAssembler.toPostResponse(post, authors.get(post.authorId()), requesterId));
+
+    return new GetPostsResponse(posts);
   }
 
   @Transactional(readOnly = true)

@@ -17,7 +17,11 @@ public class GetPostResponseSnippets {
         GetPostResponse.Media.builder().id(1L).url("https://example.com/media.png").build();
 
     GetPostResponse.Content content =
-        GetPostResponse.Content.builder().json("Post Content").media(List.of(media)).build();
+        GetPostResponse.Content.builder()
+            .json("Post Content")
+            .tags(List.of("java", "spring"))
+            .media(List.of(media))
+            .build();
 
     return GetPostResponse.builder()
         .summary(PostSummarySnippets.getPostSummary())
@@ -32,6 +36,7 @@ public class GetPostResponseSnippets {
     fields.add(fieldWithPath("content").type(JsonFieldType.OBJECT).description("Post Content"));
     fields.add(
         fieldWithPath("content.json").type(JsonFieldType.STRING).description("Post Content JSON"));
+    fields.add(fieldWithPath("content.tags").type(JsonFieldType.ARRAY).description("태그 목록"));
     fields.add(
         fieldWithPath("content.media")
             .type(JsonFieldType.ARRAY)

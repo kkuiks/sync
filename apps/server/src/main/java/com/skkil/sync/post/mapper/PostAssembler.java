@@ -23,12 +23,13 @@ public class PostAssembler {
     this.userAssembler = userAssembler;
   }
 
-  public GetPostResponse toGetPostResponse(PostDto post, List<MediaDto> media, Long requesterId) {
+  public GetPostResponse toGetPostResponse(
+      PostDto post, List<String> tags, List<MediaDto> media, Long requesterId) {
     UserSummary author = userAssembler.toUserSummary(post.authorId());
 
     return GetPostResponse.builder()
         .summary(toPostSummary(post, author, requesterId))
-        .content(postMapper.toContent(post, media))
+        .content(postMapper.toContent(post, tags, media))
         .build();
   }
 

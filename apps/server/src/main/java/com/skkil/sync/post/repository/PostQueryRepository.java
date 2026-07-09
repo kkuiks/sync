@@ -2,13 +2,16 @@ package com.skkil.sync.post.repository;
 
 import static com.skkil.sync.jooq.tables.PostBookmarks.POST_BOOKMARKS;
 import static com.skkil.sync.jooq.tables.PostLikes.POST_LIKES;
+import static com.skkil.sync.jooq.tables.PostTags.POST_TAGS;
 import static com.skkil.sync.jooq.tables.Posts.POSTS;
 import static com.skkil.sync.jooq.tables.Projects.PROJECTS;
+import static com.skkil.sync.jooq.tables.Tags.TAGS;
 import static com.skkil.sync.jooq.tables.Teammates.TEAMMATES;
 import static com.skkil.sync.jooq.tables.Users.USERS;
 
 import com.skkil.sync.common.util.pagination.interfaces.CursorPaginationDataFetcher;
 import com.skkil.sync.post.dto.data.PostDto;
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.model.PostVisibility;
@@ -94,6 +97,34 @@ public class PostQueryRepository {
     };
   }
 
+  public CursorPaginationDataFetcher<PostDto> getDraftsByAuthor(
+      Long requesterId, PostType type, PostScope scope) {
+    return (condition, orderFields, size) -> {
+      Condition draftCondition =
+          condition
+              .and(POSTS.AUTHOR_ID.eq(requesterId))
+              .and(POSTS.STATUS.eq(PostStatus.DRAFT.name()))
+              .and(visibleCondition());
+
+      if (type != null) {
+        draftCondition = draftCondition.and(POSTS.POST_TYPE.eq(type.name()));
+      }
+
+      if (scope != null) {
+        draftCondition = draftCondition.and(POSTS.SCOPE.eq(scope.name()));
+      }
+
+      return dsl.select(post(requesterId))
+          .from(POSTS)
+          .leftJoin(PROJECTS)
+          .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
+          .where(draftCondition)
+          .orderBy(orderFields)
+          .limit(size)
+          .fetchInto(PostDto.class);
+    };
+  }
+
   public CursorPaginationDataFetcher<PostDto> getBookmarkedPosts(
       Long userId, String projectHandle) {
     return (condition, orderFields, size) -> {
@@ -148,7 +179,22 @@ public class PostQueryRepository {
     return getPostsByIds(
         requesterId,
         ids,
-        POSTS.ID.in(ids).and(publicPublishedCondition()).and(PROJECTS.HANDLE.eq(projectHandle)));
+        POSTS
+            .ID
+            .in(ids)
+            .and(workspacePublishedCondition())
+            .and(workspaceReadableCondition(requesterId))
+            .and(PROJECTS.HANDLE.eq(projectHandle)));
+  }
+
+  public List<String> getTagNamesByPostId(Long postId) {
+    return dsl.select(TAGS.NAME)
+        .from(POST_TAGS)
+        .join(TAGS)
+        .on(POST_TAGS.TAG_ID.eq(TAGS.ID))
+        .where(POST_TAGS.POST_ID.eq(postId))
+        .orderBy(POST_TAGS.ID.asc())
+        .fetch(TAGS.NAME);
   }
 
   private List<PostDto> getPostsByIds(Long requesterId, List<Long> ids, Condition condition) {
@@ -201,6 +247,7 @@ public class PostQueryRepository {
         POSTS.ID.as("id"),
         POSTS.POST_TYPE.as("type"),
         POSTS.STATUS.as("status"),
+        POSTS.SCOPE.as("scope"),
         POSTS.SLUG.as("slug"),
         POSTS.TITLE.as("title"),
         POSTS.AUTHOR_ID.as("authorId"),
@@ -227,13 +274,13 @@ public class PostQueryRepository {
 
   private Condition publicPublishedCondition() {
     return visibleCondition()
-        .and(POSTS.PROJECT_ID.isNull())
+        .and(POSTS.SCOPE.eq(PostScope.PUBLIC.name()))
         .and(POSTS.STATUS.eq(PostStatus.PUBLISHED.name()));
   }
 
   private Condition workspacePublishedCondition() {
     return visibleCondition()
-        .and(POSTS.PROJECT_ID.isNotNull())
+        .and(POSTS.SCOPE.eq(PostScope.WORKSPACE.name()))
         .and(POSTS.STATUS.eq(PostStatus.PUBLISHED.name()));
   }
 

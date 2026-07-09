@@ -1,6 +1,6 @@
 package com.skkil.sync.post.service;
 
-import com.skkil.sync.post.event.PostCreatedEvent;
+import com.skkil.sync.post.event.PostContentChangedEvent;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.model.PostEmbedding;
 import com.skkil.sync.post.repository.PostEmbeddingRepository;
@@ -31,13 +31,17 @@ public class PostEmbeddingService {
 
   @Async
   @TransactionalEventListener
-  public void createPostEmbeddings(PostCreatedEvent event) {
+  public void refreshPostEmbeddings(PostContentChangedEvent event) {
     Post post = postRepository.getReferenceById(event.getPostId());
 
     Document document = Document.builder().text(event.getContent()).build();
     float[] embedding = embeddingModel.embed(document);
 
-    PostEmbedding postEmbedding = PostEmbedding.builder().post(post).embedding(embedding).build();
+    PostEmbedding postEmbedding =
+        embeddingRepository
+            .findByPostId(post.getId())
+            .orElseGet(() -> PostEmbedding.builder().post(post).embedding(embedding).build());
+    postEmbedding.updateEmbedding(embedding);
     embeddingRepository.save(postEmbedding);
   }
 

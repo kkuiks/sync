@@ -1,5 +1,6 @@
 package com.skkil.sync.post.dto.request;
 
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ public record CreatePostRequest(
     String title,
     @NotNull PostType type,
     PostStatus status,
+    PostScope scope,
     @Valid @NotNull Content content,
     List<String> tags,
     @Valid Project project) {

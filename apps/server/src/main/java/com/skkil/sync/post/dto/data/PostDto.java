@@ -1,5 +1,6 @@
 package com.skkil.sync.post.dto.data;
 
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.time.OffsetDateTime;
@@ -9,6 +10,7 @@ public record PostDto(
     Long id,
     PostType type,
     PostStatus status,
+    PostScope scope,
     String slug,
     @Nullable String title,
     Long authorId,

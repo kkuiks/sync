@@ -20,6 +20,7 @@ import com.skkil.sync.common.util.pagination.snippets.CursorPaginationRequestSni
 import com.skkil.sync.config.SecurityConfig;
 import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.service.PostQueryService;
 import com.skkil.sync.post.snippets.GetPostResponseSnippets;
@@ -75,6 +76,46 @@ class PostQueryControllerTests {
                 null,
                 Function.identity(),
                 CursorPaginationRequestSnippets.getCursorPaginationRequestParameters(),
+                GetPostsResponseSnippets.getPostsResponseFields()));
+  }
+
+  @Test
+  @DisplayName("[getDrafts] API 문서화 테스트")
+  @WithAuthenticatedUser
+  void getDrafts() throws Exception {
+    AuthenticatedUser user = WithAuthenticatedUserSecurityContextFactory.getAuthenticatedUser();
+    PostType type = PostType.LONG;
+    PostScope scope = PostScope.PUBLIC;
+
+    CursorPaginationRequest pagination =
+        CursorPaginationRequestSnippets.getCursorPaginationRequest();
+    GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
+
+    when(postQueryService.getDrafts(eq(user.userId()), eq(type), eq(scope), eq(pagination)))
+        .thenReturn(response);
+
+    mockMvc
+        .perform(
+            get("/posts/drafts")
+                .queryParam("type", type.name())
+                .queryParam("scope", scope.name())
+                .queryParams(
+                    CursorPaginationRequestSnippets.getCursorPaginationRequestQueryParams()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "GetDraftPosts",
+                ResourceSnippetParameters.builder()
+                    .tag("post")
+                    .summary("Get Draft Posts")
+                    .description("Get Draft Posts")
+                    .responseSchema(schema("GetPostsResponse")),
+                null,
+                null,
+                Function.identity(),
+                CursorPaginationRequestSnippets.getCursorPaginationRequestParameters()
+                    .and(parameterWithName("type").description("게시글 타입").optional())
+                    .and(parameterWithName("scope").description("게시글 공개 범위").optional()),
                 GetPostsResponseSnippets.getPostsResponseFields()));
   }
 

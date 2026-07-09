@@ -32,8 +32,33 @@ public class TagService {
 
   @Transactional
   public void addTagsToPost(Post post, List<String> tags) {
-    if (tags == null || tags.isEmpty()) {
+    List<String> filteredTags = normalizeTags(tags);
+    if (filteredTags.isEmpty()) {
       return;
+    }
+
+    addNormalizedTagsToPost(post, filteredTags);
+  }
+
+  @Transactional
+  public void replaceTags(Post post, List<String> tags) {
+    List<PostTag> currentTags = List.copyOf(post.getTags());
+    for (PostTag postTag : currentTags) {
+      tagRepository.decrementPostCount(postTag.getTag());
+    }
+    post.getTags().clear();
+
+    List<String> filteredTags = normalizeTags(tags);
+    if (filteredTags.isEmpty()) {
+      return;
+    }
+
+    addNormalizedTagsToPost(post, filteredTags);
+  }
+
+  private static List<String> normalizeTags(List<String> tags) {
+    if (tags == null || tags.isEmpty()) {
+      return List.of();
     }
 
     List<String> filteredTags =
@@ -48,6 +73,10 @@ public class TagService {
       throw new PostTagLimitExceededException();
     }
 
+    return filteredTags;
+  }
+
+  private void addNormalizedTagsToPost(Post post, List<String> filteredTags) {
     for (String name : filteredTags) {
       Tag tag =
           tagRepository

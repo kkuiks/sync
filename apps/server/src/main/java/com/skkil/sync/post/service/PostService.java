@@ -6,11 +6,12 @@ import com.skkil.sync.post.dto.request.CreatePostRequest;
 import com.skkil.sync.post.dto.request.UpdatePostRequest;
 import com.skkil.sync.post.dto.request.UpdatePostSummaryRequest;
 import com.skkil.sync.post.dto.response.CreatePostResponse;
-import com.skkil.sync.post.event.PostCreatedEvent;
+import com.skkil.sync.post.event.PostContentChangedEvent;
 import com.skkil.sync.post.exception.InvalidPostPublishRequestException;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.model.PostMediaFile;
+import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostMediaFileRepository;
@@ -60,7 +61,8 @@ public class PostService {
   @Transactional
   public CreatePostResponse createPost(Long authorId, CreatePostRequest request) {
     PostStatus status = resolveStatus(request);
-    validateCreatePostRequest(request, status);
+    PostScope scope = resolveScope(request);
+    validateCreatePostRequest(request, status, scope);
 
     User author = userDomainService.getUserReference(authorId);
 
@@ -75,10 +77,11 @@ public class PostService {
             .author(author)
             .type(request.type())
             .status(status)
+            .scope(scope)
             .title(request.title())
             .content(request.content().json());
 
-    if (request.project() != null) {
+    if (scope == PostScope.WORKSPACE) {
       Project project = projectDomainService.getProjectByHandle(request.project().handle());
       postBuilder.project(project);
     }
@@ -98,7 +101,8 @@ public class PostService {
     }
 
     if (post.isPublished() && post.isPublic()) {
-      eventPublisher.publishEvent(new PostCreatedEvent(post.getId(), request.content().text()));
+      eventPublisher.publishEvent(
+          new PostContentChangedEvent(post.getId(), request.content().text()));
     }
 
     return new CreatePostResponse(post.getSlug());
@@ -108,17 +112,46 @@ public class PostService {
     return request.status() == null ? PostStatus.PUBLISHED : request.status();
   }
 
-  private static void validateCreatePostRequest(CreatePostRequest request, PostStatus status) {
+  private static PostScope resolveScope(CreatePostRequest request) {
+    if (request.scope() != null) {
+      return request.scope();
+    }
+
+    return request.project() == null ? PostScope.PUBLIC : PostScope.WORKSPACE;
+  }
+
+  private static void validateCreatePostRequest(
+      CreatePostRequest request, PostStatus status, PostScope scope) {
+    validateScopeProject(scope, request.project());
+    validatePublishablePost(request.title(), request.type(), request.tags(), status);
+  }
+
+  private static void validateUpdatePostRequest(UpdatePostRequest request) {
+    validatePublishablePost(request.title(), request.type(), request.tags(), request.status());
+  }
+
+  private static void validateScopeProject(PostScope scope, CreatePostRequest.Project project) {
+    if (scope == PostScope.PUBLIC && project != null) {
+      throw new InvalidPostPublishRequestException("공개 게시글은 프로젝트에 연결할 수 없습니다.");
+    }
+
+    if (scope == PostScope.WORKSPACE && project == null) {
+      throw new InvalidPostPublishRequestException("워크스페이스 게시글에는 프로젝트가 필요합니다.");
+    }
+  }
+
+  private static void validatePublishablePost(
+      String title, PostType type, List<String> tags, PostStatus status) {
     if (status != PostStatus.PUBLISHED) {
       return;
     }
 
-    if (requiresTitle(request.type()) && isBlank(request.title())) {
+    if (requiresTitle(type) && isBlank(title)) {
       throw new InvalidPostPublishRequestException(
           "Published article and question posts require a title.");
     }
 
-    if (!hasPublishableTags(request.tags())) {
+    if (!hasPublishableTags(tags)) {
       throw new InvalidPostPublishRequestException("Published posts require at least one tag.");
     }
   }
@@ -148,8 +181,28 @@ public class PostService {
   public void updatePost(Long postId, UpdatePostRequest request) {
     Post post =
         postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+    boolean wasPublished = post.isPublished();
 
-    post.updateContent(request.content());
+    validateUpdatePostRequest(request);
+
+    List<Media> mediaFiles =
+        contentMediaService.resolveMediaFilesForUpdate(
+            post.getAuthor().getId(), post.getId(), request.content().mediaIds());
+
+    post.update(request.title(), request.type(), request.status(), request.content().json());
+    tagService.replaceTags(post, request.tags());
+    contentMediaService.replaceMediaFiles(post, mediaFiles);
+
+    if (!wasPublished && post.isPublished()) {
+      postRepository.incrementActivityCount(
+          post.getAuthor().getId(),
+          LocalDate.ofInstant(post.getCreatedAt(), ZoneId.systemDefault()));
+    }
+
+    if (post.isPublished() && post.isPublic()) {
+      eventPublisher.publishEvent(
+          new PostContentChangedEvent(post.getId(), request.content().text()));
+    }
   }
 
   @Transactional
