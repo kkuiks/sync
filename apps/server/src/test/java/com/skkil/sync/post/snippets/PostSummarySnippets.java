@@ -35,8 +35,6 @@ public class PostSummarySnippets {
         .liked(true)
         .commentCount(1L)
         .bookmarked(true)
-        .bookmarkedAt(DateTimeTestUtils.defaultTestOffsetDateTime())
-        .likedAt(DateTimeTestUtils.defaultTestOffsetDateTime())
         .build();
   }
 
@@ -106,16 +104,6 @@ public class PostSummarySnippets {
         fieldWithPath(prefix + "bookmarked")
             .type(JsonFieldType.BOOLEAN)
             .description("Whether the current user bookmarked this post"));
-    fields.add(
-        fieldWithPath(prefix + "bookmarkedAt")
-            .type(JsonFieldType.STRING)
-            .description("Bookmarked At")
-            .optional());
-    fields.add(
-        fieldWithPath(prefix + "likedAt")
-            .type(JsonFieldType.STRING)
-            .description("Liked At")
-            .optional());
     return fields;
   }
 }

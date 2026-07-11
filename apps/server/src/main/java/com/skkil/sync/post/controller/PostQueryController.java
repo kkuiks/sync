@@ -61,14 +61,35 @@ public class PostQueryController {
         user == null ? null : user.userId(), userId, type, pagination);
   }
 
+  @GetMapping("/users/{userId}/posts/commented")
+  @ResponseStatus(HttpStatus.OK)
+  public GetPostsResponse getCommentedPosts(
+      @AuthenticationPrincipal AuthenticatedUser user,
+      @PathVariable Long userId,
+      @RequestParam(required = false) String projectHandle,
+      @Validated CursorPaginationRequest pagination) {
+    return postQueryService.getCommentedPosts(
+        user == null ? null : user.userId(), userId, projectHandle, pagination);
+  }
+
+  @GetMapping("/tags/{tagId}/posts")
+  @ResponseStatus(HttpStatus.OK)
+  public GetPostsResponse getPostsByTag(
+      @AuthenticationPrincipal AuthenticatedUser user,
+      @PathVariable Long tagId,
+      @Validated CursorPaginationRequest pagination) {
+    return postQueryService.getPostsByTag(user == null ? null : user.userId(), tagId, pagination);
+  }
+
   @GetMapping("/projects/{handle}/posts")
   @ResponseStatus(HttpStatus.OK)
   public GetPostsResponse getPostsByProject(
       @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable String handle,
       @RequestParam(required = false) PostType type,
+      @RequestParam(required = false) String authorHandle,
       @Validated CursorPaginationRequest pagination) {
     return postQueryService.getPostsByProject(
-        user == null ? null : user.userId(), handle, type, pagination);
+        user == null ? null : user.userId(), handle, type, authorHandle, pagination);
   }
 }
