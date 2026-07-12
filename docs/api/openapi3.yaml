@@ -231,64 +231,6 @@ paths:
       responses:
         "204":
           description: "204"
-  /feed/recent:
-    get:
-      tags:
-      - feed
-      summary: Get Recent Feed
-      description: Get Recent Feed
-      operationId: GetRecentFeed
-      parameters:
-      - name: first
-        in: query
-        description: Number of items to return from the beginning of the list
-        required: false
-        schema:
-          type: string
-      - name: after
-        in: query
-        description: "Cursor for pagination, indicating the position after which to\
-          \ return items"
-        required: false
-        schema:
-          type: string
-      - name: last
-        in: query
-        description: Number of items to return from the end of the list
-        required: false
-        schema:
-          type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, indicating the position before which\
-          \ to return items"
-        required: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: "200"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetFeedResponse"
-              examples:
-                GetRecentFeed:
-                  value: "{\r\n  \"items\" : {\r\n    \"pageInfo\" : {\r\n      \"\
-                    size\" : 1,\r\n      \"hasNextPage\" : false,\r\n      \"hasPreviousPage\"\
-                    \ : false,\r\n      \"startCursor\" : \"start-cursor\",\r\n  \
-                    \    \"endCursor\" : \"end-cursor\"\r\n    },\r\n    \"nodes\"\
-                    \ : [ {\r\n      \"cursor\" : \"cursor\",\r\n      \"content\"\
-                    \ : {\r\n        \"id\" : 1,\r\n        \"slug\" : \"test-slug\"\
-                    ,\r\n        \"author\" : {\r\n          \"id\" : 1,\r\n     \
-                    \     \"handle\" : \"user_handle\",\r\n          \"name\" : \"\
-                    User Name\",\r\n          \"profileImageUrl\" : \"https://example.com/profile.jpg\"\
-                    \r\n        },\r\n        \"content\" : \"This is a feed item\
-                    \ content\",\r\n        \"project\" : {\r\n          \"handle\"\
-                    \ : \"project_handle\",\r\n          \"name\" : \"name\"\r\n \
-                    \       },\r\n        \"likeCount\" : 10,\r\n        \"commentCount\"\
-                    \ : 5,\r\n        \"bookmarked\" : true,\r\n        \"createdAt\"\
-                    \ : \"2026-05-04T12:00:00Z\"\r\n      }\r\n    } ]\r\n  }\r\n}"
   /handles/availability:
     get:
       tags:
@@ -396,8 +338,12 @@ paths:
                 $ref: "#/components/schemas/UploadMediaResponse"
               examples:
                 UploadMedia:
-                  value: "{\r\n  \"mediaId\" : \"1\",\r\n  \"uploadUrl\" : \"https://example.com/upload\"\
-                    ,\r\n  \"expiresAt\" : \"1970-01-01T00:00:00\"\r\n}"
+                  value: |-
+                    {
+                      "mediaId" : "1",
+                      "uploadUrl" : "https://example.com/upload",
+                      "expiresAt" : "1970-01-01T00:00:00"
+                    }
   /posts:
     get:
       tags:
@@ -482,7 +428,10 @@ paths:
                 $ref: "#/components/schemas/CreatePostResponse"
               examples:
                 CreatePost:
-                  value: "{\r\n  \"slug\" : \"slug\"\r\n}"
+                  value: |-
+                    {
+                      "slug" : "slug"
+                    }
   /posts/drafts:
     get:
       tags:
@@ -664,30 +613,53 @@ paths:
                 $ref: "#/components/schemas/GetPostRecommendationsResponse"
               examples:
                 GetPostRecommendations:
-                  value: "{\r\n  \"posts\" : {\r\n    \"pageInfo\" : {\r\n      \"\
-                    size\" : 1,\r\n      \"hasNextPage\" : false,\r\n      \"hasPreviousPage\"\
-                    \ : false,\r\n      \"startCursor\" : \"start-cursor\",\r\n  \
-                    \    \"endCursor\" : \"end-cursor\"\r\n    },\r\n    \"nodes\"\
-                    \ : [ {\r\n      \"cursor\" : \"cursor\",\r\n      \"content\"\
-                    \ : {\r\n        \"summary\" : {\r\n          \"id\" : 1,\r\n\
-                    \          \"slug\" : \"test-slug\",\r\n          \"title\" :\
-                    \ \"Test Post Title\",\r\n          \"type\" : \"SHORT\",\r\n\
-                    \          \"status\" : \"PUBLISHED\",\r\n          \"scope\"\
-                    \ : \"WORKSPACE\",\r\n          \"author\" : {\r\n           \
-                    \ \"handle\" : \"john-doe\",\r\n            \"name\" : \"John\
-                    \ Doe\",\r\n            \"profileImageUrl\" : \"https://example.com/john.png\"\
-                    \r\n          },\r\n          \"project\" : {\r\n            \"\
-                    handle\" : \"my-project\",\r\n            \"name\" : \"나의 프로젝트\
-                    \",\r\n            \"description\" : \"프로젝트 설명\",\r\n        \
-                    \    \"website\" : \"https://example.com\",\r\n            \"\
-                    isPublic\" : true,\r\n            \"iconUrl\" : \"https://example.com/icon.png\"\
-                    \r\n          },\r\n          \"resolved\" : false,\r\n      \
-                    \    \"isAuthor\" : false,\r\n          \"createdAt\" : \"1970-01-01T00:00:00Z\"\
-                    ,\r\n          \"updatedAt\" : \"1970-01-01T00:00:00Z\",\r\n \
-                    \         \"likeCount\" : 1,\r\n          \"liked\" : true,\r\n\
-                    \          \"commentCount\" : 1,\r\n          \"bookmarked\" :\
-                    \ true\r\n        },\r\n        \"content\" : \"Post Content\"\
-                    \r\n      }\r\n    } ]\r\n  }\r\n}"
+                  value: |-
+                    {
+                      "posts" : {
+                        "pageInfo" : {
+                          "size" : 1,
+                          "hasNextPage" : false,
+                          "hasPreviousPage" : false,
+                          "startCursor" : "start-cursor",
+                          "endCursor" : "end-cursor"
+                        },
+                        "nodes" : [ {
+                          "cursor" : "cursor",
+                          "content" : {
+                            "summary" : {
+                              "id" : 1,
+                              "slug" : "test-slug",
+                              "title" : "Test Post Title",
+                              "type" : "SHORT",
+                              "status" : "PUBLISHED",
+                              "scope" : "WORKSPACE",
+                              "author" : {
+                                "handle" : "john-doe",
+                                "name" : "John Doe",
+                                "profileImageUrl" : "https://example.com/john.png"
+                              },
+                              "project" : {
+                                "handle" : "my-project",
+                                "name" : "나의 프로젝트",
+                                "description" : "프로젝트 설명",
+                                "website" : "https://example.com",
+                                "isPublic" : true,
+                                "iconUrl" : "https://example.com/icon.png"
+                              },
+                              "resolved" : false,
+                              "isAuthor" : false,
+                              "createdAt" : "1970-01-01T00:00:00Z",
+                              "updatedAt" : "1970-01-01T00:00:00Z",
+                              "likeCount" : 1,
+                              "liked" : true,
+                              "commentCount" : 1,
+                              "bookmarked" : true
+                            },
+                            "content" : "Post Content"
+                          }
+                        } ]
+                      }
+                    }
   /posts/{postId}:
     delete:
       tags:
@@ -3295,122 +3267,6 @@ components:
         theme:
           type: string
           description: User theme preference
-    GetFeedResponse:
-      title: GetFeedResponse
-      type: object
-      properties:
-        items:
-          required:
-          - nodes
-          - pageInfo
-          type: object
-          properties:
-            nodes:
-              type: array
-              description: Nodes
-              items:
-                required:
-                - content
-                - cursor
-                type: object
-                properties:
-                  cursor:
-                    type: string
-                    description: Node Cursor
-                  content:
-                    required:
-                    - author
-                    - bookmarked
-                    - commentCount
-                    - content
-                    - createdAt
-                    - id
-                    - likeCount
-                    - slug
-                    type: object
-                    properties:
-                      createdAt:
-                        type: string
-                        description: Created At
-                      author:
-                        required:
-                        - handle
-                        - id
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Author Name
-                          handle:
-                            type: string
-                            description: Author Handle
-                          id:
-                            type: number
-                            description: Author ID
-                          profileImageUrl:
-                            type: string
-                            description: Author Profile Image URL
-                            nullable: true
-                        description: Author Information
-                      bookmarked:
-                        type: boolean
-                        description: Whether the current user bookmarked this feed
-                          item
-                      project:
-                        required:
-                        - handle
-                        - name
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: Project Name
-                          handle:
-                            type: string
-                            description: Project Handle
-                        description: Project Information
-                      likeCount:
-                        type: number
-                        description: Like Count
-                      id:
-                        type: number
-                        description: Feed Item ID
-                      content:
-                        type: string
-                        description: Content
-                      slug:
-                        type: string
-                        description: Post Slug
-                      commentCount:
-                        type: number
-                        description: Comment Count
-                    description: Node Content
-            pageInfo:
-              required:
-              - hasNextPage
-              - hasPreviousPage
-              - size
-              type: object
-              properties:
-                size:
-                  type: number
-                  description: Page Size
-                hasNextPage:
-                  type: boolean
-                  description: Has Next Page
-                hasPreviousPage:
-                  type: boolean
-                  description: Has Previous Page
-                endCursor:
-                  type: string
-                  description: End Cursor
-                  nullable: true
-                startCursor:
-                  type: string
-                  description: Start Cursor
-                  nullable: true
-              description: Page Info
     GetPostResponse:
       title: GetPostResponse
       required:
