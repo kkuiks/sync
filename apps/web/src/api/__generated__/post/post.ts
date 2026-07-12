@@ -30,6 +30,7 @@ import type {
   CreatePostRequest,
   CreatePostResponse,
   GetCommentedPostsParams,
+  GetDraftPostsParams,
   GetLikedPostsParams,
   GetPostActivitiesParams,
   GetPostActivitiesResponse,
@@ -512,6 +513,358 @@ export const useCreatePost = <TError = ErrorType<unknown>, TContext = unknown>(
 > => {
   return useMutation(getCreatePostMutationOptions(options), queryClient);
 };
+export type getDraftPostsResponse200 = {
+  data: GetPostsResponse;
+  status: 200;
+};
+
+export type getDraftPostsResponseSuccess = getDraftPostsResponse200 & {
+  headers: Headers;
+};
+export type getDraftPostsResponse = getDraftPostsResponseSuccess;
+
+export const getGetDraftPostsUrl = (params?: GetDraftPostsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/posts/drafts?${stringifiedParams}`
+    : `/posts/drafts`;
+};
+
+/**
+ * Get Draft Posts
+ * @summary Get Draft Posts
+ */
+export const getDraftPosts = async (
+  params?: GetDraftPostsParams,
+  options?: RequestInit,
+): Promise<getDraftPostsResponse> => {
+  return api<getDraftPostsResponse>(getGetDraftPostsUrl(params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getGetDraftPostsInfiniteQueryKey = (
+  params?: GetDraftPostsParams,
+) => {
+  return ['infinite', `/posts/drafts`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetDraftPostsQueryKey = (params?: GetDraftPostsParams) => {
+  return [`/posts/drafts`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetDraftPostsInfiniteQueryOptions = <
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    GetDraftPostsParams['after']
+  >,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof getDraftPosts>>,
+        TError,
+        TData,
+        QueryKey,
+        GetDraftPostsParams['after']
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetDraftPostsInfiniteQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    QueryKey,
+    GetDraftPostsParams['after']
+  > = ({ signal, pageParam }) =>
+    getDraftPosts(
+      { ...params, after: pageParam ?? params?.['after'] },
+      { signal, ...requestOptions },
+    );
+
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    TError,
+    TData,
+    QueryKey,
+    GetDraftPostsParams['after']
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetDraftPostsInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDraftPosts>>
+>;
+export type GetDraftPostsInfiniteQueryError = ErrorType<unknown>;
+
+export function useGetDraftPostsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    GetDraftPostsParams['after']
+  >,
+  TError = ErrorType<unknown>,
+>(
+  params: undefined | GetDraftPostsParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof getDraftPosts>>,
+        TError,
+        TData,
+        QueryKey,
+        GetDraftPostsParams['after']
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          TError,
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          QueryKey
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDraftPostsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    GetDraftPostsParams['after']
+  >,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof getDraftPosts>>,
+        TError,
+        TData,
+        QueryKey,
+        GetDraftPostsParams['after']
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          TError,
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          QueryKey
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDraftPostsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    GetDraftPostsParams['after']
+  >,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof getDraftPosts>>,
+        TError,
+        TData,
+        QueryKey,
+        GetDraftPostsParams['after']
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Draft Posts
+ */
+
+export function useGetDraftPostsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    GetDraftPostsParams['after']
+  >,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof getDraftPosts>>,
+        TError,
+        TData,
+        QueryKey,
+        GetDraftPostsParams['after']
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetDraftPostsInfiniteQueryOptions(params, options);
+
+  const query = useInfiniteQuery(
+    queryOptions,
+    queryClient,
+  ) as UseInfiniteQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getGetDraftPostsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDraftPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDraftPosts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetDraftPostsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDraftPosts>>> = ({
+    signal,
+  }) => getDraftPosts(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDraftPosts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetDraftPostsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDraftPosts>>
+>;
+export type GetDraftPostsQueryError = ErrorType<unknown>;
+
+export function useGetDraftPosts<
+  TData = Awaited<ReturnType<typeof getDraftPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params: undefined | GetDraftPostsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDraftPosts>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          TError,
+          Awaited<ReturnType<typeof getDraftPosts>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDraftPosts<
+  TData = Awaited<ReturnType<typeof getDraftPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDraftPosts>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDraftPosts>>,
+          TError,
+          Awaited<ReturnType<typeof getDraftPosts>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDraftPosts<
+  TData = Awaited<ReturnType<typeof getDraftPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDraftPosts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Draft Posts
+ */
+
+export function useGetDraftPosts<
+  TData = Awaited<ReturnType<typeof getDraftPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetDraftPostsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDraftPosts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetDraftPostsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type getLikedPostsResponse200 = {
   data: GetPostsResponse;
   status: 200;

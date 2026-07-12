@@ -6,11 +6,17 @@
  */
 import type { CreatePostRequestContent } from './CreatePostRequestContent';
 import type { CreatePostRequestProject } from './CreatePostRequestProject';
+import type { CreatePostRequestScope } from './CreatePostRequestScope';
 import type { CreatePostRequestStatus } from './CreatePostRequestStatus';
 import type { CreatePostRequestTagsItem } from './CreatePostRequestTagsItem';
 import type { CreatePostRequestType } from './CreatePostRequestType';
 
 export interface CreatePostRequest {
+  /**
+   * 게시글 공개 범위
+   * @nullable
+   */
+  scope?: CreatePostRequestScope;
   /** 프로젝트 */
   project?: CreatePostRequestProject;
   /** Post Type */

@@ -16,10 +16,16 @@ const DEBOUNCE_MS = 300;
 interface TagInputProps {
   tags: string[];
   onChange: (tags: string[]) => void;
+  projectHandle?: string;
   accentRing?: string;
 }
 
-export function TagInput({ tags, onChange, accentRing }: TagInputProps) {
+export function TagInput({
+  tags,
+  onChange,
+  projectHandle,
+  accentRing,
+}: TagInputProps) {
   const t = useTranslations('components.editor.tags');
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +36,7 @@ export function TagInput({ tags, onChange, accentRing }: TagInputProps) {
   const [open, setOpen] = useState(false);
 
   const { data, isFetching } = useSearchTags(
-    { query: debouncedInput },
+    { handle: projectHandle, query: debouncedInput },
     {
       query: {
         enabled: debouncedInput.trim().length > 0,

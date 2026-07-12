@@ -14,6 +14,7 @@ import com.skkil.sync.post.exception.PostTagLimitExceededException;
 import com.skkil.sync.post.exception.TagAlreadyExistsException;
 import com.skkil.sync.post.mapper.TagMapper;
 import com.skkil.sync.post.model.Post;
+import com.skkil.sync.post.model.PostTag;
 import com.skkil.sync.post.model.Tag;
 import com.skkil.sync.post.repository.TagRepository;
 import com.skkil.sync.project.model.Project;
@@ -186,5 +187,95 @@ class TagServiceTests {
         .isInstanceOf(TagAlreadyExistsException.class);
 
     verify(tagRepository, never()).save(any(Tag.class));
+  }
+
+  @Test
+  @DisplayName("[replaceTags] 기존 태그를 유지하는 수정은 태그를 다시 추가하지 않음")
+  void replaceTags_keepsExistingTag_doesNotReAddTag() {
+    Post post = Post.builder().slug("slug").title("제목").content("내용").build();
+    Tag existingTag = Tag.builder().name("java").build();
+    post.addTag(PostTag.builder().post(post).tag(existingTag).build());
+
+    tagService.replaceTags(post, List.of("java"));
+
+    assertThat(post.getTags()).hasSize(1);
+    assertThat(post.getTags().get(0).getTag()).isSameAs(existingTag);
+    verify(tagRepository, never()).findByNameAndProjectIsNull(any(String.class));
+    verify(tagRepository, never()).save(any(Tag.class));
+    verify(tagRepository, never()).incrementPostCount(any(Tag.class));
+    verify(tagRepository, never()).decrementPostCount(any(Tag.class));
+  }
+
+  @Test
+  @DisplayName("[replaceTags] 제거된 태그만 감소시키고 새 전역 태그만 추가")
+  void replaceTags_removesMissingTagsAndAddsNewGlobalTags() {
+    Post post = Post.builder().slug("slug").title("제목").content("내용").build();
+    Tag keptTag = Tag.builder().name("java").build();
+    Tag removedTag = Tag.builder().name("legacy").build();
+    Tag addedTag = Tag.builder().name("spring").build();
+    post.addTag(PostTag.builder().post(post).tag(keptTag).build());
+    post.addTag(PostTag.builder().post(post).tag(removedTag).build());
+
+    when(tagRepository.findByNameAndProjectIsNull("spring")).thenReturn(Optional.of(addedTag));
+
+    tagService.replaceTags(post, List.of("java", "spring"));
+
+    assertThat(post.getTags())
+        .extracting(postTag -> postTag.getTag().getName())
+        .containsExactly("java", "spring");
+    verify(tagRepository, times(1)).decrementPostCount(removedTag);
+    verify(tagRepository, never()).decrementPostCount(keptTag);
+    verify(tagRepository, times(1)).incrementPostCount(addedTag);
+    verify(tagRepository, never()).incrementPostCount(keptTag);
+    verify(tagRepository, never()).findByNameAndProjectIsNull("java");
+    verify(tagRepository, times(1)).findByNameAndProjectIsNull("spring");
+  }
+
+  @Test
+  @DisplayName("[replaceTags] Workspace 글은 프로젝트 범위 태그를 사용")
+  void replaceTags_workspacePost_usesProjectScopedTags() {
+    Project project = Project.builder().handle("workspace").name("Workspace").build();
+    Post post = Post.builder().slug("slug").title("제목").content("내용").project(project).build();
+    Tag addedTag = Tag.builder().name("spring").project(project).build();
+
+    when(tagRepository.findByNameAndProject("spring", project)).thenReturn(Optional.of(addedTag));
+
+    tagService.replaceTags(post, List.of("spring"));
+
+    assertThat(post.getTags()).extracting(postTag -> postTag.getTag()).containsExactly(addedTag);
+    verify(tagRepository, times(1)).findByNameAndProject("spring", project);
+    verify(tagRepository, never()).findByNameAndProjectIsNull(any(String.class));
+    verify(tagRepository, times(1)).incrementPostCount(addedTag);
+  }
+
+  @Test
+  @DisplayName("[replaceTags] 빈 태그 목록이면 기존 태그를 모두 제거")
+  void replaceTags_emptyTags_removesAllTags() {
+    Post post = Post.builder().slug("slug").title("제목").content("내용").build();
+    Tag existingTag = Tag.builder().name("java").build();
+    post.addTag(PostTag.builder().post(post).tag(existingTag).build());
+
+    tagService.replaceTags(post, List.of());
+
+    assertThat(post.getTags()).isEmpty();
+    verify(tagRepository, times(1)).decrementPostCount(existingTag);
+    verify(tagRepository, never()).incrementPostCount(any(Tag.class));
+  }
+
+  @Test
+  @DisplayName("[replaceTags] 태그 제한 초과 시 기존 태그를 변경하지 않음")
+  void replaceTags_tagsExceedLimit_doesNotMutateExistingTags() {
+    Post post = Post.builder().slug("slug").title("제목").content("내용").build();
+    Tag existingTag = Tag.builder().name("java").build();
+    post.addTag(PostTag.builder().post(post).tag(existingTag).build());
+    List<String> tags = List.of("tag1", "tag2", "tag3", "tag4", "tag5", "tag6");
+
+    assertThatThrownBy(() -> tagService.replaceTags(post, tags))
+        .isInstanceOf(PostTagLimitExceededException.class);
+
+    assertThat(post.getTags()).hasSize(1);
+    assertThat(post.getTags().get(0).getTag()).isSameAs(existingTag);
+    verify(tagRepository, never()).decrementPostCount(any(Tag.class));
+    verify(tagRepository, never()).incrementPostCount(any(Tag.class));
   }
 }

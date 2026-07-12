@@ -5,30 +5,39 @@ import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import type { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
 import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-import { PostStatus, PostType } from '../types/post';
+import { PostScope, PostStatus, PostType } from '../types/post';
 import { EditorBubbleMenu } from './components/EditorBubbleMenu';
 import { EditorTemplates } from './components/EditorTemplates';
 import { PostTypeSelector } from './components/PostTypeSelector';
 import { TagInput } from './components/TagInput';
 import { CommandsExtension } from './extensions/commands';
 import { ImageNode } from './extensions/nodes/image';
-import { serialize } from './utils/serializer';
+import { deserialize, serialize } from './utils/serializer';
 
 interface PostEditorProps {
+  isEditing?: boolean;
   type: PostType;
+  initialTitle?: string | null;
+  initialTags?: string[];
+  initialStatus?: PostStatus;
+  initialScope?: PostScope;
+  initialContentJson?: string;
+  initialMedia?: GetPostResponseContentMediaItem[];
   project?: {
     handle: string;
     name: string;
   };
   isSubmitting?: boolean;
+  deleteAction?: ReactNode;
   onSubmit: (data: {
     title: string;
     type: PostType;
@@ -44,6 +53,8 @@ interface PostEditorProps {
     };
   }) => void;
 }
+
+const EMPTY_MEDIA: GetPostResponseContentMediaItem[] = [];
 
 const ACCENT_RING: Record<PostType, string> = {
   [PostType.SHORT]: 'focus-within:ring-primary/30',
@@ -61,17 +72,25 @@ function getContentPlaceholder(
 }
 
 export default function PostEditor({
+  isEditing = false,
   type: initialType,
+  initialTitle,
+  initialTags = [],
+  initialStatus = PostStatus.PUBLISHED,
+  initialScope,
+  initialContentJson,
+  initialMedia = EMPTY_MEDIA,
   project,
   isSubmitting = false,
+  deleteAction,
   onSubmit,
 }: PostEditorProps) {
   const t = useTranslations('components.editor');
   const locale = useLocale();
 
   const [type, setType] = useState<PostType>(initialType);
-  const [title, setTitle] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [title, setTitle] = useState(initialTitle ?? '');
+  const [tags, setTags] = useState<string[]>(initialTags);
   const [isEditorEmpty, setIsEditorEmpty] = useState(true);
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
@@ -85,6 +104,18 @@ export default function PostEditor({
     el.style.height = `${el.scrollHeight}px`;
   }, [title]);
 
+  const initialContent = useMemo(() => {
+    if (!initialContentJson) {
+      return '';
+    }
+
+    try {
+      return deserialize(initialContentJson, initialMedia);
+    } catch {
+      return '';
+    }
+  }, [initialContentJson, initialMedia]);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -95,7 +126,7 @@ export default function PostEditor({
       CommandsExtension,
       ImageNode,
     ],
-    content: '',
+    content: initialContent,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -103,6 +134,9 @@ export default function PostEditor({
       },
     },
     onUpdate: ({ editor }) => {
+      setIsEditorEmpty(editor.isEmpty);
+    },
+    onCreate: ({ editor }) => {
       setIsEditorEmpty(editor.isEmpty);
     },
   });
@@ -161,7 +195,17 @@ export default function PostEditor({
       : t('placeholders.title-long');
   const scopeLabel = project
     ? t('scope.workspace', { workspace: project.name })
-    : t('scope.public');
+    : initialScope === PostScope.WORKSPACE
+      ? t('scope.workspace-generic')
+      : t('scope.public');
+  const canSaveDraft = !isEditing || initialStatus === PostStatus.DRAFT;
+  const draftActionLabel = isEditing
+    ? t('actions.update-draft')
+    : t('actions.save-draft');
+  const publishActionLabel =
+    isEditing && initialStatus === PostStatus.PUBLISHED
+      ? t('actions.update-published')
+      : t('actions.publish');
 
   const main = (
     <div
@@ -241,25 +285,35 @@ export default function PostEditor({
         <TagInput
           tags={tags}
           onChange={setTags}
+          projectHandle={project?.handle}
           accentRing={ACCENT_RING[type]}
         />
       </section>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button
-          variant="outline"
-          disabled={isSubmitting || isEditorEmpty}
-          onClick={() => handleSubmit(PostStatus.DRAFT)}
-        >
-          {t('actions.save-draft')}
-        </Button>
+      <div
+        className={cn(
+          'grid gap-2',
+          canSaveDraft ? 'grid-cols-2' : 'grid-cols-1',
+        )}
+      >
+        {canSaveDraft && (
+          <Button
+            variant="outline"
+            disabled={isSubmitting || isEditorEmpty}
+            onClick={() => handleSubmit(PostStatus.DRAFT)}
+          >
+            {draftActionLabel}
+          </Button>
+        )}
         <Button
           disabled={isSubmitting || isEditorEmpty}
           onClick={() => handleSubmit(PostStatus.PUBLISHED)}
         >
-          {t('actions.publish')}
+          {publishActionLabel}
         </Button>
       </div>
+
+      {deleteAction && <div className="border-t pt-4">{deleteAction}</div>}
     </div>
   );
 

@@ -6,6 +6,7 @@
  */
 import type { GetPostRecommendationsResponsePostsNodesItemContentSummaryAuthor } from './GetPostRecommendationsResponsePostsNodesItemContentSummaryAuthor';
 import type { GetPostRecommendationsResponsePostsNodesItemContentSummaryProject } from './GetPostRecommendationsResponsePostsNodesItemContentSummaryProject';
+import type { GetPostRecommendationsResponsePostsNodesItemContentSummaryScope } from './GetPostRecommendationsResponsePostsNodesItemContentSummaryScope';
 import type { GetPostRecommendationsResponsePostsNodesItemContentSummaryStatus } from './GetPostRecommendationsResponsePostsNodesItemContentSummaryStatus';
 import type { GetPostRecommendationsResponsePostsNodesItemContentSummaryType } from './GetPostRecommendationsResponsePostsNodesItemContentSummaryType';
 
@@ -36,10 +37,14 @@ export type GetPostRecommendationsResponsePostsNodesItemContentSummary = {
   isAuthor: boolean;
   /** Creation Timestamp */
   createdAt: string;
+  /** 게시글 공개 범위 */
+  scope: GetPostRecommendationsResponsePostsNodesItemContentSummaryScope;
   /** Post ID */
   id: number;
   /** Post Slug */
   slug: string;
+  /** Last Updated Timestamp */
+  updatedAt: string;
   /** Whether the question post has been resolved */
   resolved: boolean;
   /** Post Status */

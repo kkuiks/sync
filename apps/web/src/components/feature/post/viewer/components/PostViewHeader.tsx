@@ -1,7 +1,12 @@
 'use client';
 
-import { DotsThreeIcon, SirenIcon } from '@phosphor-icons/react';
+import {
+  DotsThreeIcon,
+  PencilSimpleIcon,
+  SirenIcon,
+} from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ProfileHoverCard } from '@/components/feature/profile/ProfileHoverCard';
@@ -23,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { RelativeTime } from '@/components/ui/relative-time';
+import ROUTES from '@/util/routes';
 
 import { PostStatus } from '../../types/post';
 import { useDeletePostDialog } from '../hooks/useDeletePostDialog';
@@ -45,11 +51,13 @@ export function PostViewHeader({
   const tDelete = useTranslations('pages.posts.delete');
   const tCopyLink = useTranslations('pages.posts.copy-link');
   const tViewer = useTranslations('components.post.viewer');
+  const tEdit = useTranslations('pages.posts.edit');
+  const router = useRouter();
 
   const isPreview = variant === 'preview';
   const report = useReportPostDialog();
   const deleteDialog = useDeletePostDialog(summary.id, {
-    redirectOnSuccess: !isPreview,
+    redirectTo: isPreview ? undefined : ROUTES.HOME(),
   });
 
   const handleCopyLink = async () => {
@@ -113,12 +121,29 @@ export function PostViewHeader({
               {tCopyLink('trigger')}
             </DropdownMenuItem>
             {summary.isAuthor ? (
-              <DropdownMenuItem
-                variant="destructive"
-                onSelect={() => deleteDialog.open()}
-              >
-                {tDelete('trigger')}
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    router.push(
+                      summary.project?.handle
+                        ? ROUTES.PROJECT_POST_EDIT(
+                            summary.project.handle,
+                            summary.slug,
+                          )
+                        : ROUTES.POST_EDIT(summary.slug),
+                    )
+                  }
+                >
+                  <PencilSimpleIcon />
+                  {tEdit('trigger')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => deleteDialog.open()}
+                >
+                  {tDelete('trigger')}
+                </DropdownMenuItem>
+              </>
             ) : isPreview ? (
               <DropdownMenuItem variant="destructive">
                 {t('trigger')}

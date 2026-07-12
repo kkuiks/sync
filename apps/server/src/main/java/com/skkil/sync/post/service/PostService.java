@@ -131,6 +131,12 @@ public class PostService {
     validatePublishablePost(request.title(), request.type(), request.tags(), request.status());
   }
 
+  private static void validateStatusTransition(Post post, PostStatus requestedStatus) {
+    if (post.isPublished() && requestedStatus == PostStatus.DRAFT) {
+      throw new InvalidPostPublishRequestException("Published posts cannot be reverted to draft.");
+    }
+  }
+
   private static void validateScopeProject(PostScope scope, CreatePostRequest.Project project) {
     if (scope == PostScope.PUBLIC && project != null) {
       throw new InvalidPostPublishRequestException("공개 게시글은 프로젝트에 연결할 수 없습니다.");
@@ -171,10 +177,18 @@ public class PostService {
 
   private static String createSlug(User author, CreatePostRequest request) {
     if (isBlank(request.title())) {
-      return String.format("%s-%d", author.getHandle(), System.currentTimeMillis());
+      return String.format("%s-%d", createUntitledSlugPrefix(author), System.currentTimeMillis());
     }
 
     return Slugify.slugify(request.title());
+  }
+
+  private static String createUntitledSlugPrefix(User author) {
+    if (!isBlank(author.getHandle())) {
+      return author.getHandle();
+    }
+
+    return author.getId() == null ? "post" : String.format("user-%d", author.getId());
   }
 
   @Transactional
@@ -182,9 +196,10 @@ public class PostService {
   public void updatePost(Long postId, UpdatePostRequest request) {
     Post post =
         postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
-    boolean wasPublished = post.isPublished();
 
     validateUpdatePostRequest(request);
+    validateStatusTransition(post, request.status());
+    boolean wasPublished = post.isPublished();
 
     List<Media> mediaFiles =
         contentMediaService.resolveMediaFilesForUpdate(

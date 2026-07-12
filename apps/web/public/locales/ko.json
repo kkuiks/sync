@@ -105,6 +105,38 @@
           "error": "링크 복사에 실패했습니다."
         }
       },
+      "edit": {
+        "trigger": "수정"
+      },
+      "drafts": {
+        "title": "내 초안",
+        "new-post": "새 글",
+        "filters": {
+          "all": "전체",
+          "public": "Public",
+          "workspace": "Workspace",
+          "all-types": "모든 타입"
+        },
+        "empty": {
+          "title": "저장된 초안이 없습니다",
+          "description": "초안으로 저장한 글이 이곳에 표시됩니다.",
+          "action": "글 작성"
+        },
+        "error": {
+          "title": "초안을 불러올 수 없습니다",
+          "description": "잠시 후 다시 시도해주세요.",
+          "load-more": "초안을 더 불러오지 못했습니다.",
+          "retry": "다시 시도"
+        },
+        "actions": {
+          "edit": "수정"
+        },
+        "untitled": {
+          "SHORT": "제목 없는 TIL",
+          "LONG": "제목 없는 블로그",
+          "QUESTION": "제목 없는 질문"
+        }
+      },
       "render-error": {
         "title": "포스트를 표시할 수 없습니다",
         "description": "이 포스트의 내용을 불러오는 중 문제가 발생했습니다."
@@ -987,7 +1019,7 @@
         "QUESTION": "질문"
       },
       "status": {
-        "DRAFT": "임시저장",
+        "DRAFT": "초안",
         "PUBLISHED": "게시됨"
       },
       "viewer": {
@@ -1067,7 +1099,7 @@
           "trending-posts": "인기 게시물",
           "explore-projects": "프로젝트 탐색",
           "tags": "태그",
-          "drafts": "임시저장",
+          "drafts": "초안",
           "feed": "피드",
           "questions": "질문",
           "guides": "가이드",
@@ -1174,12 +1206,15 @@
       "submit": "게시하기",
       "posting-to": "{project}에 게시",
       "actions": {
-        "save-draft": "임시저장",
-        "publish": "게시하기"
+        "save-draft": "초안으로 저장",
+        "publish": "게시하기",
+        "update-draft": "초안으로 저장",
+        "update-published": "변경사항 저장"
       },
       "scope": {
         "public": "공개",
         "workspace": "워크스페이스: {workspace}",
+        "workspace-generic": "워크스페이스",
         "workspace-loading": "불러오는 중"
       },
       "validation": {
@@ -1189,6 +1224,10 @@
       "messages": {
         "create-success": "게시글이 작성되었습니다.",
         "create-error": "게시글 작성에 실패했습니다.",
+        "update-success": "게시글이 수정되었습니다.",
+        "update-error": "게시글 수정에 실패했습니다.",
+        "edit-forbidden": "이 게시글을 수정할 수 없습니다.",
+        "edit-unavailable": "게시글을 불러올 수 없습니다.",
         "empty-content": "내용을 입력해주세요."
       },
       "sidebar": {

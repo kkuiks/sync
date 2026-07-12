@@ -6,6 +6,7 @@
  */
 import type { GetPostResponseSummaryAuthor } from './GetPostResponseSummaryAuthor';
 import type { GetPostResponseSummaryProject } from './GetPostResponseSummaryProject';
+import type { GetPostResponseSummaryScope } from './GetPostResponseSummaryScope';
 import type { GetPostResponseSummaryStatus } from './GetPostResponseSummaryStatus';
 import type { GetPostResponseSummaryType } from './GetPostResponseSummaryType';
 
@@ -36,10 +37,14 @@ export type GetPostResponseSummary = {
   isAuthor: boolean;
   /** Creation Timestamp */
   createdAt: string;
+  /** 게시글 공개 범위 */
+  scope: GetPostResponseSummaryScope;
   /** Post ID */
   id: number;
   /** Post Slug */
   slug: string;
+  /** Last Updated Timestamp */
+  updatedAt: string;
   /** Whether the question post has been resolved */
   resolved: boolean;
   /** Post Status */

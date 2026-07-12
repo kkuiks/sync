@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 import type { GetPostResponseContentMediaItem } from './GetPostResponseContentMediaItem';
+import type { GetPostResponseContentTagsItem } from './GetPostResponseContentTagsItem';
 
 /**
  * Post Content
@@ -14,4 +15,6 @@ export type GetPostResponseContent = {
   json: string;
   /** Media attached to the post */
   media: GetPostResponseContentMediaItem[];
+  /** 태그 목록 */
+  tags: GetPostResponseContentTagsItem[];
 };

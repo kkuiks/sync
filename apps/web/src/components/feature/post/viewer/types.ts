@@ -1,6 +1,6 @@
 import type { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
 
-import { PostStatus, PostType } from '../types/post';
+import { PostScope, PostStatus, PostType } from '../types/post';
 
 export interface PostAuthorSummary {
   name: string;
@@ -18,6 +18,7 @@ export interface PostSummary {
   slug: string;
   type: PostType;
   status: PostStatus;
+  scope: PostScope;
   title?: string | null;
   author: PostAuthorSummary;
   project?: PostProjectSummary;
@@ -43,10 +44,11 @@ export type PostCardVariant = 'preview' | 'detail';
 
 interface RawPostSummary extends Omit<
   PostSummary,
-  'type' | 'status' | 'author' | 'project'
+  'type' | 'status' | 'scope' | 'author' | 'project'
 > {
   type: string;
   status: string;
+  scope: string;
   author: PostAuthorSummary;
   project?: PostProjectSummary;
 }
@@ -66,6 +68,7 @@ export function toPostViewSource(raw: {
       ...raw.summary,
       type: raw.summary.type as PostType,
       status: raw.summary.status as PostStatus,
+      scope: raw.summary.scope as PostScope,
     },
     content: raw.content,
   };

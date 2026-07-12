@@ -3,8 +3,13 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreatePost } from '@/api/__generated__/post/post';
+import type { CreatePostRequest } from '@/api/__generated__/types';
 import PostEditor from '@/components/feature/post/editor/PostEditor';
-import { PostType } from '@/components/feature/post/types/post';
+import {
+  PostScope,
+  PostStatus,
+  PostType,
+} from '@/components/feature/post/types/post';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import ROUTES from '@/util/routes';
 
@@ -23,7 +28,12 @@ export default function CreatePostPage() {
 
   const { mutate: createPost, isPending: isCreatingPost } = useCreatePost({
     mutation: {
-      onSuccess: ({ data }) => {
+      onSuccess: ({ data }, variables) => {
+        if (variables.data?.status === PostStatus.DRAFT) {
+          router.replace(ROUTES.POST_EDIT(data.slug));
+          return;
+        }
+
         router.push(ROUTES.POST(data.slug));
       },
     },
@@ -38,6 +48,7 @@ export default function CreatePostPage() {
           data: {
             type,
             status,
+            scope: PostScope.PUBLIC,
             title,
             tags,
             content: {
@@ -45,7 +56,7 @@ export default function CreatePostPage() {
               text: content.text,
               mediaIds: content.media.map((media) => media.id),
             },
-          },
+          } as CreatePostRequest & { scope: PostScope },
         });
       }}
     />

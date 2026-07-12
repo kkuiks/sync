@@ -6,6 +6,7 @@
  */
 import type { SearchPostsResponsePostsItemSummaryAuthor } from './SearchPostsResponsePostsItemSummaryAuthor';
 import type { SearchPostsResponsePostsItemSummaryProject } from './SearchPostsResponsePostsItemSummaryProject';
+import type { SearchPostsResponsePostsItemSummaryScope } from './SearchPostsResponsePostsItemSummaryScope';
 import type { SearchPostsResponsePostsItemSummaryStatus } from './SearchPostsResponsePostsItemSummaryStatus';
 import type { SearchPostsResponsePostsItemSummaryType } from './SearchPostsResponsePostsItemSummaryType';
 
@@ -36,10 +37,14 @@ export type SearchPostsResponsePostsItemSummary = {
   isAuthor: boolean;
   /** Creation Timestamp */
   createdAt: string;
+  /** 게시글 공개 범위 */
+  scope: SearchPostsResponsePostsItemSummaryScope;
   /** Post ID */
   id: number;
   /** Post Slug */
   slug: string;
+  /** Last Updated Timestamp */
+  updatedAt: string;
   /** Whether the question post has been resolved */
   resolved: boolean;
   /** Post Status */

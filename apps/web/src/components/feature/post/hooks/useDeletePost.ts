@@ -8,11 +8,12 @@ function getQueryPath(queryKey: readonly unknown[]) {
   return typeof path === 'string' ? path : '';
 }
 
-function isPostRelatedQueryKey(queryKey: readonly unknown[]) {
+export function isPostRelatedQueryKey(queryKey: readonly unknown[]) {
   const path = getQueryPath(queryKey);
 
   return (
     path === '/posts' ||
+    path === '/posts/drafts' ||
     path === '/posts/likes' ||
     path === '/posts/recommendations' ||
     path.startsWith('/posts/') ||
