@@ -113,8 +113,8 @@
         "new-post": "새 글",
         "filters": {
           "all": "전체",
-          "public": "Public",
-          "workspace": "Workspace",
+          "public": "공개",
+          "workspace": "워크스페이스",
           "all-types": "모든 타입"
         },
         "empty": {

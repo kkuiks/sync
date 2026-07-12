@@ -89,7 +89,7 @@ class PostQueryControllerTests {
 
     CursorPaginationRequest pagination =
         CursorPaginationRequestSnippets.getCursorPaginationRequest();
-    GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
+    GetPostsResponse response = GetPostsResponseSnippets.getGetDraftPostsResponse();
 
     when(postQueryService.getDrafts(eq(user.userId()), eq(type), eq(scope), eq(pagination)))
         .thenReturn(response);

@@ -6,6 +6,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import com.epages.restdocs.apispec.FieldDescriptors;
 import com.skkil.sync.common.util.pagination.snippets.CursorPaginationResponseSnippets;
 import com.skkil.sync.post.dto.response.GetPostsResponse;
+import com.skkil.sync.post.model.PostStatus;
 import java.util.List;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -14,9 +15,17 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 public class GetPostsResponseSnippets {
 
   public static GetPostsResponse getGetPostsResponse() {
+    return getGetPostsResponse(PostStatus.PUBLISHED);
+  }
+
+  public static GetPostsResponse getGetDraftPostsResponse() {
+    return getGetPostsResponse(PostStatus.DRAFT);
+  }
+
+  private static GetPostsResponse getGetPostsResponse(PostStatus status) {
     GetPostsResponse.Post post =
         GetPostsResponse.Post.builder()
-            .summary(PostSummarySnippets.getPostSummary())
+            .summary(PostSummarySnippets.getPostSummary(status))
             .content("Post Content")
             .build();
 

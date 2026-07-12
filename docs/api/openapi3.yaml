@@ -491,9 +491,9 @@ paths:
                     hasPreviousPage\":false,\"startCursor\":\"start-cursor\",\"endCursor\"\
                     :\"end-cursor\"},\"nodes\":[{\"cursor\":\"cursor\",\"content\"\
                     :{\"summary\":{\"id\":1,\"slug\":\"test-slug\",\"title\":\"Test\
-                    \ Post Title\",\"type\":\"SHORT\",\"status\":\"PUBLISHED\",\"\
-                    scope\":\"WORKSPACE\",\"author\":{\"handle\":\"john-doe\",\"name\"\
-                    :\"John Doe\",\"profileImageUrl\":\"https://example.com/john.png\"\
+                    \ Post Title\",\"type\":\"SHORT\",\"status\":\"DRAFT\",\"scope\"\
+                    :\"WORKSPACE\",\"author\":{\"handle\":\"john-doe\",\"name\":\"\
+                    John Doe\",\"profileImageUrl\":\"https://example.com/john.png\"\
                     },\"project\":{\"handle\":\"my-project\",\"name\":\"나의 프로젝트\"\
                     ,\"description\":\"프로젝트 설명\",\"website\":\"https://example.com\"\
                     ,\"isPublic\":true,\"iconUrl\":\"https://example.com/icon.png\"\

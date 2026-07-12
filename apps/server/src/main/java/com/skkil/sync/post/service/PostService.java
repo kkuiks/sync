@@ -139,11 +139,12 @@ public class PostService {
 
   private static void validateScopeProject(PostScope scope, CreatePostRequest.Project project) {
     if (scope == PostScope.PUBLIC && project != null) {
-      throw new InvalidPostPublishRequestException("공개 게시글은 프로젝트에 연결할 수 없습니다.");
+      throw new InvalidPostPublishRequestException(
+          "Public posts cannot be associated with a project.");
     }
 
     if (scope == PostScope.WORKSPACE && project == null) {
-      throw new InvalidPostPublishRequestException("워크스페이스 게시글에는 프로젝트가 필요합니다.");
+      throw new InvalidPostPublishRequestException("Workspace posts require a project.");
     }
   }
 

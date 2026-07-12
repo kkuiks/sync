@@ -18,12 +18,16 @@ import org.springframework.restdocs.payload.JsonFieldType;
 public class PostSummarySnippets {
 
   public static PostSummary getPostSummary() {
+    return getPostSummary(PostStatus.PUBLISHED);
+  }
+
+  public static PostSummary getPostSummary(PostStatus status) {
     return PostSummary.builder()
         .id(1L)
         .slug("test-slug")
         .title("Test Post Title")
         .type(PostType.SHORT)
-        .status(PostStatus.PUBLISHED)
+        .status(status)
         .scope(PostScope.WORKSPACE)
         .author(UserSummarySnippets.getUserSummary())
         .project(ProjectSummarySnippets.getProjectSummary())
