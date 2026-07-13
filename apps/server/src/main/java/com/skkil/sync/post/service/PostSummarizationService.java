@@ -1,8 +1,10 @@
-package com.skkil.sync.post.listener;
+package com.skkil.sync.post.service;
 
 import com.skkil.sync.post.dto.data.PostSummaryDto;
 import com.skkil.sync.post.event.PostContentChangedEvent;
-import com.skkil.sync.post.service.PostSummaryService;
+import com.skkil.sync.post.exception.PostNotFoundException;
+import com.skkil.sync.post.model.Post;
+import com.skkil.sync.post.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -14,11 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @Slf4j
-public class PostContentChangedEventListener {
+public class PostSummarizationService {
 
   private static final int MINIMUM_SUMMARIZABLE_CONTENT_LENGTH = 200;
 
@@ -26,12 +29,11 @@ public class PostContentChangedEventListener {
   private Resource resource;
 
   private final ChatModel chatModel;
-  private final PostSummaryService postSummaryService;
+  private final PostRepository postRepository;
 
-  public PostContentChangedEventListener(
-      ChatModel chatModel, PostSummaryService postSummaryService) {
+  public PostSummarizationService(ChatModel chatModel, PostRepository postRepository) {
     this.chatModel = chatModel;
-    this.postSummaryService = postSummaryService;
+    this.postRepository = postRepository;
   }
 
   @Async
@@ -41,7 +43,7 @@ public class PostContentChangedEventListener {
 
     if (event.getContent().trim().length() <= MINIMUM_SUMMARIZABLE_CONTENT_LENGTH) {
       log.debug("Skipping summary for short post {}", event.getPostId());
-      postSummaryService.updateGeneratedSummary(event.getPostId(), null);
+      updateGeneratedSummary(event.getPostId(), null);
       return;
     }
 
@@ -56,8 +58,21 @@ public class PostContentChangedEventListener {
         ChatClient.create(chatModel).prompt(prompt).call().entity(PostSummaryDto.class);
     log.debug("Summarized post {}", event.getPostId());
 
-    postSummaryService.updateGeneratedSummary(event.getPostId(), response.summary());
+    updateGeneratedSummary(event.getPostId(), response.summary());
 
     log.debug("Saved summary for post {}", event.getPostId());
+  }
+
+  /**
+   * Persists a system-generated summary (e.g. from {@link #refreshPostSummary}). Unlike {@link
+   * PostService#updatePostSummary}, this is not a user-initiated edit, so it is not gated behind
+   * the 'EDIT' permission.
+   */
+  @Transactional
+  public void updateGeneratedSummary(Long postId, String summary) {
+    Post post =
+        postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+    post.updateSummary(summary);
   }
 }

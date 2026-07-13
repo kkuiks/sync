@@ -39,7 +39,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(PostQueryController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = true)
 @AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 @Import({SecurityConfig.class, TestSecurityConfig.class})
@@ -223,6 +223,7 @@ class PostQueryControllerTests {
 
   @Test
   @DisplayName("[getPostsByTag] API 문서화 테스트")
+  @WithAuthenticatedUser
   void getPostsByTag() throws Exception {
     Long tagId = 1L;
 
@@ -293,5 +294,11 @@ class PostQueryControllerTests {
                     .and(parameterWithName("type").description("게시글 타입").optional())
                     .and(parameterWithName("authorHandle").description("작성자 핸들").optional()),
                 GetPostsResponseSnippets.getPostsResponseFields()));
+  }
+
+  @Test
+  @DisplayName("[getDrafts] 로그인하지 않은 사용자는 접근할 수 없다")
+  void getDrafts_unauthenticatedUser_shouldReturnUnauthorized() throws Exception {
+    mockMvc.perform(get("/posts/drafts")).andExpect(status().isUnauthorized());
   }
 }

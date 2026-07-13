@@ -142,6 +142,7 @@ CREATE TABLE posts (
     title VARCHAR(255),
     post_type VARCHAR(50) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED',
+    scope VARCHAR(20) NOT NULL DEFAULT 'PUBLIC',
     content TEXT,
     summary TEXT,
     like_count BIGINT NOT NULL DEFAULT 0,
@@ -156,7 +157,11 @@ CREATE TABLE posts (
         NULL,
     FOREIGN KEY(hidden_by) REFERENCES users (id) ON DELETE
     SET
-        NULL
+        NULL,
+    CONSTRAINT chk_posts_scope_project CHECK (
+        (scope = 'PUBLIC' AND project_id IS NULL)
+        OR (scope = 'WORKSPACE' AND project_id IS NOT NULL)
+    )
 );
 
 CREATE TABLE post_likes (
@@ -340,6 +345,10 @@ CREATE INDEX idx_posts_content_gin ON posts USING gin (content gin_trgm_ops);
 CREATE INDEX idx_posts_status_created_id ON posts(status, created_at DESC, id DESC);
 
 CREATE INDEX idx_posts_visibility ON posts(visibility);
+
+CREATE INDEX idx_posts_scope_status_created_id ON posts(scope, status, created_at DESC, id DESC);
+
+CREATE INDEX idx_posts_author_status_updated_id ON posts(author_id, status, updated_at DESC, id DESC);
 
 CREATE INDEX idx_post_reports_status_created_id ON post_reports(status, created_at DESC, id DESC);
 

@@ -15,7 +15,6 @@ import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostQueryRepository;
 import com.skkil.sync.post.repository.pagination.CommentedPostCursorPaginationProvider;
 import com.skkil.sync.post.repository.pagination.PostCursorPaginationProvider;
-import com.skkil.sync.post.repository.pagination.PostUpdatedCursorPaginationProvider;
 import com.skkil.sync.user.mapper.UserAssembler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +32,6 @@ public class PostQueryService {
 
   private final PaginationService paginationService;
   private final PostCursorPaginationProvider paginationProvider;
-  private final PostUpdatedCursorPaginationProvider updatedPaginationProvider;
   private final CommentedPostCursorPaginationProvider commentedPostPaginationProvider;
 
   public PostQueryService(
@@ -42,7 +40,6 @@ public class PostQueryService {
       PostAssembler postAssembler,
       UserAssembler userAssembler,
       PostCursorPaginationProvider paginationProvider,
-      PostUpdatedCursorPaginationProvider updatedPaginationProvider,
       CommentedPostCursorPaginationProvider commentedPostPaginationProvider,
       PaginationService paginationService) {
     this.postQueryRepository = postQueryRepository;
@@ -50,7 +47,6 @@ public class PostQueryService {
     this.postAssembler = postAssembler;
     this.userAssembler = userAssembler;
     this.paginationProvider = paginationProvider;
-    this.updatedPaginationProvider = updatedPaginationProvider;
     this.commentedPostPaginationProvider = commentedPostPaginationProvider;
     this.paginationService = paginationService;
   }
@@ -74,22 +70,10 @@ public class PostQueryService {
   }
 
   @Transactional(readOnly = true)
-  @PreAuthorize("isAuthenticated()")
   public GetPostsResponse getDrafts(
       Long requesterId, PostType type, PostScope scope, CursorPaginationRequest pagination) {
-    var posts =
-        paginationService
-            .paginate(
-                postQueryRepository.getDraftsByAuthor(requesterId, type, scope),
-                updatedPaginationProvider,
-                pagination)
-            .mapWithLookup(
-                PostDto::authorId,
-                userAssembler::toUserSummaries,
-                (post, authors) ->
-                    postAssembler.toPostResponse(post, authors.get(post.authorId()), requesterId));
-
-    return new GetPostsResponse(posts);
+    return getPostsResponse(
+        requesterId, postQueryRepository.getDraftsByAuthor(requesterId, type, scope), pagination);
   }
 
   @Transactional(readOnly = true)

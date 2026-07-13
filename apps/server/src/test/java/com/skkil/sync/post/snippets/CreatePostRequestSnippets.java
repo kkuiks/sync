@@ -5,7 +5,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.post.dto.request.CreatePostRequest;
-import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import java.util.List;
@@ -23,7 +22,6 @@ public class CreatePostRequestSnippets {
         .title("title")
         .type(PostType.SHORT)
         .status(PostStatus.PUBLISHED)
-        .scope(PostScope.WORKSPACE)
         .content(content)
         .tags(List.of("java", "spring"))
         .project(new CreatePostRequest.Project("project-handle"))
@@ -41,11 +39,6 @@ public class CreatePostRequestSnippets {
             .type(RestDocsUtils.ENUM_TYPE)
             .description("Post Status")
             .attributes(RestDocsUtils.getEnumAttributes(PostStatus.class))
-            .optional(),
-        fieldWithPath("scope")
-            .type(RestDocsUtils.ENUM_TYPE)
-            .description("게시글 공개 범위")
-            .attributes(RestDocsUtils.getEnumAttributes(PostScope.class))
             .optional(),
         fieldWithPath("content").type(JsonFieldType.OBJECT).description("Content"),
         fieldWithPath("content.text").type(JsonFieldType.STRING).description("Text Content"),

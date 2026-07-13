@@ -5,10 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreatePost } from '@/api/__generated__/post/post';
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
-import {
-  type CreatePostRequest,
-  CreatePostRequestScope,
-} from '@/api/__generated__/types';
+import { type CreatePostRequest } from '@/api/__generated__/types';
 import PostEditor from '@/components/feature/post/editor/PostEditor';
 import { PostStatus, PostType } from '@/components/feature/post/types/post';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
@@ -56,7 +53,6 @@ export default function CreateProjectPostPage() {
           data: {
             type,
             status,
-            scope: CreatePostRequestScope.Workspace,
             title,
             tags,
             project,

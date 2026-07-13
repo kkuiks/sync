@@ -95,15 +95,14 @@ public class Post extends BaseEntity {
       String title,
       String content,
       PostType type,
-      PostStatus status,
-      PostScope scope) {
+      PostStatus status) {
     this.slug = slug;
     this.author = author;
     this.project = project;
     this.title = title;
     this.type = type == null ? PostType.SHORT : type;
     this.status = status == null ? PostStatus.PUBLISHED : status;
-    this.scope = scope == null ? PostScope.fromProject(project) : scope;
+    this.scope = PostScope.fromProject(project);
     this.content = content;
   }
 

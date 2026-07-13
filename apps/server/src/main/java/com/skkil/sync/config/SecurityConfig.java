@@ -59,6 +59,8 @@ public class SecurityConfig {
                     .authenticated()
                     .requestMatchers(HttpMethod.GET, "/posts/recommendations")
                     .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/posts/drafts")
+                    .authenticated()
                     .requestMatchers("/search/**")
                     .authenticated()
                     .requestMatchers(

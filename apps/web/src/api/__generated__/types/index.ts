@@ -12,7 +12,6 @@ export * from './CreatePostRequest';
 export * from './CreatePostRequestContent';
 export * from './CreatePostRequestContentMediaIdsItem';
 export * from './CreatePostRequestProject';
-export * from './CreatePostRequestScope';
 export * from './CreatePostRequestStatus';
 export * from './CreatePostRequestTagsItem';
 export * from './CreatePostRequestType';

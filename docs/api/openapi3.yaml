@@ -415,10 +415,10 @@ paths:
             examples:
               CreatePost:
                 value: "{\"title\":\"title\",\"type\":\"SHORT\",\"status\":\"PUBLISHED\"\
-                  ,\"scope\":\"WORKSPACE\",\"content\":{\"text\":\"This is a post\
-                  \ content.\",\"json\":\"{\\\"text\\\": \\\"This is a post content.\\\
-                  \"}\",\"mediaIds\":[1,2]},\"tags\":[\"java\",\"spring\"],\"project\"\
-                  :{\"handle\":\"project-handle\"}}"
+                  ,\"content\":{\"text\":\"This is a post content.\",\"json\":\"{\\\
+                  \"text\\\": \\\"This is a post content.\\\"}\",\"mediaIds\":[1,2]},\"\
+                  tags\":[\"java\",\"spring\"],\"project\":{\"handle\":\"project-handle\"\
+                  }}"
       responses:
         "201":
           description: "201"
@@ -3185,79 +3185,6 @@ components:
         handle:
           type: string
           description: 생성된 프로젝트 핸들
-    CreatePostRequest:
-      title: CreatePostRequest
-      required:
-      - content
-      - type
-      type: object
-      properties:
-        scope:
-          type: string
-          description: 게시글 공개 범위
-          nullable: true
-          enum:
-          - PUBLIC
-          - WORKSPACE
-        project:
-          type: object
-          properties:
-            handle:
-              type: string
-              description: 프로젝트 핸들
-              nullable: true
-          description: 프로젝트
-        type:
-          type: string
-          description: Post Type
-          enum:
-          - SHORT
-          - LONG
-          - QUESTION
-        title:
-          type: string
-          description: Title
-          nullable: true
-        content:
-          required:
-          - json
-          - text
-          type: object
-          properties:
-            json:
-              type: string
-              description: JSON Content
-            mediaIds:
-              type: array
-              description: 사용된 미디어 ID 목록
-              nullable: true
-              items:
-                oneOf:
-                - type: object
-                - type: boolean
-                - type: string
-                - type: number
-            text:
-              type: string
-              description: Text Content
-          description: Content
-        tags:
-          type: array
-          description: 태그 목록
-          nullable: true
-          items:
-            oneOf:
-            - type: object
-            - type: boolean
-            - type: string
-            - type: number
-        status:
-          type: string
-          description: Post Status
-          nullable: true
-          enum:
-          - DRAFT
-          - PUBLISHED
     GetUserPreferencesResponse:
       title: GetUserPreferencesResponse
       required:
@@ -3567,6 +3494,72 @@ components:
                 type: string
                 description: 프로젝트 아이콘 URL
                 nullable: true
+    CreatePostRequest:
+      title: CreatePostRequest
+      required:
+      - content
+      - type
+      type: object
+      properties:
+        project:
+          type: object
+          properties:
+            handle:
+              type: string
+              description: 프로젝트 핸들
+              nullable: true
+          description: 프로젝트
+        type:
+          type: string
+          description: Post Type
+          enum:
+          - SHORT
+          - LONG
+          - QUESTION
+        title:
+          type: string
+          description: Title
+          nullable: true
+        content:
+          required:
+          - json
+          - text
+          type: object
+          properties:
+            json:
+              type: string
+              description: JSON Content
+            mediaIds:
+              type: array
+              description: 사용된 미디어 ID 목록
+              nullable: true
+              items:
+                oneOf:
+                - type: object
+                - type: boolean
+                - type: string
+                - type: number
+            text:
+              type: string
+              description: Text Content
+          description: Content
+        tags:
+          type: array
+          description: 태그 목록
+          nullable: true
+          items:
+            oneOf:
+            - type: object
+            - type: boolean
+            - type: string
+            - type: number
+        status:
+          type: string
+          description: Post Status
+          nullable: true
+          enum:
+          - DRAFT
+          - PUBLISHED
     GetPostActivitiesResponse:
       title: GetPostActivitiesResponse
       required:
