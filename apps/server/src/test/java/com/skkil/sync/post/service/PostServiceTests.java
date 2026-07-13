@@ -7,7 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.skkil.sync.post.dto.request.CreatePostRequest;
+import com.skkil.sync.post.dto.request.PostContentRequest;
 import com.skkil.sync.post.dto.request.UpdatePostRequest;
+import com.skkil.sync.post.dto.request.UpdateProjectPostRequest;
 import com.skkil.sync.post.dto.response.CreatePostResponse;
 import com.skkil.sync.post.exception.InvalidPostPublishRequestException;
 import com.skkil.sync.post.exception.PostNotFoundException;
@@ -16,6 +18,9 @@ import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostRepository;
 import com.skkil.sync.post.snippets.UpdatePostRequestSnippets;
+import com.skkil.sync.post.snippets.UpdateProjectPostRequestSnippets;
+import com.skkil.sync.project.model.Project;
+import com.skkil.sync.project.service.ProjectDomainService;
 import com.skkil.sync.user.model.User;
 import com.skkil.sync.user.service.domain.UserDomainService;
 import java.util.List;
@@ -32,6 +37,8 @@ class PostServiceTests {
 
   @Mock private UserDomainService userDomainService;
 
+  @Mock private ProjectDomainService projectDomainService;
+
   @Mock private PostContentMediaService contentMediaService;
 
   @Mock private TagService tagService;
@@ -39,26 +46,6 @@ class PostServiceTests {
   @Mock private PostRepository postRepository;
 
   @InjectMocks private PostService postService;
-
-  @Test
-  @DisplayName("[createPost] 발행 글에 태그가 없으면 InvalidPostPublishRequestException 예외 발생")
-  void createPost_publishedWithoutTags_throwsException() {
-    CreatePostRequest request =
-        createPostRequest(PostType.SHORT, null, PostStatus.PUBLISHED, List.of());
-
-    assertThatThrownBy(() -> postService.createPost(1L, request))
-        .isInstanceOf(InvalidPostPublishRequestException.class);
-  }
-
-  @Test
-  @DisplayName("[createPost] 질문 발행 글에 제목이 없으면 InvalidPostPublishRequestException 예외 발생")
-  void createPost_publishedQuestionWithoutTitle_throwsException() {
-    CreatePostRequest request =
-        createPostRequest(PostType.QUESTION, " ", PostStatus.PUBLISHED, List.of("java"));
-
-    assertThatThrownBy(() -> postService.createPost(1L, request))
-        .isInstanceOf(InvalidPostPublishRequestException.class);
-  }
 
   @Test
   @DisplayName("[createPost] 작성자 handle이 없어도 제목 없는 초안 slug에 null을 사용하지 않음")
@@ -74,7 +61,7 @@ class PostServiceTests {
     CreatePostResponse response = postService.createPost(authorId, request);
 
     assertThat(response.slug()).startsWith("user-1-");
-    verify(tagService).addTagsToPost(any(Post.class), any(), any());
+    verify(tagService).addTagsToPost(any(Post.class), any(), any(), any());
   }
 
   @Test
@@ -94,7 +81,7 @@ class PostServiceTests {
             "제목",
             PostType.LONG,
             PostStatus.DRAFT,
-            new UpdatePostRequest.Content("content", "{\"text\":\"content\"}", List.of()),
+            new PostContentRequest("content", "{\"text\":\"content\"}", List.of()),
             List.of());
 
     when(postRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -117,6 +104,83 @@ class PostServiceTests {
   }
 
   @Test
+  @DisplayName("[updatePost] 프로젝트 글을 전역 글 수정 API로 수정하려는 경우 PostNotFoundException 예외 발생")
+  void updatePost_postBelongsToProject_throwsException() {
+    Long postId = 1L;
+    Project project = Project.builder().handle("project-handle").name("Project").build();
+    project.setId(1L);
+    Post post =
+        Post.builder()
+            .slug("project-post")
+            .title("제목")
+            .content("{\"text\":\"content\"}")
+            .type(PostType.LONG)
+            .status(PostStatus.PUBLISHED)
+            .project(project)
+            .build();
+    UpdatePostRequest request = UpdatePostRequestSnippets.getUpdatePostRequest();
+
+    when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+    assertThatThrownBy(() -> postService.updatePost(postId, request))
+        .isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
+  @DisplayName("[updateProjectPost] 다른 프로젝트의 handle로 수정하려는 경우 PostNotFoundException 예외 발생")
+  void updateProjectPost_handleMismatch_throwsException() {
+    Long postId = 1L;
+    String handle = "other-project";
+    Project postProject = Project.builder().handle("post-project").name("Post Project").build();
+    postProject.setId(1L);
+    Project requestedProject = Project.builder().handle(handle).name("Other Project").build();
+    requestedProject.setId(2L);
+    Post post =
+        Post.builder()
+            .slug("project-post")
+            .title("제목")
+            .content("{\"text\":\"content\"}")
+            .type(PostType.LONG)
+            .status(PostStatus.PUBLISHED)
+            .project(postProject)
+            .build();
+    UpdateProjectPostRequest request =
+        UpdateProjectPostRequestSnippets.getUpdateProjectPostRequest();
+
+    when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+    when(projectDomainService.getProjectByHandle(handle)).thenReturn(requestedProject);
+
+    assertThatThrownBy(() -> postService.updateProjectPost(postId, handle, request))
+        .isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
+  @DisplayName(
+      "[updateProjectPost] 프로젝트에 속하지 않은 글을 프로젝트 글 API로 수정하려는 경우 PostNotFoundException 예외 발생")
+  void updateProjectPost_postWithoutProject_throwsException() {
+    Long postId = 1L;
+    String handle = "project-handle";
+    Project requestedProject = Project.builder().handle(handle).name("Project").build();
+    requestedProject.setId(1L);
+    Post post =
+        Post.builder()
+            .slug("post")
+            .title("제목")
+            .content("{\"text\":\"content\"}")
+            .type(PostType.LONG)
+            .status(PostStatus.PUBLISHED)
+            .build();
+    UpdateProjectPostRequest request =
+        UpdateProjectPostRequestSnippets.getUpdateProjectPostRequest();
+
+    when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+    when(projectDomainService.getProjectByHandle(handle)).thenReturn(requestedProject);
+
+    assertThatThrownBy(() -> postService.updateProjectPost(postId, handle, request))
+        .isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
   @DisplayName("[deletePost] 존재하지 않는 회고를 삭제하려는 경우 PostNotFoundException 예외 발생")
   void deletePost_postNotFound_throwsException() {
     Long postId = 1L;
@@ -133,7 +197,7 @@ class PostServiceTests {
         .title(title)
         .type(type)
         .status(status)
-        .content(new CreatePostRequest.Content("content", "{\"text\":\"content\"}", List.of()))
+        .content(new PostContentRequest("content", "{\"text\":\"content\"}", List.of()))
         .tags(tags)
         .build();
   }

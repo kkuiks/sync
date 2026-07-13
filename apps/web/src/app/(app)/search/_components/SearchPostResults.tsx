@@ -59,29 +59,26 @@ export default function SearchPostResults({
   return (
     <div className="divide-y">
       {posts.map((post) => {
-        const href = post.summary.project?.handle
-          ? ROUTES.PROJECT_POST(post.summary.project.handle, post.summary.slug)
-          : ROUTES.POST(post.summary.slug);
+        const href = post.project?.handle
+          ? ROUTES.PROJECT_POST(post.project.handle, post.slug)
+          : ROUTES.POST(post.slug);
 
         return (
-          <Link key={post.summary.id} href={href} className="block py-4">
+          <Link key={post.id} href={href} className="block py-4">
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">{post.summary.author.name}</span>
+              <span className="font-semibold">{post.author.name}</span>
               <span className="text-muted-foreground">
-                @{post.summary.author.handle} ·{' '}
-                <RelativeTime date={post.summary.createdAt} />
+                @{post.author.handle} · <RelativeTime date={post.createdAt} />
               </span>
-              {post.summary.project?.name && (
-                <Badge variant="secondary">{post.summary.project.name}</Badge>
+              {post.project?.name && (
+                <Badge variant="secondary">{post.project.name}</Badge>
               )}
             </div>
 
-            {post.summary.title && (
-              <h3 className="mt-1 font-semibold">{post.summary.title}</h3>
-            )}
+            {post.title && <h3 className="mt-1 font-semibold">{post.title}</h3>}
 
             <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-              {post.content}
+              {post.preview}
             </p>
           </Link>
         );

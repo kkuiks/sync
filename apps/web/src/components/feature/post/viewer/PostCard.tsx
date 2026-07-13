@@ -13,11 +13,13 @@ import ROUTES from '@/util/routes';
 import { PostType } from '../types/post';
 import { PostBody } from './components/PostBody';
 import { PostCardActions } from './components/PostCardActions';
+import { PostPreviewBody } from './components/PostPreviewBody';
+import { PostTagChips } from './components/PostTagChips';
 import { PostViewHeader } from './components/PostViewHeader';
-import { PreviewTagChips } from './components/PreviewTagChips';
 import PostRenderErrorBoundary from './error/PostRenderErrorBoundary';
 import { useReadOnlyPostEditor } from './hooks/useReadOnlyPostEditor';
 import {
+  type PostPreviewMedia,
   type PostProjectSummary,
   type PostSummary,
   type PostViewSource,
@@ -27,7 +29,6 @@ import { normalizePostContent } from './utils/normalizePostContent';
 import {
   type ReviewStatus,
   getMockReviewStatus,
-  getMockTags,
 } from './utils/placeholderData';
 
 const WORDS_PER_MINUTE = 200;
@@ -101,6 +102,7 @@ function ShortTypePostCard({ summary, editor, postPath }: TypePostCardProps) {
           commentCount={summary.commentCount}
           bookmarked={summary.bookmarked}
         />
+        <PostTagChips tags={summary.tags} />
       </CardContent>
     </Card>
   );
@@ -129,6 +131,7 @@ function LongTypePostCard({ summary, editor, postPath }: TypePostCardProps) {
           commentCount={summary.commentCount}
           bookmarked={summary.bookmarked}
         />
+        <PostTagChips tags={summary.tags} />
       </CardContent>
     </Card>
   );
@@ -161,6 +164,7 @@ function QuestionTypePostCard({
           commentCount={summary.commentCount}
           bookmarked={summary.bookmarked}
         />
+        <PostTagChips tags={summary.tags} />
       </CardContent>
     </Card>
   );
@@ -169,21 +173,19 @@ function QuestionTypePostCard({
 // ---- PostPreviewCard: feed view, data injected by PostList ----
 
 export interface PostPreviewCardProps {
-  source: PostViewSource;
+  summary: PostSummary;
 }
 
-export function PostPreviewCard({ source }: PostPreviewCardProps) {
+export function PostPreviewCard({ summary }: PostPreviewCardProps) {
   return (
     <PostRenderErrorBoundary>
-      <PostPreviewCardBySource source={source} />
+      <PostPreviewCardBySummary summary={summary} />
     </PostRenderErrorBoundary>
   );
 }
 
-function PostPreviewCardBySource({ source }: PostPreviewCardProps) {
-  const { summary, content } = source;
+function PostPreviewCardBySummary({ summary }: PostPreviewCardProps) {
   const router = useRouter();
-  const editor = useReadOnlyPostEditor(normalizePostContent(content));
 
   const postPath = summary.project?.handle
     ? ROUTES.PROJECT_POST(summary.project.handle, summary.slug)
@@ -191,11 +193,9 @@ function PostPreviewCardBySource({ source }: PostPreviewCardProps) {
 
   const typePreviewCardProps: TypePostPreviewCardProps = {
     summary,
-    editor,
     postPath,
     onClick: () => router.push(postPath),
     reviewStatus: getMockReviewStatus(summary.id),
-    tags: getMockTags(summary.id),
   };
 
   switch (summary.type) {
@@ -211,11 +211,9 @@ function PostPreviewCardBySource({ source }: PostPreviewCardProps) {
 
 interface TypePostPreviewCardProps {
   summary: PostSummary;
-  editor: Editor | null;
   postPath: string;
   onClick: () => void;
   reviewStatus: ReviewStatus;
-  tags: string[];
 }
 
 function ReviewStatusIndicator({ status }: { status: ReviewStatus }) {
@@ -244,7 +242,6 @@ function ReviewStatusIndicator({ status }: { status: ReviewStatus }) {
 
 function ShortTypePostPreviewCard({
   summary,
-  editor,
   postPath,
   onClick,
   reviewStatus,
@@ -263,7 +260,7 @@ function ShortTypePostPreviewCard({
         {summary.title && (
           <h3 className="text-lg font-semibold">{summary.title}</h3>
         )}
-        <PostBody editor={editor} />
+        <PostPreviewBody preview={summary.preview} />
 
         <div className="flex items-center justify-between">
           <ReviewStatusIndicator status={reviewStatus} />
@@ -275,6 +272,8 @@ function ShortTypePostPreviewCard({
             bookmarked={summary.bookmarked}
           />
         </div>
+
+        <PostTagChips tags={summary.tags} />
       </CardContent>
     </Card>
   );
@@ -282,11 +281,9 @@ function ShortTypePostPreviewCard({
 
 function LongTypePostPreviewCard({
   summary,
-  editor,
   postPath,
   onClick,
   reviewStatus,
-  tags,
 }: TypePostPreviewCardProps) {
   return (
     <Card onClick={onClick}>
@@ -299,12 +296,16 @@ function LongTypePostPreviewCard({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <ArticlePreviewMedia editor={editor} project={summary.project} />
+        <ArticlePreviewMedia
+          previewMedia={summary.previewMedia}
+          wordCount={summary.wordCount}
+          project={summary.project}
+        />
 
         {summary.title && (
           <h3 className="text-lg font-semibold">{summary.title}</h3>
         )}
-        <PostBody editor={editor} className="line-clamp-6" />
+        <PostPreviewBody preview={summary.preview} className="line-clamp-6" />
 
         <div className="flex items-center justify-between">
           <ReviewStatusIndicator status={reviewStatus} />
@@ -317,7 +318,7 @@ function LongTypePostPreviewCard({
           />
         </div>
 
-        <PreviewTagChips tags={tags} />
+        <PostTagChips tags={summary.tags} />
       </CardContent>
     </Card>
   );
@@ -325,10 +326,8 @@ function LongTypePostPreviewCard({
 
 function QuestionTypePostPreviewCard({
   summary,
-  editor,
   postPath,
   onClick,
-  tags,
 }: TypePostPreviewCardProps) {
   const t = useTranslations('components.post.viewer');
 
@@ -362,7 +361,7 @@ function QuestionTypePostPreviewCard({
           {summary.title && (
             <h3 className="text-lg font-semibold">{summary.title}</h3>
           )}
-          <PostBody editor={editor} />
+          <PostPreviewBody preview={summary.preview} />
 
           <div className="flex items-center justify-between">
             <PostCardActions
@@ -372,7 +371,7 @@ function QuestionTypePostPreviewCard({
               commentCount={summary.commentCount}
               bookmarked={summary.bookmarked}
             />
-            <PreviewTagChips tags={tags} />
+            <PostTagChips tags={summary.tags} />
           </div>
         </div>
       </CardContent>
@@ -381,24 +380,28 @@ function QuestionTypePostPreviewCard({
 }
 
 function ArticlePreviewMedia({
-  editor,
+  previewMedia,
+  wordCount,
   project,
 }: {
-  editor: Editor | null;
+  previewMedia: PostPreviewMedia[];
+  wordCount: number;
   project?: PostProjectSummary;
 }) {
   const t = useTranslations('components.post.viewer');
-
-  // TODO: real reading time needs a stable word count from the server —
-  // this estimates from the loaded editor content client-side.
-  const wordCount = editor?.getText().split(/\s+/).filter(Boolean).length ?? 0;
   const readingMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
-  // TODO: no thumbnail/category field on posts yet — falls back to the
-  // project name, or a generic label.
+  // TODO: no category field on posts yet — falls back to the project name,
+  // or a generic label.
   const category = project?.name?.toUpperCase() ?? t('article');
+  const thumbnail = previewMedia[0];
 
   return (
-    <div className="relative flex h-32 items-end rounded-lg bg-gradient-to-br from-primary/20 to-success-tint p-4">
+    <div
+      className="relative flex h-32 items-end rounded-lg bg-gradient-to-br from-primary/20 to-success-tint bg-cover bg-center p-4"
+      style={
+        thumbnail ? { backgroundImage: `url(${thumbnail.url})` } : undefined
+      }
+    >
       <span className="absolute top-3 right-3 rounded-full bg-background/80 px-2 py-0.5 text-xs font-medium">
         {t('minRead', { minutes: readingMinutes })}
       </span>

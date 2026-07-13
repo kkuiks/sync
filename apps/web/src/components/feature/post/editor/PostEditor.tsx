@@ -5,20 +5,27 @@ import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useLocale, useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
+import type {
+  GetPostResponseContent,
+  GetPostResponseContentMediaItem,
+} from '@/api/__generated__/types';
 import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import ROUTES from '@/util/routes';
 
 import { PostScope, PostStatus, PostType } from '../types/post';
+import { PostDeleteButton } from '../viewer/components/PostDeleteButton';
+import { PostSummary } from '../viewer/types';
 import { EditorBubbleMenu } from './components/EditorBubbleMenu';
 import { EditorTemplates } from './components/EditorTemplates';
 import { PostTypeSelector } from './components/PostTypeSelector';
-import { TagInput } from './components/TagInput';
+import { TagInput, TagValue } from './components/TagInput';
 import { CommandsExtension } from './extensions/commands';
 import { ImageNode } from './extensions/nodes/image';
 import { deserialize, serialize } from './utils/serializer';
@@ -26,24 +33,20 @@ import { deserialize, serialize } from './utils/serializer';
 interface PostEditorProps {
   isEditing?: boolean;
   type: PostType;
-  initialTitle?: string | null;
-  initialTags?: string[];
-  initialStatus?: PostStatus;
-  initialScope?: PostScope;
-  initialContentJson?: string;
-  initialMedia?: GetPostResponseContentMediaItem[];
+  routeProjectHandle?: string;
+  summary?: PostSummary;
+  content?: GetPostResponseContent;
   project?: {
     handle: string;
     name: string;
   };
   isSubmitting?: boolean;
-  deleteAction?: ReactNode;
   onSubmit: (data: {
     title: string;
     type: PostType;
     status: PostStatus;
     tags: string[];
-    project?: { handle: string };
+    projectTags: string[];
     content: {
       json: string;
       text: string;
@@ -74,23 +77,52 @@ function getContentPlaceholder(
 export default function PostEditor({
   isEditing = false,
   type: initialType,
-  initialTitle,
-  initialTags = [],
-  initialStatus = PostStatus.PUBLISHED,
-  initialScope,
-  initialContentJson,
-  initialMedia = EMPTY_MEDIA,
+  routeProjectHandle,
+  summary,
+  content,
   project,
   isSubmitting = false,
-  deleteAction,
   onSubmit,
 }: PostEditorProps) {
   const t = useTranslations('components.editor');
   const locale = useLocale();
+  const router = useRouter();
+
+  const postId = summary?.id;
+  const slug = summary?.slug;
+  const initialTitle = summary?.title;
+  const initialStatus = summary?.status ?? PostStatus.PUBLISHED;
+  const initialScope = summary?.scope;
+  const initialContentJson = content?.json;
+  const initialMedia = content?.media ?? EMPTY_MEDIA;
+
+  useEffect(() => {
+    if (!isEditing || !slug) {
+      return;
+    }
+
+    const canonicalPath = project?.handle
+      ? ROUTES.PROJECT_POST_EDIT(project.handle, slug)
+      : ROUTES.POST_EDIT(slug);
+    const isCanonical = project?.handle
+      ? routeProjectHandle === project.handle
+      : routeProjectHandle === undefined;
+
+    if (!isCanonical) {
+      router.replace(canonicalPath);
+    }
+  }, [isEditing, project?.handle, router, routeProjectHandle, slug]);
 
   const [type, setType] = useState<PostType>(initialType);
   const [title, setTitle] = useState(initialTitle ?? '');
-  const [tags, setTags] = useState<string[]>(initialTags);
+  const [tags, setTags] = useState<TagValue[]>(() => [
+    ...(summary?.tags ?? [])
+      .filter((tag) => !tag.projectHandle)
+      .map((tag) => ({ name: tag.name, isProjectTag: false })),
+    ...(summary?.tags ?? [])
+      .filter((tag) => tag.projectHandle)
+      .map((tag) => ({ name: tag.name, isProjectTag: true })),
+  ]);
   const [isEditorEmpty, setIsEditorEmpty] = useState(true);
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
@@ -182,8 +214,10 @@ export default function PostEditor({
       title,
       type,
       status,
-      tags,
-      project: project ? { handle: project.handle } : undefined,
+      tags: tags.filter((tag) => !tag.isProjectTag).map((tag) => tag.name),
+      projectTags: tags
+        .filter((tag) => tag.isProjectTag)
+        .map((tag) => tag.name),
       content: serialize(editor),
     });
   };
@@ -313,7 +347,17 @@ export default function PostEditor({
         </Button>
       </div>
 
-      {deleteAction && <div className="border-t pt-4">{deleteAction}</div>}
+      {isEditing &&
+        initialStatus === PostStatus.DRAFT &&
+        postId !== undefined && (
+          <div className="border-t pt-4">
+            <PostDeleteButton
+              postId={postId}
+              redirectTo={ROUTES.DRAFTS()}
+              className="w-full"
+            />
+          </div>
+        )}
     </div>
   );
 

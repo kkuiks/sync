@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 public class PostQueryController {
 
   private final PostQueryService postQueryService;
@@ -40,7 +41,7 @@ public class PostQueryController {
       @RequestParam(required = false) PostType type,
       @RequestParam(required = false) PostScope scope,
       @Validated CursorPaginationRequest pagination) {
-    return postQueryService.getDrafts(user == null ? null : user.userId(), type, scope, pagination);
+    return postQueryService.getDrafts(user.userId(), type, scope, pagination);
   }
 
   @GetMapping("/posts/{slug}")

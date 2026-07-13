@@ -1,12 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 
 import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
-import { Unimplemented } from '@/components/ui/unimplemented';
 import { requireOnboardedSession } from '@/lib/auth/guards';
 
 import DiscoverCard from './_components/DiscoverCard';
 import HomeFeed from './_components/HomeFeed';
-import RecentlyViewedPosts from './_components/RecentlyViewedPosts';
 import TrendingTags from './_components/TrendingTags';
 
 export default async function Home() {
@@ -25,15 +23,8 @@ export default async function Home() {
         main={<HomeFeed />}
         side={
           <div className="space-y-4">
-            <Unimplemented>
-              <DiscoverCard />
-            </Unimplemented>
-            <Unimplemented>
-              <TrendingTags />
-            </Unimplemented>
-            <Unimplemented>
-              <RecentlyViewedPosts />
-            </Unimplemented>
+            <DiscoverCard />
+            <TrendingTags />
           </div>
         }
       />

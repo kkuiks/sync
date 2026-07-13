@@ -20,7 +20,7 @@ export interface UpdatePostRequest {
   /** Content */
   content: UpdatePostRequestContent;
   /**
-   * 태그 목록
+   * 전역 태그 목록
    * @nullable
    */
   tags?: UpdatePostRequestTagsItem[] | null;

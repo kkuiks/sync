@@ -13,4 +13,7 @@ public interface PostMediaFileRepository extends JpaRepository<PostMediaFile, Lo
   @Modifying
   @Query("DELETE FROM PostMediaFile postMediaFile WHERE postMediaFile.post.id = :postId")
   void deleteAllByPostId(Long postId);
+
+  List<PostMediaFile> findByPostIdInAndSortOrderLessThanOrderByPostIdAscSortOrderAsc(
+      List<Long> postIds, int sortOrderExclusiveUpperBound);
 }

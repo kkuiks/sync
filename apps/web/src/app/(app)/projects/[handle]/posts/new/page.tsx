@@ -3,9 +3,9 @@
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
-import { useCreatePost } from '@/api/__generated__/post/post';
+import { useCreateProjectPost } from '@/api/__generated__/post/post';
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
-import { type CreatePostRequest } from '@/api/__generated__/types';
+import { type CreateProjectPostRequest } from '@/api/__generated__/types';
 import PostEditor from '@/components/feature/post/editor/PostEditor';
 import { PostStatus, PostType } from '@/components/feature/post/types/post';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
@@ -27,18 +27,19 @@ export default function CreateProjectPostPage() {
   useAuthGuard();
   const { data: projectData } = useGetProjectByHandle(handle);
 
-  const { mutate: createPost, isPending: isCreatingPost } = useCreatePost({
-    mutation: {
-      onSuccess: ({ data }, variables) => {
-        if (variables.data?.status === PostStatus.DRAFT) {
-          router.replace(ROUTES.PROJECT_POST_EDIT(handle, data.slug));
-          return;
-        }
+  const { mutate: createProjectPost, isPending: isCreatingPost } =
+    useCreateProjectPost({
+      mutation: {
+        onSuccess: ({ data }, variables) => {
+          if (variables.data?.status === PostStatus.DRAFT) {
+            router.replace(ROUTES.PROJECT_POST_EDIT(handle, data.slug));
+            return;
+          }
 
-        router.push(ROUTES.PROJECT_POST(handle, data.slug));
+          router.push(ROUTES.PROJECT_POST(handle, data.slug));
+        },
       },
-    },
-  });
+    });
 
   return (
     <PostEditor
@@ -48,20 +49,21 @@ export default function CreateProjectPostPage() {
         handle,
         name: projectData?.data.summary.name ?? t('workspace-loading'),
       }}
-      onSubmit={({ title, type, status, tags, project, content }) => {
-        createPost({
+      onSubmit={({ title, type, status, tags, projectTags, content }) => {
+        createProjectPost({
+          handle,
           data: {
             type,
             status,
             title,
             tags,
-            project,
+            projectTags,
             content: {
               json: content.json,
               text: content.text,
               mediaIds: content.media.map((media) => media.id),
             },
-          } satisfies CreatePostRequest,
+          } satisfies CreateProjectPostRequest,
         });
       }}
     />

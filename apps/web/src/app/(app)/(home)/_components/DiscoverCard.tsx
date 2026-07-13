@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
-import { useGetRecommendations } from '@/api/__generated__/user/user';
+import { useGetUserRecommendations } from '@/api/__generated__/user/user';
 import {
   useFollowUser,
   useFollowedRecommendedUserIds,
@@ -17,7 +17,7 @@ const MAX_DISCOVER_USERS = 4;
 export default function DiscoverCard() {
   const t = useTranslations('pages.home.discover');
   const followedUserIds = useFollowedRecommendedUserIds();
-  const { data, isPending } = useGetRecommendations();
+  const { data, isPending } = useGetUserRecommendations();
   const { mutate: followUser, isPending: isFollowPending } = useFollowUser();
 
   const users = (data?.data.users ?? []).slice(0, MAX_DISCOVER_USERS);

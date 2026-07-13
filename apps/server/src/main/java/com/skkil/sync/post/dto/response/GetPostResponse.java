@@ -10,7 +10,7 @@ import lombok.Builder;
 public record GetPostResponse(PostSummary summary, Content content) {
 
   @Builder
-  public static record Content(String json, List<String> tags, List<Media> media) {}
+  public static record Content(String json, List<Media> media) {}
 
   @Builder
   public static record Media(Long id, String url) {}

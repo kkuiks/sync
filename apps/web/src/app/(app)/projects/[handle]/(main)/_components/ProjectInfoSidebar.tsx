@@ -121,7 +121,7 @@ function OpenQuestionsWidget({ handle }: ProjectInfoSidebarProps) {
   });
 
   const nodes = data?.data.posts?.nodes ?? [];
-  const openQuestions = nodes.filter((node) => !node.content.summary.resolved);
+  const openQuestions = nodes.filter((node) => !node.content.resolved);
   const visibleQuestions = openQuestions.slice(0, MAX_OPEN_QUESTIONS);
 
   return (
@@ -146,12 +146,12 @@ function OpenQuestionsWidget({ handle }: ProjectInfoSidebarProps) {
         ) : (
           <ul className="space-y-2">
             {visibleQuestions.map((node) => (
-              <li key={node.content.summary.id}>
+              <li key={node.content.id}>
                 <Link
-                  href={ROUTES.PROJECT_POST(handle, node.content.summary.slug)}
+                  href={ROUTES.PROJECT_POST(handle, node.content.slug)}
                   className="text-sm hover:underline"
                 >
-                  {node.content.summary.title}
+                  {node.content.title}
                 </Link>
               </li>
             ))}

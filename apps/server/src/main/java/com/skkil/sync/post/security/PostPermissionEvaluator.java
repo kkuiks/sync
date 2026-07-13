@@ -6,6 +6,7 @@ import com.skkil.sync.common.security.PermissionOperation;
 import com.skkil.sync.common.security.enums.PermissionEvaluatorType;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.repository.PostRepository;
+import com.skkil.sync.project.model.Teammate;
 import com.skkil.sync.project.repository.TeammateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -94,9 +95,25 @@ public class PostPermissionEvaluator implements CustomPermissionEvaluator<Long> 
       return false;
     }
 
-    boolean isOwner = user.userId().equals(post.getAuthor().getId());
-    if (!isOwner) {
-      log.debug("User {} is not the owner of post {}, cannot delete", user.userId(), post.getId());
+    if (user.userId().equals(post.getAuthor().getId())) {
+      return true;
+    }
+
+    if (post.getProject() == null) {
+      log.debug("User {} is not the author of post {}, cannot delete", user.userId(), post.getId());
+      return false;
+    }
+
+    boolean canManageProject =
+        teammateRepository
+            .findByProjectIdAndUserId(post.getProject().getId(), user.userId())
+            .map(Teammate::canManageProject)
+            .orElse(false);
+    if (!canManageProject) {
+      log.debug(
+          "User {} is neither the author of post {} nor a manager of its project, cannot delete",
+          user.userId(),
+          post.getId());
       return false;
     }
 

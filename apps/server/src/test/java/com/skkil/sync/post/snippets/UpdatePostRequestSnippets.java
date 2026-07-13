@@ -4,6 +4,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
+import com.skkil.sync.post.dto.request.PostContentRequest;
 import com.skkil.sync.post.dto.request.UpdatePostRequest;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
@@ -14,8 +15,8 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 public class UpdatePostRequestSnippets {
 
   public static UpdatePostRequest getUpdatePostRequest() {
-    UpdatePostRequest.Content content =
-        new UpdatePostRequest.Content(
+    PostContentRequest content =
+        new PostContentRequest(
             "This is a post content.", "{\"text\": \"This is a post content.\"}", List.of(1L));
 
     return new UpdatePostRequest(
@@ -40,6 +41,6 @@ public class UpdatePostRequestSnippets {
             .type(JsonFieldType.ARRAY)
             .description("사용된 미디어 ID 목록")
             .optional(),
-        fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록").optional());
+        fieldWithPath("tags").type(JsonFieldType.ARRAY).description("전역 태그 목록").optional());
   }
 }

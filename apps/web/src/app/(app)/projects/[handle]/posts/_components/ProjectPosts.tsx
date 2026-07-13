@@ -10,7 +10,7 @@ import { useGetProjectTags } from '@/api/__generated__/tag/tag';
 import { PostType } from '@/components/feature/post/types/post';
 import PostList from '@/components/feature/post/viewer/PostList';
 import PostListMessage from '@/components/feature/post/viewer/error/PostListMessage';
-import { toPostViewSource } from '@/components/feature/post/viewer/types';
+import { toPostSummary } from '@/components/feature/post/viewer/types';
 import { Button, LinkButton } from '@/components/ui/button';
 import { useRequireAuth } from '@/hooks/use-require-auth';
 import ROUTES from '@/util/routes';
@@ -100,7 +100,7 @@ export default function ProjectPosts({
       <h1 className="text-xl font-semibold">{viewTitle}</h1>
 
       <PostList
-        items={posts.map((post) => toPostViewSource(post.content))}
+        items={posts.map((post) => toPostSummary(post.content))}
         isPending={isPending}
         isError={isError}
         hasNextPage={!!hasNextPage}

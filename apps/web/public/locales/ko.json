@@ -24,12 +24,12 @@
           "questions": "질문"
         }
       },
-      "recently-viewed": {
-        "title": "최근 본 게시물"
-      },
       "trending-tags": {
         "title": "인기 태그",
-        "post-count": "게시물 {count}개"
+        "explore": "탐색",
+        "post-count": "게시물 {count}개",
+        "follow": "팔로우",
+        "following": "팔로잉"
       }
     },
     "explore": {
@@ -43,6 +43,26 @@
         },
         "TRENDING": {
           "title": "인기 포스트가 없습니다",
+          "description": "잠시 후 다시 확인해 주세요."
+        }
+      },
+      "tags": {
+        "title": "태그",
+        "description": "관심 있는 태그를 팔로우하고 관련 글을 모아보세요.",
+        "list": {
+          "empty": "태그가 없습니다.",
+          "error": "태그를 불러오는 중 오류가 발생했습니다."
+        },
+        "post-count": "게시물 {count}개",
+        "no-description": "설명이 없습니다.",
+        "follow": "팔로우",
+        "unfollow": "팔로잉"
+      },
+      "projects": {
+        "title": "이번 달 인기 프로젝트",
+        "description": "팔로우할 가치가 있는 프로젝트를 만나보세요.",
+        "empty": {
+          "title": "추천 프로젝트가 없습니다",
           "description": "잠시 후 다시 확인해 주세요."
         }
       }
@@ -283,7 +303,7 @@
               "cancel": "취소",
               "submit": "생성",
               "messages": {
-                "success": "'{name}' 태그를 생성했습니다.",
+                "success": "‘{name}’ 태그를 생성했습니다.",
                 "error": "태그 생성에 실패했습니다."
               }
             },
@@ -293,7 +313,7 @@
               "empty": "인증되지 않은 태그가 없습니다.",
               "verify": "인증",
               "messages": {
-                "success": "'{name}' 태그를 인증했습니다.",
+                "success": "‘{name}’ 태그를 인증했습니다.",
                 "error": "태그 인증에 실패했습니다."
               }
             },
@@ -664,23 +684,33 @@
         "description": "몇 가지만 더 알려주시면 sync를 시작할 준비가 끝나요."
       },
       "steps": {
-        "welcome": {
-          "title": "sync에 오신 것을 환영합니다!",
-          "description": "시작하려면 몇 가지 질문에 답해주세요."
-        },
-        "choose-handle": {
-          "title": "사용자 이름 선택",
-          "description": "다른 사용자가 볼 수 있는 고유한 사용자 이름을 선택하세요.",
+        "profile": {
+          "title": "프로필을 설정해주세요",
+          "description": "다른 사용자에게 보여질 이름과 사용자 이름을 확인하고 필요하면 수정하세요.",
           "form": {
+            "name": {
+              "label": "이름",
+              "placeholder": "이름을 입력하세요"
+            },
             "handle": {
+              "label": "사용자 이름",
               "placeholder": "사용자 이름을 입력하세요 (예: username123)"
             },
             "errors": {
+              "required_name": "이름은 필수 항목입니다.",
               "invalid_characters": "사용자 이름에는 영문자, 숫자, 밑줄만 사용할 수 있습니다.",
               "minimum_length": "사용자 이름은 최소 {length}자 이상이어야 합니다.",
               "maximum_length": "사용자 이름은 최대 {length}자 이하여야 합니다.",
               "handle_in_use": "이 사용자 이름은 이미 사용 중입니다."
             }
+          }
+        },
+        "tags": {
+          "title": "관심 있는 태그를 팔로우하세요",
+          "description": "관심 분야의 태그를 검색해서 팔로우하면 관련된 글을 피드에서 먼저 만나볼 수 있어요.",
+          "search": {
+            "placeholder": "태그 검색하기",
+            "empty": "검색 결과가 없어요. 다른 검색어로 시도해보세요."
           }
         },
         "follow": {
@@ -689,6 +719,30 @@
           "follow": "팔로우",
           "following": "팔로잉",
           "empty": "아직 추천할 사용자가 없어요. 나중에 다시 확인해보세요."
+        },
+        "email-verification": {
+          "title": "이메일을 인증해주세요",
+          "description": "계정 보호를 위해 이메일 인증이 필요해요. 인증 코드를 받고 입력해주세요.",
+          "form": {
+            "token": {
+              "label": "인증 코드",
+              "placeholder": "이메일로 받은 인증 코드를 입력하세요"
+            }
+          },
+          "actions": {
+            "send": "인증 코드 보내기",
+            "resend": "인증 코드 다시 보내기",
+            "verify": "인증하기"
+          },
+          "messages": {
+            "sent": "인증 코드를 보냈어요. 이메일을 확인해주세요.",
+            "verified": "이메일이 인증되었어요.",
+            "alreadyVerified": "이미 인증된 이메일이에요."
+          },
+          "errors": {
+            "send": "인증 코드를 보내지 못했어요. 다시 시도해주세요.",
+            "invalidToken": "인증 코드가 올바르지 않아요."
+          }
         },
         "finished": {
           "title": "이제 sync를 사용할 준비가 끝났습니다!",
@@ -1265,7 +1319,8 @@
         "post-count": "{count}개의 게시물",
         "max-tags": "태그는 최대 {count}개까지 추가할 수 있습니다",
         "loading": "태그를 검색하는 중...",
-        "not-found": "태그를 찾을 수 없습니다"
+        "not-found": "태그를 찾을 수 없습니다",
+        "project-tag": "프로젝트 태그입니다"
       }
     }
   },
