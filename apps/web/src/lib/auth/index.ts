@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
+import { setSessionCookie } from 'better-auth/cookies';
 import { nextCookies } from 'better-auth/next-js';
 import { HTTPError } from 'ky';
 
@@ -64,6 +65,8 @@ export const auth = betterAuth({
               }
               const sessionCookieHash =
                 await hashSpringSessionCookie(sessionCookie);
+              const forceSync =
+                String(ctx.query?.disableCookieCache) === 'true';
 
               const existingToken = await ctx.getSignedCookie(
                 ctx.context.authCookies.sessionToken.name,
@@ -75,6 +78,7 @@ export const auth = betterAuth({
                   await ctx.context.internalAdapter.findSession(existingToken);
 
                 if (
+                  !forceSync &&
                   existingSession &&
                   new Date(existingSession.session.expiresAt) > new Date() &&
                   existingSession.session.springSessionHash ===
@@ -156,14 +160,7 @@ export const auth = betterAuth({
                 { springSessionHash: sessionCookieHash },
               );
 
-              await ctx.setSignedCookie(
-                ctx.context.authCookies.sessionToken.name,
-                session.token,
-                ctx.context.secret,
-                {
-                  ...ctx.context.authCookies.sessionToken.attributes,
-                },
-              );
+              await setSessionCookie(ctx, { session, user });
 
               return {
                 user,

@@ -22,7 +22,11 @@ export function useOnboardProfile(options?: UseOnboardProfileOptions) {
           queryKey: getGetAuthenticatedUserQueryKey(),
         });
 
-        await refetchSession();
+        await refetchSession({
+          query: {
+            disableCookieCache: true,
+          },
+        });
 
         options?.onSuccess?.();
       },
