@@ -756,7 +756,8 @@
           },
           "errors": {
             "send": "인증 코드를 보내지 못했어요. 다시 시도해주세요.",
-            "invalidToken": "인증 코드가 올바르지 않아요."
+            "invalidToken": "인증 코드가 올바르지 않아요.",
+            "useEnglishInput": "영문 입력으로 전환해주세요."
           }
         },
         "finished": {

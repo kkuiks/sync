@@ -26,6 +26,15 @@ import SyncError, { ErrorCode } from '@/lib/error';
 
 import { OnboardingStepContentProps, OnboardingStepContentRef } from '../page';
 
+const EMAIL_VERIFICATION_TOKEN_LENGTH = 6;
+const HANGUL_PATTERN = /\p{Script=Hangul}/u;
+
+const sanitizeVerificationToken = (value: string) =>
+  value
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '')
+    .slice(0, EMAIL_VERIFICATION_TOKEN_LENGTH);
+
 export const EmailVerificationStep = forwardRef<
   OnboardingStepContentRef,
   OnboardingStepContentProps
@@ -121,6 +130,11 @@ export const EmailVerificationStep = forwardRef<
     sendVerificationEmail();
   };
 
+  const tokenChangeHandler = (value: string) => {
+    setToken(sanitizeVerificationToken(value));
+    setError(HANGUL_PATTERN.test(value) ? t('errors.useEnglishInput') : null);
+  };
+
   const verifyClickHandler = () => {
     setError(null);
     verifyEmail({ data: { token } });
@@ -152,8 +166,10 @@ export const EmailVerificationStep = forwardRef<
           <div className="flex gap-2">
             <Input
               value={token}
-              onChange={(event) => setToken(event.target.value)}
+              onChange={(event) => tokenChangeHandler(event.target.value)}
+              autoComplete="one-time-code"
               placeholder={t('form.token.placeholder')}
+              spellCheck={false}
             />
             <Button
               type="button"
