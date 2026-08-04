@@ -1,210 +1,283 @@
 'use client';
 
-import {
-  ClockIcon,
-  GaugeIcon,
-  QuestionIcon,
-  StarIcon,
-} from '@phosphor-icons/react';
+import { PencilIcon, PushPinIcon } from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { toast } from 'sonner';
 
-import { useGetPinnedPostsByProject } from '@/api/__generated__/post/post';
+import {
+  useGetPinnedPostsByProject,
+  useGetPostsByProjectInfinite,
+} from '@/api/__generated__/post/post';
 import { useGetProjectByHandle } from '@/api/__generated__/project/project';
-import type { GetPostsResponsePostsItem } from '@/api/__generated__/types';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { RelativeTime } from '@/components/ui/relative-time';
+import { GetProjectResponseSummaryJoinPolicy } from '@/api/__generated__/types';
+import { PostPreviewCard } from '@/components/feature/post/viewer/PostCard';
+import PostList from '@/components/feature/post/viewer/PostList';
+import PostListMessage from '@/components/feature/post/viewer/error/PostListMessage';
+import { toPostSummary } from '@/components/feature/post/viewer/types';
+import {
+  useFollowProject,
+  useUnfollowProject,
+} from '@/components/feature/project/hooks/useFollowProject';
+import { useJoinProject } from '@/components/feature/project/hooks/useProjectJoinRequest';
+import { Button, LinkButton } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Unimplemented } from '@/components/ui/unimplemented';
+import { useRequireAuth } from '@/hooks/use-require-auth';
 import ROUTES from '@/util/routes';
 
-const WORDS_PER_MINUTE = 200;
+import AddTeammatePopover from '../../posts/_components/AddTeammatePopover';
 
-// TODO: there's no knowledge-verification feature yet — placeholder stats
-// until that backend work exists.
-const MOCK_KNOWLEDGE_HEALTH = {
-  freshPercent: 88,
-  needsReviewCount: 4,
-  unansweredCount: 3,
-};
+const PAGE_SIZE = '10';
+const MAX_PINNED = 2;
 
 interface ProjectDashboardProps {
   handle: string;
 }
 
 export default function ProjectDashboard({ handle }: ProjectDashboardProps) {
-  const { data, isPending } = useGetProjectByHandle(handle);
-
   return (
     <div className="space-y-6">
-      <KnowledgeHealthSection />
-      <PinnedSection handle={handle} />
-      <RecentActivitySection
-        activities={data?.data.recentActivities ?? []}
-        isPending={isPending}
-        handle={handle}
-      />
+      <FeedHeader handle={handle} />
+      <PinnedBanner handle={handle} />
+      <ProjectFeed handle={handle} />
     </div>
   );
 }
 
-function KnowledgeHealthSection() {
-  const t = useTranslations(
-    'pages.projects.project.dashboard.knowledge-health',
-  );
+function FeedHeader({ handle }: { handle: string }) {
+  const t = useTranslations('pages.projects.project.header');
+  const tDashboard = useTranslations('pages.projects.project.dashboard.feed');
+  const { requireAuth } = useRequireAuth();
+
+  const { data, isPending } = useGetProjectByHandle(handle);
+  const { mutate: followProject, isPending: isFollowPending } =
+    useFollowProject();
+  const { mutate: unfollowProject, isPending: isUnfollowPending } =
+    useUnfollowProject();
+  const { mutate: joinProject, isPending: isJoinPending } = useJoinProject();
+
+  const handleFollowToggle = (isFollowing: boolean) => {
+    if (!requireAuth({ intent: 'follow' })) {
+      return;
+    }
+
+    if (isFollowing) {
+      unfollowProject({ handle });
+      return;
+    }
+
+    followProject({ handle });
+  };
+
+  const handleJoin = (joinPolicy: GetProjectResponseSummaryJoinPolicy) => {
+    if (!requireAuth({ intent: 'join' })) {
+      return;
+    }
+
+    joinProject(
+      { handle },
+      {
+        onSuccess: () => {
+          toast.success(
+            joinPolicy === GetProjectResponseSummaryJoinPolicy.Open
+              ? t('join.joined')
+              : t('join.requested'),
+          );
+        },
+        onError: () => {
+          toast.error(t('join.error'));
+        },
+      },
+    );
+  };
+
+  const { summary, role, hasPendingJoinRequest, isFollowing } =
+    data?.data ?? {};
+  const isMember = !!role;
+  const canJoin =
+    summary?.joinPolicy === GetProjectResponseSummaryJoinPolicy.Open ||
+    summary?.joinPolicy === GetProjectResponseSummaryJoinPolicy.Request;
 
   return (
-    <Unimplemented>
-      <Card>
-        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-center gap-3">
-            <GaugeIcon className="text-success-text size-8" />
-            <div>
-              <p className="text-sm font-semibold">{t('fresh')}</p>
-              <p className="text-muted-foreground text-xs">
-                {t('fresh-detail', {
-                  percent: MOCK_KNOWLEDGE_HEALTH.freshPercent,
-                })}
-              </p>
-            </div>
-          </div>
+    <div className="flex items-center justify-between gap-3">
+      <h1 className="text-lg font-semibold">{tDashboard('heading')}</h1>
 
-          <div className="flex items-center gap-3">
-            <ClockIcon className="text-warning-text size-8" />
-            <div>
-              <p className="text-lg font-semibold">
-                {MOCK_KNOWLEDGE_HEALTH.needsReviewCount}
-              </p>
-              <p className="text-muted-foreground text-xs">
-                {t('needs-review')}
-              </p>
-            </div>
-          </div>
+      {isPending ? (
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-20 rounded-md" />
+          <Skeleton className="h-9 w-20 rounded-md" />
+        </div>
+      ) : (
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Membership — joining the project is separate from following it. */}
+          {isMember ? (
+            <Button variant="outline" disabled>
+              {t('status.member')}
+            </Button>
+          ) : (
+            canJoin &&
+            summary &&
+            (hasPendingJoinRequest ? (
+              <Button variant="outline" disabled>
+                {t('join.requested-status')}
+              </Button>
+            ) : (
+              <Button
+                disabled={isJoinPending}
+                onClick={() => handleJoin(summary.joinPolicy)}
+              >
+                {summary.joinPolicy === GetProjectResponseSummaryJoinPolicy.Open
+                  ? t('join.join')
+                  : t('join.request')}
+              </Button>
+            ))
+          )}
 
-          <div className="flex items-center gap-3">
-            <QuestionIcon className="text-destructive size-8" />
-            <div>
-              <p className="text-lg font-semibold">
-                {MOCK_KNOWLEDGE_HEALTH.unansweredCount}
-              </p>
-              <p className="text-muted-foreground text-xs">{t('unanswered')}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Unimplemented>
+          {/* Following — for non-members only; membership already subscribes. */}
+          {!isMember && (
+            <Button
+              variant="outline"
+              disabled={isFollowPending || isUnfollowPending}
+              onClick={() => handleFollowToggle(!!isFollowing)}
+            >
+              {isFollowing ? t('follow.following') : t('follow.follow')}
+            </Button>
+          )}
+
+          {/* Writing — teammates only. */}
+          {isMember && (
+            <LinkButton href={ROUTES.NEW_PROJECT_POST(handle)}>
+              <PencilIcon />
+              {t('actions.write')}
+            </LinkButton>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
-function PinnedSection({ handle }: { handle: string }) {
+function PinnedBanner({ handle }: { handle: string }) {
   const t = useTranslations('pages.projects.project.dashboard.pinned');
   const { data, isPending } = useGetPinnedPostsByProject(handle);
-  const posts = data?.data.posts ?? [];
+  const posts = (data?.data.posts ?? []).slice(0, MAX_PINNED);
 
   if (!isPending && posts.length === 0) {
     return null;
   }
 
-  return (
-    <section className="space-y-3">
-      <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-        <StarIcon />
-        {t('heading')}
-      </h2>
-
-      {isPending ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <Skeleton key={index} className="h-20 w-full rounded-lg" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {posts.map((post) => (
-            <PinnedPostCard key={post.id} handle={handle} post={post} t={t} />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
-function PinnedPostCard({
-  handle,
-  post,
-  t,
-}: {
-  handle: string;
-  post: GetPostsResponsePostsItem;
-  t: ReturnType<
-    typeof useTranslations<'pages.projects.project.dashboard.pinned'>
-  >;
-}) {
-  const minutes = Math.max(1, Math.ceil(post.wordCount / WORDS_PER_MINUTE));
-
-  return (
-    <Link href={ROUTES.PROJECT_POST(handle, post.slug)}>
-      <Card>
-        <CardContent className="space-y-2">
-          <div className="flex items-center gap-2 text-xs">
-            <Badge variant="secondary">{t('badge')}</Badge>
-          </div>
-          <p className="text-sm font-semibold">{post.title ?? post.preview}</p>
-          <p className="text-muted-foreground text-xs">
-            {t('meta', { author: post.author.name, minutes })}
-          </p>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
-function RecentActivitySection({
-  activities,
-  isPending,
-  handle,
-}: {
-  activities: { id: string; text: string; timestamp: string }[];
-  isPending: boolean;
-  handle: string;
-}) {
-  const t = useTranslations('pages.projects.project.dashboard.recent-activity');
-
-  return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">{t('heading')}</h2>
-        <Link
-          href={ROUTES.PROJECT_FEED(handle)}
-          className="text-primary text-xs font-medium hover:underline"
-        >
-          {t('view-all')}
-        </Link>
+  if (isPending) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <Skeleton key={index} className="h-20 w-full rounded-lg" />
+        ))}
       </div>
+    );
+  }
 
-      {isPending ? (
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} className="h-14 w-full rounded-lg" />
-          ))}
+  return (
+    <div className="space-y-2">
+      {posts.map((post) => (
+        <div
+          key={post.id}
+          className="border-primary/30 bg-primary/5 overflow-hidden rounded-lg border"
+        >
+          <div className="text-primary flex items-center gap-1.5 px-4 pt-3 text-xs font-medium">
+            <PushPinIcon weight="fill" className="size-3.5" />
+            {t('badge')}
+          </div>
+          <PostPreviewCard summary={toPostSummary(post)} surface="flat" />
         </div>
-      ) : activities.length === 0 ? (
-        <p className="text-muted-foreground text-sm">{t('empty')}</p>
-      ) : (
-        <div className="space-y-3">
-          {activities.map((activity) => (
-            <Card key={activity.id} size="sm">
-              <CardContent className="flex items-center justify-between gap-3">
-                <p className="text-sm">{activity.text}</p>
-                <span className="text-muted-foreground shrink-0 text-xs">
-                  <RelativeTime date={activity.timestamp} />
-                </span>
-              </CardContent>
-            </Card>
-          ))}
+      ))}
+    </div>
+  );
+}
+
+function ProjectFeed({ handle }: { handle: string }) {
+  const t = useTranslations('pages.projects.project.posts');
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+  } = useGetPostsByProjectInfinite(
+    handle,
+    { first: PAGE_SIZE },
+    {
+      query: {
+        getNextPageParam: (lastPage) => {
+          const pageInfo = lastPage.data.posts?.pageInfo;
+          return pageInfo?.hasNextPage
+            ? (pageInfo.endCursor ?? undefined)
+            : undefined;
+        },
+      },
+    },
+  );
+
+  const posts =
+    data?.pages.flatMap((page) => page.data.posts?.nodes ?? []) ?? [];
+
+  return (
+    <PostList
+      items={posts.map((post) => toPostSummary(post.content))}
+      isPending={isPending}
+      isError={isError}
+      hasNextPage={!!hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
+      empty={<ProjectFeedEmpty handle={handle} />}
+      error={
+        <PostListMessage message={t('list.error')} variant="destructive" />
+      }
+      end={
+        <div className="py-4 text-center">
+          <p className="text-muted-foreground text-xs">{t('list.end')}</p>
         </div>
-      )}
-    </section>
+      }
+    />
+  );
+}
+
+function ProjectFeedEmpty({ handle }: { handle: string }) {
+  const t = useTranslations('pages.projects.project.posts.empty-state');
+  const { requireAuth } = useRequireAuth();
+
+  return (
+    <div className="flex w-full flex-col items-center gap-6 text-center">
+      <div className="space-y-2">
+        <p className="font-medium">{t('title')}</p>
+        <p className="text-muted-foreground text-sm">{t('description')}</p>
+      </div>
+      <div className="flex gap-2">
+        <AddTeammatePopover
+          projectHandle={handle}
+          trigger={
+            <Button variant="outline" size="sm">
+              {t('invite')}
+            </Button>
+          }
+        />
+        <LinkButton
+          href={ROUTES.NEW_PROJECT_POST(handle)}
+          size="sm"
+          onClick={(event) => {
+            if (
+              !requireAuth({
+                intent: 'write',
+                redirectTo: ROUTES.NEW_PROJECT_POST(handle),
+              })
+            ) {
+              event.preventDefault();
+            }
+          }}
+        >
+          {t('write')}
+        </LinkButton>
+      </div>
+    </div>
   );
 }

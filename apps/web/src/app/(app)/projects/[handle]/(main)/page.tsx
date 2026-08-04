@@ -5,7 +5,6 @@ import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import SyncError, { ErrorCode } from '@/lib/error';
 
 import ProjectDashboard from './_components/ProjectDashboard';
-import ProjectHeader from './_components/ProjectHeader';
 import ProjectInfoSidebar from './_components/ProjectInfoSidebar';
 
 interface ProjectDashboardPageProps {
@@ -31,14 +30,10 @@ export default async function ProjectDashboardPage({
   }
 
   return (
-    <div className="space-y-6">
-      <ProjectHeader handle={handle} />
-
-      <TwoColumnLayout
-        main={<ProjectDashboard handle={handle} />}
-        side={<ProjectInfoSidebar handle={handle} />}
-        reverseSideOnMobile
-      />
-    </div>
+    <TwoColumnLayout
+      main={<ProjectDashboard handle={handle} />}
+      side={<ProjectInfoSidebar handle={handle} />}
+      reverseSideOnMobile
+    />
   );
 }

@@ -450,11 +450,6 @@
           }
         },
         "header": {
-          "role": {
-            "admin": "관리자"
-          },
-          "description-empty": "설명이 없습니다.",
-          "meta": "멤버 {count}명 · {year}년 생성",
           "status": {
             "member": "참여 중"
           },
@@ -475,36 +470,34 @@
           }
         },
         "dashboard": {
-          "knowledge-health": {
-            "fresh": "지식이 최신 상태입니다",
-            "fresh-detail": "최근 주기에서 {percent}% 검증됨",
-            "needs-review": "검토 필요",
-            "unanswered": "미답변"
+          "feed": {
+            "heading": "피드"
           },
           "pinned": {
-            "heading": "고정된 게시글",
-            "badge": "고정",
-            "meta": "{author} · {minutes}분"
-          },
-          "recent-activity": {
-            "heading": "최근 활동",
-            "view-all": "피드에서 모두 보기 →",
-            "empty": "최근 활동이 없습니다."
+            "badge": "고정됨"
           }
         },
         "sidebar": {
-          "members": {
+          "about": {
+            "heading": "소개",
+            "description-empty": "설명이 없습니다.",
+            "visibility": {
+              "public": "공개",
+              "private": "비공개"
+            },
+            "join-policy": {
+              "open": "자유 가입",
+              "request": "승인제",
+              "invite": "초대 전용"
+            },
+            "stats": {
+              "followers": "팔로워",
+              "members": "멤버"
+            }
+          },
+          "contributors": {
             "heading": "멤버",
-            "invite": "멤버 초대하기",
-            "manage": "멤버 관리"
-          },
-          "open-questions": {
-            "heading": "미해결 질문",
-            "empty": "미해결 질문이 없습니다."
-          },
-          "top-tags": {
-            "heading": "인기 태그",
-            "empty": "태그가 없습니다."
+            "invite": "초대"
           }
         },
         "settings": {
