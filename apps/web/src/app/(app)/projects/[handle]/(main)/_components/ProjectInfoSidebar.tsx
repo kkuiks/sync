@@ -29,6 +29,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { toSafeHttpUrl } from '@/lib/utils';
 import ROUTES from '@/util/routes';
 
 import AddTeammatePopover from '../../posts/_components/AddTeammatePopover';
@@ -69,6 +70,7 @@ function AboutCard({ handle }: ProjectInfoSidebarProps) {
 
   const { summary } = data.data;
   const memberCount = teammatesData?.data.teammates.length ?? 0;
+  const websiteUrl = toSafeHttpUrl(summary.website);
 
   const joinPolicyLabel =
     summary.joinPolicy === GetProjectResponseSummaryJoinPolicy.Open
@@ -86,15 +88,15 @@ function AboutCard({ handle }: ProjectInfoSidebarProps) {
           {summary.description || t('description-empty')}
         </p>
 
-        {summary.website && (
+        {websiteUrl && (
           <a
-            href={summary.website}
+            href={websiteUrl}
             target="_blank"
             rel="noreferrer noopener"
             className="text-primary flex items-center gap-1.5 text-sm hover:underline"
           >
             <GlobeIcon className="size-4 shrink-0" />
-            <span className="truncate">{summary.website}</span>
+            <span className="truncate">{websiteUrl}</span>
           </a>
         )}
 

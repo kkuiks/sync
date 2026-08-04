@@ -474,7 +474,8 @@
             "heading": "피드"
           },
           "pinned": {
-            "badge": "고정됨"
+            "badge": "고정",
+            "meta": "{author} · {minutes}분"
           }
         },
         "sidebar": {
