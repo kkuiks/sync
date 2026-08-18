@@ -12,12 +12,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { toLocalDateTimeInputValue } from './dateTime';
 import {
   EmploymentType,
   ExperienceLevel,
   type RecruitmentFormValue,
   WorkMode,
 } from './types';
+
+export { toOptionalIsoDateTime } from './dateTime';
 
 interface RecruitmentFieldsProps {
   value: RecruitmentFormValue;
@@ -165,11 +168,7 @@ export function toRecruitmentFormValue(
     location: details.location ?? '',
     experienceLevel: details.experienceLevel,
     closesAt: details.closesAt
-      ? new Date(details.closesAt).toISOString().slice(0, 16)
+      ? toLocalDateTimeInputValue(details.closesAt)
       : '',
   };
-}
-
-export function toOptionalIsoDateTime(value: string): string | undefined {
-  return value ? new Date(value).toISOString() : undefined;
 }

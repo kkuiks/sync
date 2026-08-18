@@ -63,6 +63,6 @@ class RelatedPostControllerTests {
                 null,
                 Function.identity(),
                 pathParameters(parameterWithName("postId").description("기준 게시글 ID")),
-                GetPostsResponseSnippets.getPostsResponseFields("관련 게시글 목록 (최대 N개)")));
+                GetPostsResponseSnippets.getPostsResponseFields()));
   }
 }

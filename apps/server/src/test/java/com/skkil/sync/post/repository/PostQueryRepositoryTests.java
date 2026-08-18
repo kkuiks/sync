@@ -155,6 +155,25 @@ class PostQueryRepositoryTests {
   }
 
   @Test
+  @DisplayName("[getPostBySlug] 구인글 상세 조회는 구인 메타데이터를 포함한다")
+  void getPostBySlug_recruitmentPost_includesRecruitmentMetadata() {
+    User author = saveUser("recruitment-detail-author");
+    Post recruitment = savePost("recruitment-detail-post", author, null);
+    saveRecruitment(recruitment);
+
+    assertThat(postQueryRepository.getPostBySlug(author.getId(), recruitment.getSlug()))
+        .get()
+        .satisfies(
+            post -> {
+              assertThat(post.recruitmentStatus()).isEqualTo(RecruitmentStatus.OPEN);
+              assertThat(post.recruitmentEmploymentType()).isEqualTo(EmploymentType.FULL_TIME);
+              assertThat(post.recruitmentWorkMode()).isEqualTo(WorkMode.HYBRID);
+              assertThat(post.recruitmentLocation()).isEqualTo("서울");
+              assertThat(post.recruitmentExperienceLevel()).isEqualTo(ExperienceLevel.MID);
+            });
+  }
+
+  @Test
   @DisplayName("[getRecruitmentPosts] 구인글은 메타데이터 필터와 함께 전용 목록에 노출된다")
   void getRecruitmentPosts_returnsMatchingRecruitmentPosts() {
     User author = saveUser("recruitment-list-author");

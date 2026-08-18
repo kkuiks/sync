@@ -73,7 +73,7 @@ class PostSearchControllerTests {
                     parameterWithName("projectHandle")
                         .description("프로젝트로 검색 범위 제한 (선택)")
                         .optional()),
-                GetPostsResponseSnippets.getPostsResponseFields("검색 결과 게시글 목록")));
+                GetPostsResponseSnippets.getPostsResponseFields()));
   }
 
   @Test

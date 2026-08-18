@@ -4998,306 +4998,6 @@ paths:
                     }}]}}"
 components:
   schemas:
-    GetPostsResponse:
-      title: GetPostsResponse
-      required:
-      - posts
-      type: object
-      properties:
-        posts:
-          type: array
-          description: 프로젝트에 고정된 게시글 목록
-          items:
-            required:
-            - accessLevel
-            - author
-            - bookmarked
-            - canComment
-            - canDelete
-            - commentCount
-            - createdAt
-            - id
-            - isAuthor
-            - isSeriesPost
-            - likeCount
-            - liked
-            - mediaCount
-            - preview
-            - previewMedia
-            - resolved
-            - scope
-            - slug
-            - status
-            - tags
-            - type
-            - updatedAt
-            - wordCount
-            type: object
-            properties:
-              preview:
-                type: string
-                description: 게시물 내용의 일반 텍스트 미리보기
-              coverImageUrl:
-                type: string
-                description: 게시물 커버 이미지 URL (없으면 없음)
-                nullable: true
-              project:
-                type: object
-                properties:
-                  website:
-                    type: string
-                    description: 프로젝트 웹사이트
-                    nullable: true
-                  name:
-                    type: string
-                    description: 프로젝트 이름
-                    nullable: true
-                  isPublic:
-                    type: boolean
-                    description: 공개 여부
-                    nullable: true
-                  description:
-                    type: string
-                    description: 프로젝트 설명
-                    nullable: true
-                  handle:
-                    type: string
-                    description: 프로젝트 핸들
-                    nullable: true
-                  iconUrl:
-                    type: string
-                    description: 프로젝트 아이콘 URL
-                    nullable: true
-                  joinPolicy:
-                    type: string
-                    description: 프로젝트 참여 정책
-                    nullable: true
-                    enum:
-                    - OPEN
-                    - REQUEST
-                    - INVITE
-                  followerCount:
-                    type: number
-                    description: 프로젝트 팔로워 수
-                    nullable: true
-                description: 소속 프로젝트 정보
-              likeCount:
-                type: number
-                description: Number of Likes
-              type:
-                type: string
-                description: Post Type
-                enum:
-                - SHORT
-                - LONG
-                - QUESTION
-              title:
-                type: string
-                description: Post Title
-                nullable: true
-              liked:
-                type: boolean
-                description: Whether the current user liked this post
-              isAuthor:
-                type: boolean
-                description: Whether the requesting user is the author of this post
-              pinnedAt:
-                type: string
-                description: 게시글이 프로젝트 대시보드에 고정된 시각 (고정되지 않은 경우 없음)
-                nullable: true
-              createdAt:
-                type: string
-                description: Creation Timestamp
-              recruitment:
-                type: object
-                properties:
-                  experienceLevel:
-                    type: string
-                    description: 경력 수준
-                    nullable: true
-                    enum:
-                    - ANY
-                    - ENTRY
-                    - JUNIOR
-                    - MID
-                    - SENIOR
-                  workMode:
-                    type: string
-                    description: 근무 방식
-                    nullable: true
-                    enum:
-                    - REMOTE
-                    - HYBRID
-                    - ONSITE
-                  employmentType:
-                    type: string
-                    description: 고용 형태
-                    nullable: true
-                    enum:
-                    - FULL_TIME
-                    - PART_TIME
-                    - CONTRACT
-                    - INTERNSHIP
-                    - FREELANCE_PROJECT
-                  location:
-                    type: string
-                    description: 근무 지역
-                    nullable: true
-                  closesAt:
-                    type: string
-                    description: 모집 마감 시각
-                    nullable: true
-                  status:
-                    type: string
-                    description: 모집 상태
-                    nullable: true
-                    enum:
-                    - OPEN
-                    - CLOSED
-                description: 구인글 메타데이터 (일반 게시글에는 없음)
-              scope:
-                type: string
-                description: 게시글 공개 범위
-                enum:
-                - PUBLIC
-                - WORKSPACE
-              mediaCount:
-                type: number
-                description: 게시물에 첨부된 전체 미디어 수
-              canDelete:
-                type: boolean
-                description: "요청자가 이 게시글을 삭제할 수 있는지 여부 (작성자, 플랫폼 관리자(개인 게시글), 프로젝트\
-                  \ 관리자(프로젝트 게시글))"
-              canComment:
-                type: boolean
-                description: 요청자가 이 게시글에 댓글을 작성할 수 있는지 여부 (프로젝트 게시글은 팀원만 가능)
-              id:
-                type: number
-                description: Post ID
-              slug:
-                type: string
-                description: Post Slug
-              updatedAt:
-                type: string
-                description: Last Updated Timestamp
-              resolved:
-                type: boolean
-                description: Whether the question post has been resolved
-              wordCount:
-                type: number
-                description: 게시물 본문의 단어 수
-              accessLevel:
-                type: string
-                description: "요청자의 열람 수준 (FULL: 본문까지 열람, PREVIEW: 유료 게이트로 본문 잠김)"
-                enum:
-                - FULL
-                - PREVIEW
-              createdViaClientName:
-                type: string
-                description: 이 글을 만든 에이전트 클라이언트의 이름. 사람이 직접 쓴 글에는 없다
-                nullable: true
-              bookmarked:
-                type: boolean
-                description: Whether the current user bookmarked this post
-              author:
-                required:
-                - handle
-                - isDeleted
-                - name
-                type: object
-                properties:
-                  isDeleted:
-                    type: boolean
-                    description: 탈퇴한 사용자인지 여부
-                  name:
-                    type: string
-                    description: 유저 이름
-                  handle:
-                    type: string
-                    description: 유저 핸들
-                  profileImageUrl:
-                    type: string
-                    description: 유저 프로필 이미지 URL
-                    nullable: true
-                description: 작성자 정보
-              tags:
-                type: array
-                description: 게시물에 달린 태그 목록
-                items:
-                  required:
-                  - description
-                  - followerCount
-                  - id
-                  - isFollowing
-                  - name
-                  - postCount
-                  - verified
-                  type: object
-                  properties:
-                    isFollowing:
-                      type: boolean
-                      description: 요청자가 해당 태그를 팔로우하고 있는지 여부 (프로젝트 태그는 항상 false)
-                    verified:
-                      type: boolean
-                      description: 태그 검증 여부
-                    name:
-                      type: string
-                      description: 태그 이름
-                    postCount:
-                      type: number
-                      description: 태그가 사용된 게시물 수
-                    description:
-                      type: string
-                      description: 태그 설명
-                    id:
-                      type: number
-                      description: 태그 ID
-                    followerCount:
-                      type: number
-                      description: 태그를 팔로우하는 사용자 수
-                    projectHandle:
-                      type: string
-                      description: 프로젝트 태그인 경우 해당 프로젝트의 핸들 (전역 태그인 경우 없음)
-                      nullable: true
-              commentCount:
-                type: number
-                description: Number of Comments
-              isSeriesPost:
-                type: boolean
-                description: 게시글이 어떤 시리즈에 속해 있는지 여부
-              previewMedia:
-                type: array
-                description: 미리보기용 첨부 이미지 목록 (최대 3개). 이미지가 아닌 첨부 파일은 포함되지 않는다
-                items:
-                  required:
-                  - fileName
-                  - fileSize
-                  - id
-                  - mediaType
-                  - url
-                  type: object
-                  properties:
-                    fileName:
-                      type: string
-                      description: 업로드된 원본 파일 이름
-                    fileSize:
-                      type: number
-                      description: 파일 크기 (바이트)
-                    mediaType:
-                      type: string
-                      description: 파일의 MIME 타입
-                    id:
-                      type: number
-                      description: 미디어 ID
-                    url:
-                      type: string
-                      description: 미디어 URL
-              status:
-                type: string
-                description: Post Status
-                enum:
-                - DRAFT
-                - PUBLISHED
     UpdateCollectionRequest:
       title: UpdateCollectionRequest
       type: object
@@ -6214,6 +5914,306 @@ components:
                 type: string
                 description: 게시글을 담고 있는 컬렉션의 외부 식별자
                 nullable: true
+    GetPostsResponse:
+      title: GetPostsResponse
+      required:
+      - posts
+      type: object
+      properties:
+        posts:
+          type: array
+          description: 게시글 목록
+          items:
+            required:
+            - accessLevel
+            - author
+            - bookmarked
+            - canComment
+            - canDelete
+            - commentCount
+            - createdAt
+            - id
+            - isAuthor
+            - isSeriesPost
+            - likeCount
+            - liked
+            - mediaCount
+            - preview
+            - previewMedia
+            - resolved
+            - scope
+            - slug
+            - status
+            - tags
+            - type
+            - updatedAt
+            - wordCount
+            type: object
+            properties:
+              preview:
+                type: string
+                description: 게시물 내용의 일반 텍스트 미리보기
+              coverImageUrl:
+                type: string
+                description: 게시물 커버 이미지 URL (없으면 없음)
+                nullable: true
+              project:
+                type: object
+                properties:
+                  website:
+                    type: string
+                    description: 프로젝트 웹사이트
+                    nullable: true
+                  name:
+                    type: string
+                    description: 프로젝트 이름
+                    nullable: true
+                  isPublic:
+                    type: boolean
+                    description: 공개 여부
+                    nullable: true
+                  description:
+                    type: string
+                    description: 프로젝트 설명
+                    nullable: true
+                  handle:
+                    type: string
+                    description: 프로젝트 핸들
+                    nullable: true
+                  iconUrl:
+                    type: string
+                    description: 프로젝트 아이콘 URL
+                    nullable: true
+                  joinPolicy:
+                    type: string
+                    description: 프로젝트 참여 정책
+                    nullable: true
+                    enum:
+                    - OPEN
+                    - REQUEST
+                    - INVITE
+                  followerCount:
+                    type: number
+                    description: 프로젝트 팔로워 수
+                    nullable: true
+                description: 소속 프로젝트 정보
+              likeCount:
+                type: number
+                description: Number of Likes
+              type:
+                type: string
+                description: Post Type
+                enum:
+                - SHORT
+                - LONG
+                - QUESTION
+              title:
+                type: string
+                description: Post Title
+                nullable: true
+              liked:
+                type: boolean
+                description: Whether the current user liked this post
+              isAuthor:
+                type: boolean
+                description: Whether the requesting user is the author of this post
+              pinnedAt:
+                type: string
+                description: 게시글이 프로젝트 대시보드에 고정된 시각 (고정되지 않은 경우 없음)
+                nullable: true
+              createdAt:
+                type: string
+                description: Creation Timestamp
+              recruitment:
+                type: object
+                properties:
+                  experienceLevel:
+                    type: string
+                    description: 경력 수준
+                    nullable: true
+                    enum:
+                    - ANY
+                    - ENTRY
+                    - JUNIOR
+                    - MID
+                    - SENIOR
+                  workMode:
+                    type: string
+                    description: 근무 방식
+                    nullable: true
+                    enum:
+                    - REMOTE
+                    - HYBRID
+                    - ONSITE
+                  employmentType:
+                    type: string
+                    description: 고용 형태
+                    nullable: true
+                    enum:
+                    - FULL_TIME
+                    - PART_TIME
+                    - CONTRACT
+                    - INTERNSHIP
+                    - FREELANCE_PROJECT
+                  location:
+                    type: string
+                    description: 근무 지역
+                    nullable: true
+                  closesAt:
+                    type: string
+                    description: 모집 마감 시각
+                    nullable: true
+                  status:
+                    type: string
+                    description: 모집 상태
+                    nullable: true
+                    enum:
+                    - OPEN
+                    - CLOSED
+                description: 구인글 메타데이터 (일반 게시글에는 없음)
+              scope:
+                type: string
+                description: 게시글 공개 범위
+                enum:
+                - PUBLIC
+                - WORKSPACE
+              mediaCount:
+                type: number
+                description: 게시물에 첨부된 전체 미디어 수
+              canDelete:
+                type: boolean
+                description: "요청자가 이 게시글을 삭제할 수 있는지 여부 (작성자, 플랫폼 관리자(개인 게시글), 프로젝트\
+                  \ 관리자(프로젝트 게시글))"
+              canComment:
+                type: boolean
+                description: 요청자가 이 게시글에 댓글을 작성할 수 있는지 여부 (프로젝트 게시글은 팀원만 가능)
+              id:
+                type: number
+                description: Post ID
+              slug:
+                type: string
+                description: Post Slug
+              updatedAt:
+                type: string
+                description: Last Updated Timestamp
+              resolved:
+                type: boolean
+                description: Whether the question post has been resolved
+              wordCount:
+                type: number
+                description: 게시물 본문의 단어 수
+              accessLevel:
+                type: string
+                description: "요청자의 열람 수준 (FULL: 본문까지 열람, PREVIEW: 유료 게이트로 본문 잠김)"
+                enum:
+                - FULL
+                - PREVIEW
+              createdViaClientName:
+                type: string
+                description: 이 글을 만든 에이전트 클라이언트의 이름. 사람이 직접 쓴 글에는 없다
+                nullable: true
+              bookmarked:
+                type: boolean
+                description: Whether the current user bookmarked this post
+              author:
+                required:
+                - handle
+                - isDeleted
+                - name
+                type: object
+                properties:
+                  isDeleted:
+                    type: boolean
+                    description: 탈퇴한 사용자인지 여부
+                  name:
+                    type: string
+                    description: 유저 이름
+                  handle:
+                    type: string
+                    description: 유저 핸들
+                  profileImageUrl:
+                    type: string
+                    description: 유저 프로필 이미지 URL
+                    nullable: true
+                description: 작성자 정보
+              tags:
+                type: array
+                description: 게시물에 달린 태그 목록
+                items:
+                  required:
+                  - description
+                  - followerCount
+                  - id
+                  - isFollowing
+                  - name
+                  - postCount
+                  - verified
+                  type: object
+                  properties:
+                    isFollowing:
+                      type: boolean
+                      description: 요청자가 해당 태그를 팔로우하고 있는지 여부 (프로젝트 태그는 항상 false)
+                    verified:
+                      type: boolean
+                      description: 태그 검증 여부
+                    name:
+                      type: string
+                      description: 태그 이름
+                    postCount:
+                      type: number
+                      description: 태그가 사용된 게시물 수
+                    description:
+                      type: string
+                      description: 태그 설명
+                    id:
+                      type: number
+                      description: 태그 ID
+                    followerCount:
+                      type: number
+                      description: 태그를 팔로우하는 사용자 수
+                    projectHandle:
+                      type: string
+                      description: 프로젝트 태그인 경우 해당 프로젝트의 핸들 (전역 태그인 경우 없음)
+                      nullable: true
+              commentCount:
+                type: number
+                description: Number of Comments
+              isSeriesPost:
+                type: boolean
+                description: 게시글이 어떤 시리즈에 속해 있는지 여부
+              previewMedia:
+                type: array
+                description: 미리보기용 첨부 이미지 목록 (최대 3개). 이미지가 아닌 첨부 파일은 포함되지 않는다
+                items:
+                  required:
+                  - fileName
+                  - fileSize
+                  - id
+                  - mediaType
+                  - url
+                  type: object
+                  properties:
+                    fileName:
+                      type: string
+                      description: 업로드된 원본 파일 이름
+                    fileSize:
+                      type: number
+                      description: 파일 크기 (바이트)
+                    mediaType:
+                      type: string
+                      description: 파일의 MIME 타입
+                    id:
+                      type: number
+                      description: 미디어 ID
+                    url:
+                      type: string
+                      description: 미디어 URL
+              status:
+                type: string
+                description: Post Status
+                enum:
+                - DRAFT
+                - PUBLISHED
     UpdatePromotionRequest:
       title: UpdatePromotionRequest
       required:

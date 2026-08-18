@@ -46,8 +46,10 @@ public class PostQueryRepository {
   }
 
   public Optional<PostDto> getPostBySlug(Long requesterId, String slug) {
-    return dsl.select(post(requesterId, true))
+    return dsl.select(postWithRecruitment(requesterId, true))
         .from(POSTS)
+        .leftJoin(POST_RECRUITMENTS)
+        .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
         .leftJoin(PROJECTS)
         .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
         .where(POSTS.SLUG.eq(slug).and(PostConditions.readable(requesterId)))
@@ -122,7 +124,7 @@ public class PostQueryRepository {
                     .or(POSTS.PREVIEW.containsIgnoreCase(keyword)));
       }
 
-      return dsl.select(post(requesterId))
+      return dsl.select(postWithRecruitment(requesterId, false))
           .from(POSTS)
           .join(POST_RECRUITMENTS)
           .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
@@ -264,10 +266,12 @@ public class PostQueryRepository {
         bookmarkCondition = bookmarkCondition.and(PROJECTS.HANDLE.eq(projectHandle));
       }
 
-      return dsl.select(post(userId, POST_BOOKMARKS.CREATED_AT))
+      return dsl.select(postWithRecruitment(userId, POST_BOOKMARKS.CREATED_AT))
           .from(POST_BOOKMARKS)
           .join(POSTS)
           .on(POST_BOOKMARKS.POST_ID.eq(POSTS.ID))
+          .leftJoin(POST_RECRUITMENTS)
+          .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
           .leftJoin(PROJECTS)
           .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
           .where(bookmarkCondition)
@@ -286,10 +290,12 @@ public class PostQueryRepository {
         likeCondition = likeCondition.and(PROJECTS.HANDLE.eq(projectHandle));
       }
 
-      return dsl.select(post(userId, POST_LIKES.CREATED_AT))
+      return dsl.select(postWithRecruitment(userId, POST_LIKES.CREATED_AT))
           .from(POST_LIKES)
           .join(POSTS)
           .on(POST_LIKES.POST_ID.eq(POSTS.ID))
+          .leftJoin(POST_RECRUITMENTS)
+          .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
           .leftJoin(PROJECTS)
           .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
           .where(likeCondition)
@@ -313,10 +319,12 @@ public class PostQueryRepository {
         commentedCondition = commentedCondition.and(PROJECTS.HANDLE.eq(projectHandle));
       }
 
-      return dsl.select(post(userId, COMMENTED_AT))
+      return dsl.select(postWithRecruitment(userId, COMMENTED_AT))
           .from(commentedPosts)
           .join(POSTS)
           .on(POSTS.ID.eq(DSL.field(DSL.name("commented_posts", "postId"), Long.class)))
+          .leftJoin(POST_RECRUITMENTS)
+          .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
           .leftJoin(PROJECTS)
           .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
           .where(commentedCondition)
@@ -387,8 +395,10 @@ public class PostQueryRepository {
 
     Map<Long, PostDto> byId =
         dsl
-            .select(post(requesterId))
+            .select(postWithRecruitment(requesterId, false))
             .from(POSTS)
+            .leftJoin(POST_RECRUITMENTS)
+            .on(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID))
             .leftJoin(PROJECTS)
             .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
             .where(condition)
@@ -400,23 +410,27 @@ public class PostQueryRepository {
   }
 
   private List<SelectFieldOrAsterisk> post(Long requesterId) {
-    return post(requesterId, POSTS.CREATED_AT, false);
+    return post(requesterId, POSTS.CREATED_AT, false, false);
   }
 
-  private List<SelectFieldOrAsterisk> post(Long requesterId, boolean shouldFetchContent) {
-    return post(requesterId, POSTS.CREATED_AT, shouldFetchContent);
+  private List<SelectFieldOrAsterisk> postWithRecruitment(
+      Long requesterId, boolean shouldFetchContent) {
+    return post(requesterId, POSTS.CREATED_AT, shouldFetchContent, true);
   }
 
-  private List<SelectFieldOrAsterisk> post(Long requesterId, Field<OffsetDateTime> sortKey) {
-    return post(requesterId, sortKey, false);
+  private List<SelectFieldOrAsterisk> postWithRecruitment(
+      Long requesterId, Field<OffsetDateTime> sortKey) {
+    return post(requesterId, sortKey, false, true);
   }
 
-  // Shared by every query method below. POSTS.CONTENT is only ever the real column for
-  // getPostBySlug (shouldFetchContent = true) — every list-shaped query gets a null
-  // placeholder in its place instead of paying for the unbounded payload, while still
-  // keeping the selected column count aligned with PostDto's record components.
+  // 모든 조회가 공유하는 셀렉트 목록이다. POSTS.CONTENT 는 getPostBySlug 에서만 실제 컬럼을 싣고
+  // 목록 조회에서는 큰 본문을 읽지 않도록 null 자리를 채운다. 구인 메타데이터도 구인글을 반환할 수 있는
+  // 조회에서만 테이블을 조인하고, 일반글 전용 목록에서는 PostDto 컬럼 정렬을 유지하는 타입 지정 null 을 쓴다.
   private List<SelectFieldOrAsterisk> post(
-      Long requesterId, Field<OffsetDateTime> sortKey, boolean shouldFetchContent) {
+      Long requesterId,
+      Field<OffsetDateTime> sortKey,
+      boolean shouldFetchContent,
+      boolean includeRecruitment) {
     Field<Boolean> bookmarked =
         requesterId == null
             ? DSL.value(false)
@@ -457,35 +471,29 @@ public class PostQueryRepository {
                 .where(OAUTH2_REGISTERED_CLIENT.ID.eq(POSTS.CREATED_VIA_CLIENT_ID)));
 
     Field<String> recruitmentStatus =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.STATUS)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.STATUS
+            : DSL.value((String) null, POST_RECRUITMENTS.STATUS.getDataType());
     Field<String> recruitmentEmploymentType =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.EMPLOYMENT_TYPE)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.EMPLOYMENT_TYPE
+            : DSL.value((String) null, POST_RECRUITMENTS.EMPLOYMENT_TYPE.getDataType());
     Field<String> recruitmentWorkMode =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.WORK_MODE)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.WORK_MODE
+            : DSL.value((String) null, POST_RECRUITMENTS.WORK_MODE.getDataType());
     Field<String> recruitmentLocation =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.LOCATION)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.LOCATION
+            : DSL.value((String) null, POST_RECRUITMENTS.LOCATION.getDataType());
     Field<String> recruitmentExperienceLevel =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.EXPERIENCE_LEVEL)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.EXPERIENCE_LEVEL
+            : DSL.value((String) null, POST_RECRUITMENTS.EXPERIENCE_LEVEL.getDataType());
     Field<OffsetDateTime> recruitmentClosesAt =
-        DSL.field(
-            DSL.select(POST_RECRUITMENTS.CLOSES_AT)
-                .from(POST_RECRUITMENTS)
-                .where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+        includeRecruitment
+            ? POST_RECRUITMENTS.CLOSES_AT
+            : DSL.value((OffsetDateTime) null, POST_RECRUITMENTS.CLOSES_AT.getDataType());
 
     return List.of(
         POSTS.ID.as("id"),
