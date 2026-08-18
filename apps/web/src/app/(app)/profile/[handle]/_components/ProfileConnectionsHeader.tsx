@@ -32,6 +32,7 @@ export default function ProfileConnectionsHeader({
         <div className="flex items-center gap-2">
           <ProfileAvatar
             name={profile.data.name}
+            seed={handle}
             imageUrl={profile.data.profileImageUrl}
             size="sm"
           />

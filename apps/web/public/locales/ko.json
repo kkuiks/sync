@@ -643,6 +643,16 @@
             }
           }
         },
+        "members": {
+          "label": "멤버",
+          "list": {
+            "empty": "멤버가 없습니다.",
+            "error": "멤버를 불러오는 중 오류가 발생했습니다."
+          },
+          "role": {
+            "owner": "소유자"
+          }
+        },
         "header": {
           "status": {
             "member": "참여 중"
@@ -2265,9 +2275,8 @@
           "recruitment": "구인",
           "tags": "태그",
           "drafts": "초안",
-          "feed": "피드",
-          "questions": "질문",
-          "guides": "가이드",
+          "board": "게시판",
+          "members": "멤버",
           "browse": "둘러보기",
           "my-posts": "내 게시물",
           "my-comments": "내 댓글",

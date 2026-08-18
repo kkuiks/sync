@@ -64,6 +64,7 @@ export default function SearchUserResults({
           <Card className="items-center gap-3 p-4 text-center transition-colors hover:bg-muted/50">
             <ProfileAvatar
               name={user.name}
+              seed={user.handle}
               imageUrl={user.profileImageUrl}
               className="size-14"
             />

@@ -18,6 +18,7 @@ import {
   UpdateProjectRequestJoinPolicy,
 } from '@/api/__generated__/types';
 import { uploadFileToS3 } from '@/api/s3';
+import { ProjectAvatar } from '@/components/feature/project/avatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { FileInput, FileInputError, Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -440,18 +440,12 @@ function ProjectIconField({
 
   return (
     <div className="flex gap-4">
-      <Avatar className="h-16 w-16 rounded-lg">
-        <AvatarImage
-          src={
-            selectedIcon
-              ? selectedIcon.src
-              : project.summary.iconUrl || undefined
-          }
-        />
-        <AvatarFallback className="rounded-lg">
-          {project.summary.name.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <ProjectAvatar
+        className="h-16 w-16"
+        name={project.summary.name}
+        seed={handle}
+        iconUrl={selectedIcon ? selectedIcon.src : project.summary.iconUrl}
+      />
 
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">

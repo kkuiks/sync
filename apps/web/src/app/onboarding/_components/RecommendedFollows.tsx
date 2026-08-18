@@ -104,6 +104,7 @@ export const RecommendedFollows = forwardRef<
           >
             <ProfileAvatar
               name={user.summary.name}
+              seed={user.summary.handle}
               imageUrl={user.summary.profileImageUrl}
               size="lg"
             />

@@ -61,6 +61,7 @@ export default function TrendingProjectPosts() {
                 <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
                   <ProjectAvatar
                     name={post.project?.name ?? ''}
+                    seed={post.project?.handle ?? null}
                     iconUrl={post.project?.iconUrl}
                     className="size-4 rounded text-[0.5rem]"
                   />

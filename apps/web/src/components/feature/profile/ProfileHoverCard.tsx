@@ -53,6 +53,7 @@ export function ProfileHoverCard({
       <PopoverTrigger asChild>
         <ProfileAvatar
           name={name}
+          seed={handle}
           imageUrl={imageUrl}
           size={size}
           className={cn('cursor-pointer', className)}
@@ -73,6 +74,7 @@ export function ProfileHoverCard({
             <div className="flex items-center gap-3">
               <ProfileAvatar
                 name={isLoading ? name : (profile?.name ?? name)}
+                seed={handle}
                 imageUrl={
                   isLoading ? imageUrl : (profile?.profileImageUrl ?? imageUrl)
                 }

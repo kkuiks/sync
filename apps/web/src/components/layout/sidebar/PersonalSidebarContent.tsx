@@ -284,8 +284,8 @@ export default function PersonalSidebarContent() {
                           <Link href={ROUTES.PROJECT(project.handle)}>
                             <ProjectAvatar
                               name={project.name}
+                              seed={project.handle}
                               iconUrl={project.iconUrl}
-                              size="sm"
                             />
                             {project.name}
                           </Link>

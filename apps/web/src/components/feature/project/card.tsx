@@ -54,6 +54,7 @@ function ProjectCard(props: ProjectCardProps) {
         <div className="flex min-w-0 items-center gap-3">
           <ProjectAvatar
             name={props.name}
+            seed={props.handle}
             iconUrl={props.iconUrl}
             size="lg"
             className="size-10 text-lg"

@@ -39,11 +39,6 @@ const ROUTES = {
     const query = searchParams.toString();
     return query ? `${base}?${query}` : base;
   },
-  PROJECT_FEED: (handle: string) => ROUTES.PROJECT_POSTS(handle),
-  PROJECT_QUESTIONS: (handle: string) =>
-    ROUTES.PROJECT_POSTS(handle, { type: 'QUESTION' }),
-  PROJECT_GUIDES: (handle: string) =>
-    ROUTES.PROJECT_POSTS(handle, { type: 'LONG' }),
   PROJECT_MY_POSTS: (handle: string) => ROUTES.PROJECT(handle) + '/posts/my',
   PROJECT_MY_COMMENTS: (handle: string) =>
     ROUTES.PROJECT(handle) + '/posts/my-comments',
@@ -51,6 +46,7 @@ const ROUTES = {
     ROUTES.PROJECT(handle) + '/posts/bookmarks',
   PROJECT_COLLECTIONS: (handle: string) =>
     ROUTES.PROJECT(handle) + '/collections',
+  PROJECT_MEMBERS: (handle: string) => ROUTES.PROJECT(handle) + '/members',
   PROJECT_DRAFTS: (handle: string) => ROUTES.PROJECT(handle) + '/posts/drafts',
   TAG: (id: string) => `/tags/${id}`,
   PROJECT_TAG: (handle: string, id: string) =>

@@ -2,7 +2,6 @@
 
 import {
   ArrowLeftIcon,
-  BookOpenIcon,
   BookmarkSimpleIcon,
   CaretDownIcon,
   ChatCircleIcon,
@@ -11,14 +10,14 @@ import {
   HouseIcon,
   NotePencilIcon,
   PencilIcon,
-  QuestionIcon,
   RssIcon,
   StackSimpleIcon,
   TagIcon,
+  UsersIcon,
 } from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import {
@@ -157,7 +156,12 @@ function ProjectSwitcher({ handle }: SectionProps) {
               className="rounded-lg border border-sidebar-border"
               data-state={isProjectMenuOpen ? 'open' : 'closed'}
             >
-              <ProjectAvatar name={projectName} iconUrl={projectIconUrl} />
+              <ProjectAvatar
+                name={projectName}
+                seed={handle}
+                iconUrl={projectIconUrl}
+                size="lg"
+              />
               <span className="truncate font-medium">{projectName}</span>
               <CaretDownIcon
                 className={`ml-auto transition-transform ${
@@ -173,8 +177,8 @@ function ProjectSwitcher({ handle }: SectionProps) {
                 <Link href={ROUTES.PROJECT(project.handle)}>
                   <ProjectAvatar
                     name={project.name}
+                    seed={project.handle}
                     iconUrl={project.iconUrl}
-                    size="sm"
                   />
                   <span className="truncate">{project.name}</span>
                 </Link>
@@ -231,11 +235,9 @@ function AskOrWriteButton({ handle }: SectionProps) {
 function Browse({ handle }: SectionProps) {
   const t = useTranslations('components.layout.sidebar');
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const isPostsPath = pathname === ROUTES.PROJECT_POSTS(handle);
-  const type = searchParams.get('type');
-  const authorHandle = searchParams.get('authorHandle');
+  const isMembersPath = pathname.startsWith(ROUTES.PROJECT_MEMBERS(handle));
   const isTagsPath = pathname.startsWith(ROUTES.PROJECT_TAGS(handle));
   const isCollectionsPath = pathname.startsWith(
     ROUTES.PROJECT_COLLECTIONS(handle),
@@ -249,22 +251,16 @@ function Browse({ handle }: SectionProps) {
       isActive: pathname === ROUTES.PROJECT(handle),
     },
     {
-      labelKey: 'nav.feed',
-      href: ROUTES.PROJECT_FEED(handle),
+      labelKey: 'nav.board',
+      href: ROUTES.PROJECT_POSTS(handle),
       icon: RssIcon,
-      isActive: isPostsPath && !type && !authorHandle,
+      isActive: isPostsPath,
     },
     {
-      labelKey: 'nav.questions',
-      href: ROUTES.PROJECT_QUESTIONS(handle),
-      icon: QuestionIcon,
-      isActive: isPostsPath && type === 'QUESTION',
-    },
-    {
-      labelKey: 'nav.guides',
-      href: ROUTES.PROJECT_GUIDES(handle),
-      icon: BookOpenIcon,
-      isActive: isPostsPath && type === 'LONG',
+      labelKey: 'nav.members',
+      href: ROUTES.PROJECT_MEMBERS(handle),
+      icon: UsersIcon,
+      isActive: isMembersPath,
     },
     {
       labelKey: 'nav.tags',

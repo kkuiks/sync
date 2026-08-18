@@ -179,6 +179,7 @@ export default function ProjectInvitations() {
             <div className="flex min-w-0 items-center gap-3">
               <ProjectAvatar
                 name={invitation.project.name}
+                seed={invitation.project.handle}
                 iconUrl={invitation.project.iconUrl}
                 size="lg"
               />

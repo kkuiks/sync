@@ -57,7 +57,11 @@ export default function FollowingProjects() {
             variant="link"
             className="min-w-0 h-auto justify-start gap-3 p-0 text-foreground hover:no-underline"
           >
-            <ProjectAvatar name={project.name} iconUrl={project.iconUrl} />
+            <ProjectAvatar
+              name={project.name}
+              seed={project.handle}
+              iconUrl={project.iconUrl}
+            />
             <span className="flex min-w-0 flex-col items-start text-left">
               <span className="truncate text-sm font-medium">
                 {project.name}

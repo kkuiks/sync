@@ -51,7 +51,11 @@ export default function ProfileProjectsList({
       {projects.map((project) => (
         <Link key={project.handle} href={ROUTES.PROJECT(project.handle)}>
           <article className="flex items-center gap-3 rounded-md border p-4 hover:bg-accent transition-colors">
-            <ProjectAvatar name={project.name} iconUrl={project.iconUrl} />
+            <ProjectAvatar
+              name={project.name}
+              seed={project.handle}
+              iconUrl={project.iconUrl}
+            />
             <div>
               <p className="font-medium">{project.name}</p>
               <p className="text-sm text-muted-foreground">/{project.handle}</p>

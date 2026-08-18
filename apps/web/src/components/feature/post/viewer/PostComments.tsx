@@ -94,7 +94,7 @@ function PostCommentItem({
   return (
     <div className="flex items-start gap-3 py-4">
       {isAuthorDeleted ? (
-        <ProfileAvatar name={authorName} size="sm" />
+        <ProfileAvatar name={authorName} seed={null} size="sm" />
       ) : (
         <ProfileHoverCard
           handle={author?.handle ?? ''}
@@ -329,6 +329,7 @@ export default function PostComments({
           <div className="flex items-start gap-3 px-5 py-4">
             <ProfileAvatar
               name={session.user.name}
+              seed={session.user.handle}
               imageUrl={session.user.image}
               size="sm"
             />

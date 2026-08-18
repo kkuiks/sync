@@ -48,6 +48,7 @@ export default function ProfileOverview({ handle }: ProfileOverviewProps) {
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
         <ProfileAvatar
           name={profile.data.name}
+          seed={handle}
           imageUrl={profile.data.profileImageUrl}
           className="h-28 w-28 border"
         />

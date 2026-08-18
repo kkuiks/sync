@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import type { GetNotificationsResponseNotificationsContentItem } from '@/api/__generated__/types/GetNotificationsResponseNotificationsContentItem';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ProfileAvatar } from '@/components/feature/profile/ProfileAvatar';
 import { cn } from '@/lib/utils';
 import ROUTES from '@/util/routes';
 
@@ -27,10 +27,13 @@ export default function NotificationItem({
   const body = (
     <div className="flex items-start gap-3">
       {actor && (
-        <Avatar size="sm" className="mt-0.5">
-          <AvatarImage src={actor.profileImageUrl ?? undefined} />
-          <AvatarFallback>{actor.name?.[0]}</AvatarFallback>
-        </Avatar>
+        <ProfileAvatar
+          name={actor.name ?? ''}
+          seed={actor.handle ?? null}
+          imageUrl={actor.profileImageUrl}
+          size="sm"
+          className="mt-0.5"
+        />
       )}
       <p className="flex-1 text-sm">{message}</p>
       {status === 'UNREAD' && (

@@ -364,7 +364,7 @@ function PendingInvitationRow({
     <TableRow className="border-0">
       <TableCell className="border-l-0">
         <div className="flex items-center gap-3">
-          <ProfileAvatar name={name} imageUrl={undefined} />
+          <ProfileAvatar name={name} seed={handle} imageUrl={undefined} />
           <div>
             <p className="text-sm font-medium">{name}</p>
             <p className="text-xs text-muted-foreground">@{handle}</p>
@@ -456,7 +456,7 @@ function JoinRequestRow({
     <TableRow className="border-0">
       <TableCell className="border-l-0">
         <div className="flex items-center gap-3">
-          <ProfileAvatar name={name} imageUrl={profileImageUrl} />
+          <ProfileAvatar name={name} seed={handle} imageUrl={profileImageUrl} />
           <div>
             <p className="text-sm font-medium">{name}</p>
             <p className="text-xs text-muted-foreground">@{handle}</p>

@@ -124,6 +124,7 @@ export default function ExploreProjects() {
           >
             <ProjectAvatar
               name={project.name}
+              seed={project.handle}
               iconUrl={project.iconUrl}
               size="lg"
               className="size-11 shrink-0 text-lg"

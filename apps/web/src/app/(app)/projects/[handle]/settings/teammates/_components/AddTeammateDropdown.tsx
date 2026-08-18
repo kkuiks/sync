@@ -127,6 +127,7 @@ export default function AddTeammateDropdown({
                   >
                     <ProfileAvatar
                       name={user.name}
+                      seed={user.handle}
                       imageUrl={user.profileImageUrl}
                       className="h-6 w-6"
                     />

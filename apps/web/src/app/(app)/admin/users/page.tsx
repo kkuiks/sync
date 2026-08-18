@@ -144,7 +144,11 @@ function UserResultCard({ user, onDelete }: UserResultCardProps) {
     <div className="flex flex-col gap-4 rounded-lg border p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <ProfileAvatar name={user.name} imageUrl={user.profileImageUrl} />
+          <ProfileAvatar
+            name={user.name}
+            seed={user.handle ?? null}
+            imageUrl={user.profileImageUrl}
+          />
           <div className="flex flex-col">
             {user.handle ? (
               <Link

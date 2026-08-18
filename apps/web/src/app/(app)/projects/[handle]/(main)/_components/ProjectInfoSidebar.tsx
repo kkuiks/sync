@@ -207,6 +207,7 @@ function ContributorsCard({ handle }: ProjectInfoSidebarProps) {
                 <TooltipTrigger asChild>
                   <ProfileAvatar
                     name={user.name}
+                    seed={user.handle}
                     imageUrl={user.profileImageUrl}
                     size="sm"
                   />

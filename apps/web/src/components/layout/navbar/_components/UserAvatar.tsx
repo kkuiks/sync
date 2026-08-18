@@ -130,6 +130,7 @@ export default function UserAvatar({ align = 'end' }: UserAvatarProps) {
         <Button variant="ghost" size="icon" className="rounded-full">
           <ProfileAvatar
             name={session.user.name}
+            seed={session.user.handle}
             imageUrl={session.user.image}
           />
         </Button>

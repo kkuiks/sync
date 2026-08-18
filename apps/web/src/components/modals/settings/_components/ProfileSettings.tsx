@@ -278,6 +278,7 @@ function ProfileImageField() {
       <div className="flex gap-4">
         <ProfileAvatar
           name={profile.data.name}
+          seed={profile.data.handle ?? null}
           imageUrl={
             selectedImage ? selectedImage.src : profile.data.profileImageUrl
           }

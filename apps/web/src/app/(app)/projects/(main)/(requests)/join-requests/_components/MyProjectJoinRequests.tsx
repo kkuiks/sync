@@ -127,6 +127,7 @@ export default function MyProjectJoinRequests() {
             >
               <ProjectAvatar
                 name={request.project.name}
+                seed={request.project.handle}
                 iconUrl={request.project.iconUrl}
                 size="lg"
               />

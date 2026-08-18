@@ -22,6 +22,7 @@ import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.repository.PostRecruitmentRepository;
 import com.skkil.sync.post.repository.PostRepository;
+import com.skkil.sync.post.repository.PostSeriesPostRepository;
 import com.skkil.sync.post.util.PostSlugGenerator;
 import com.skkil.sync.project.model.Project;
 import com.skkil.sync.project.service.ProjectDomainService;
@@ -50,6 +51,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostRecruitmentRepository postRecruitmentRepository;
+  private final PostSeriesPostRepository seriesPostRepository;
 
   public PostService(
       UserDomainService userDomainService,
@@ -60,6 +62,7 @@ public class PostService {
       PostContentMediaService contentMediaService,
       PostRepository postRepository,
       PostRecruitmentRepository postRecruitmentRepository,
+      PostSeriesPostRepository seriesPostRepository,
       ApplicationEventPublisher eventPublisher) {
     this.userDomainService = userDomainService;
     this.projectDomainService = projectDomainService;
@@ -69,6 +72,7 @@ public class PostService {
     this.contentMediaService = contentMediaService;
     this.postRepository = postRepository;
     this.postRecruitmentRepository = postRecruitmentRepository;
+    this.seriesPostRepository = seriesPostRepository;
     this.eventPublisher = eventPublisher;
   }
 
@@ -399,6 +403,18 @@ public class PostService {
     if (!postRepository.existsById(postId)) {
       throw new PostNotFoundException(postId);
     }
+
+    // post_series_posts 는 FK cascade 로 함께 지워지지만 그 경로는 JPA 를 타지 않아 뒤쪽 편들의
+    // position 이 메워지지 않으므로, 게시글을 지우기 전에 편성을 먼저 정리한다.
+    seriesPostRepository
+        .findByPostId(postId)
+        .ifPresent(
+            seriesPost -> {
+              Long seriesId = seriesPost.getSeries().getId();
+              int position = seriesPost.getPosition();
+              seriesPostRepository.delete(seriesPost);
+              seriesPostRepository.shiftDownAfter(seriesId, position);
+            });
 
     postRepository.deleteById(postId);
   }

@@ -2,7 +2,6 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-import { ArticleMetaLine } from '../components/ArticleMetaLine';
 import { ArticlePreviewMedia } from '../components/ArticlePreviewMedia';
 import { PostCardActions } from '../components/PostCardActions';
 import { PostCardTitle } from '../components/PostCardTitle';
@@ -68,7 +67,6 @@ export function LongPostPreviewCard({
           />
 
           <div className="space-y-1 mb-2">
-            <ArticleMetaLine project={summary.project} />
             <PostCardTitle
               title={summary.title}
               variant="preview"

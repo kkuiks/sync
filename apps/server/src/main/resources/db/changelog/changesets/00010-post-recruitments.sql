@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset skkil:00008-post-recruitments
+--changeset skkil:00010-post-recruitments
 
 -- 구인글은 기존 LONG 게시글의 본문, 태그, 댓글, 좋아요, 북마크를 그대로 쓴다.
 -- 이 테이블의 행이 존재하는지가 일반 게시글과 구인글을 구분하며, 지원 방법과 보상 조건은

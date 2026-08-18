@@ -54,6 +54,7 @@ export function ProjectHoverCard({
       <PopoverTrigger asChild>
         <ProjectAvatar
           name={name}
+          seed={handle}
           iconUrl={iconUrl}
           size={size}
           className={cn('cursor-pointer', className)}
@@ -76,6 +77,7 @@ export function ProjectHoverCard({
           >
             <ProjectAvatar
               name={isLoading ? name : (project?.name ?? name)}
+              seed={handle}
               iconUrl={isLoading ? iconUrl : (project?.iconUrl ?? iconUrl)}
               size="lg"
             />
