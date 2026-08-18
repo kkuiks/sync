@@ -73,6 +73,95 @@
         "learn-more": "자세히 보기"
       }
     },
+    "recruitment": {
+      "title": "구인",
+      "description": "함께할 사람을 찾는 글을 한곳에서 살펴보세요.",
+      "write": "구인글 작성",
+      "load-more": "더 보기",
+      "new": {
+        "title": "구인글 작성"
+      },
+      "edit": {
+        "title": "구인글 수정"
+      },
+      "editor": {
+        "scope": "구인 게시판",
+        "details": "구인 정보"
+      },
+      "fields": {
+        "employment-type": "고용 형태",
+        "work-mode": "근무 방식",
+        "location": "근무 지역",
+        "location-placeholder": "예: 서울, 판교, 지역 무관",
+        "experience-level": "경력 수준",
+        "closes-at": "모집 마감",
+        "closes-at-description": "마감일이 정해지지 않았다면 비워두세요."
+      },
+      "employment-types": {
+        "FULL_TIME": "정규직",
+        "PART_TIME": "파트타임",
+        "CONTRACT": "계약직",
+        "INTERNSHIP": "인턴",
+        "FREELANCE_PROJECT": "프리랜스·프로젝트"
+      },
+      "work-modes": {
+        "REMOTE": "원격",
+        "HYBRID": "하이브리드",
+        "ONSITE": "현장"
+      },
+      "experience-levels": {
+        "ANY": "경력 무관",
+        "ENTRY": "신입",
+        "JUNIOR": "주니어",
+        "MID": "미들",
+        "SENIOR": "시니어"
+      },
+      "statuses": {
+        "OPEN": "모집 중",
+        "CLOSED": "마감"
+      },
+      "filters": {
+        "query-placeholder": "모집 제목이나 내용을 검색하세요",
+        "location-placeholder": "지역 검색",
+        "tag-placeholder": "기술 태그",
+        "tag-label": "기술 태그 검색",
+        "tag-search-hint": "검색할 기술 태그를 입력하세요.",
+        "tag-searching": "태그를 검색하는 중이에요.",
+        "tag-no-results": "일치하는 기술 태그가 없습니다.",
+        "all-statuses": "모든 상태",
+        "all-employment-types": "모든 고용 형태",
+        "all-work-modes": "모든 근무 방식",
+        "all-experience-levels": "모든 경력",
+        "reset": "필터 초기화"
+      },
+      "card": {
+        "work-location": "{mode} · {location}",
+        "closes-at": "{date} 마감"
+      },
+      "actions": {
+        "close": "모집 마감",
+        "reopen": "다시 모집"
+      },
+      "empty": {
+        "title": "조건에 맞는 구인글이 없습니다",
+        "description": "필터를 바꾸거나 새로운 구인글을 작성해보세요."
+      },
+      "error": {
+        "title": "구인글을 불러오지 못했어요",
+        "description": "잠시 후 다시 시도해 주세요.",
+        "retry": "다시 시도"
+      },
+      "messages": {
+        "create-error": "구인글을 작성하지 못했어요.",
+        "update-success": "구인글을 수정했습니다.",
+        "update-error": "구인글을 수정하지 못했어요.",
+        "edit-unavailable": "구인글을 불러오지 못했어요.",
+        "edit-forbidden": "이 구인글을 수정할 수 없습니다.",
+        "status-open": "모집을 다시 시작했습니다.",
+        "status-closed": "모집을 마감했습니다.",
+        "status-error": "모집 상태를 변경하지 못했어요."
+      }
+    },
     "explore": {
       "title": "탐색",
       "description": "팔로우할 가치가 있는 프로젝트, 사람, 포스트 — 인기가 아닌 신뢰를 기준으로.",
@@ -2173,6 +2262,7 @@
         "nav": {
           "home": "홈",
           "explore-projects": "프로젝트 탐색",
+          "recruitment": "구인",
           "tags": "태그",
           "drafts": "초안",
           "feed": "피드",

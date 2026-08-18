@@ -8,6 +8,7 @@ import type { PaginatedGetPostsResponsePostsNodesItemContentAccessLevel } from '
 import type { PaginatedGetPostsResponsePostsNodesItemContentAuthor } from './PaginatedGetPostsResponsePostsNodesItemContentAuthor';
 import type { PaginatedGetPostsResponsePostsNodesItemContentPreviewMediaItem } from './PaginatedGetPostsResponsePostsNodesItemContentPreviewMediaItem';
 import type { PaginatedGetPostsResponsePostsNodesItemContentProject } from './PaginatedGetPostsResponsePostsNodesItemContentProject';
+import type { PaginatedGetPostsResponsePostsNodesItemContentRecruitment } from './PaginatedGetPostsResponsePostsNodesItemContentRecruitment';
 import type { PaginatedGetPostsResponsePostsNodesItemContentScope } from './PaginatedGetPostsResponsePostsNodesItemContentScope';
 import type { PaginatedGetPostsResponsePostsNodesItemContentStatus } from './PaginatedGetPostsResponsePostsNodesItemContentStatus';
 import type { PaginatedGetPostsResponsePostsNodesItemContentTagsItem } from './PaginatedGetPostsResponsePostsNodesItemContentTagsItem';
@@ -46,6 +47,8 @@ export type PaginatedGetPostsResponsePostsNodesItemContent = {
   pinnedAt?: string | null;
   /** Creation Timestamp */
   createdAt: string;
+  /** 구인글 메타데이터 (일반 게시글에는 없음) */
+  recruitment?: PaginatedGetPostsResponsePostsNodesItemContentRecruitment;
   /** 게시글 공개 범위 */
   scope: PaginatedGetPostsResponsePostsNodesItemContentScope;
   /** 게시물에 첨부된 전체 미디어 수 */

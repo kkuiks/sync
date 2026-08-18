@@ -11,8 +11,12 @@ import com.skkil.sync.post.dto.response.GetPostsResponse;
 import com.skkil.sync.post.dto.response.PaginatedGetPostsResponse;
 import com.skkil.sync.post.exception.PostNotFoundException;
 import com.skkil.sync.post.mapper.PostAssembler;
+import com.skkil.sync.post.model.EmploymentType;
+import com.skkil.sync.post.model.ExperienceLevel;
 import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostType;
+import com.skkil.sync.post.model.RecruitmentStatus;
+import com.skkil.sync.post.model.WorkMode;
 import com.skkil.sync.post.repository.PostQueryRepository;
 import com.skkil.sync.post.repository.pagination.CommentedPostCursorPaginationProvider;
 import com.skkil.sync.post.repository.pagination.PostCursorPaginationProvider;
@@ -51,6 +55,24 @@ public class PostQueryService {
   @Transactional(readOnly = true)
   public PaginatedGetPostsResponse getPosts(Long requesterId, CursorPaginationRequest pagination) {
     return getPostsResponse(requesterId, postQueryRepository.getPosts(requesterId), pagination);
+  }
+
+  @Transactional(readOnly = true)
+  public PaginatedGetPostsResponse getRecruitmentPosts(
+      Long requesterId,
+      RecruitmentStatus status,
+      EmploymentType employmentType,
+      WorkMode workMode,
+      ExperienceLevel experienceLevel,
+      String location,
+      String tag,
+      String query,
+      CursorPaginationRequest pagination) {
+    return getPostsResponse(
+        requesterId,
+        postQueryRepository.getRecruitmentPosts(
+            requesterId, status, employmentType, workMode, experienceLevel, location, tag, query),
+        pagination);
   }
 
   @Transactional(readOnly = true)

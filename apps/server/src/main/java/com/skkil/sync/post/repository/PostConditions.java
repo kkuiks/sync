@@ -1,5 +1,6 @@
 package com.skkil.sync.post.repository;
 
+import static com.skkil.sync.jooq.tables.PostRecruitments.POST_RECRUITMENTS;
 import static com.skkil.sync.jooq.tables.Posts.POSTS;
 import static com.skkil.sync.jooq.tables.Projects.PROJECTS;
 import static com.skkil.sync.jooq.tables.Teammates.TEAMMATES;
@@ -25,6 +26,17 @@ final class PostConditions {
 
   static Condition published() {
     return POSTS.STATUS.eq(PostStatus.PUBLISHED.name());
+  }
+
+  /** 전용 구인 화면이 아닌 일반 게시글 목록에서 사용할 콘텐츠 채널 조건. */
+  static Condition general() {
+    return DSL.notExists(
+        DSL.selectOne().from(POST_RECRUITMENTS).where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
+  }
+
+  static Condition recruitment() {
+    return DSL.exists(
+        DSL.selectOne().from(POST_RECRUITMENTS).where(POST_RECRUITMENTS.POST_ID.eq(POSTS.ID)));
   }
 
   private static Condition personalPublished() {

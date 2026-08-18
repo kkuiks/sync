@@ -1,18 +1,26 @@
 package com.skkil.sync.post.repository;
 
+import static com.skkil.sync.jooq.tables.Posts.POSTS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.skkil.sync.common.config.TestcontainersConfig;
 import com.skkil.sync.config.JpaConfig;
+import com.skkil.sync.post.model.EmploymentType;
+import com.skkil.sync.post.model.ExperienceLevel;
 import com.skkil.sync.post.model.Post;
+import com.skkil.sync.post.model.PostRecruitment;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
+import com.skkil.sync.post.model.RecruitmentStatus;
+import com.skkil.sync.post.model.WorkMode;
 import com.skkil.sync.project.model.Project;
 import com.skkil.sync.project.model.Teammate;
 import com.skkil.sync.project.repository.ProjectRepository;
 import com.skkil.sync.project.repository.TeammateRepository;
 import com.skkil.sync.user.model.User;
 import com.skkil.sync.user.repository.UserRepository;
+import java.util.List;
+import org.jooq.impl.DSL;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +37,8 @@ class PostQueryRepositoryTests {
   @Autowired private PostQueryRepository postQueryRepository;
 
   @Autowired private PostRepository postRepository;
+
+  @Autowired private PostRecruitmentRepository postRecruitmentRepository;
 
   @Autowired private ProjectRepository projectRepository;
 
@@ -125,6 +135,56 @@ class PostQueryRepositoryTests {
     assertThat(postQueryRepository.getPostBySlug(null, draft.getSlug())).isEmpty();
   }
 
+  @Test
+  @DisplayName("[getPosts] 구인글은 일반 게시글 목록에서 제외된다")
+  void getPosts_excludesRecruitmentPosts() {
+    User author = saveUser("general-feed-author");
+    Post general = savePost("general-feed-post", author, null);
+    Post recruitment = savePost("recruitment-feed-post", author, null);
+    saveRecruitment(recruitment);
+
+    var posts =
+        postQueryRepository
+            .getPosts(author.getId())
+            .fetch(DSL.trueCondition(), List.of(POSTS.CREATED_AT.desc(), POSTS.ID.desc()), 10);
+
+    assertThat(posts)
+        .extracting(dto -> dto.id())
+        .contains(general.getId())
+        .doesNotContain(recruitment.getId());
+  }
+
+  @Test
+  @DisplayName("[getRecruitmentPosts] 구인글은 메타데이터 필터와 함께 전용 목록에 노출된다")
+  void getRecruitmentPosts_returnsMatchingRecruitmentPosts() {
+    User author = saveUser("recruitment-list-author");
+    Post recruitment = savePost("matching-recruitment-post", author, null);
+    saveRecruitment(recruitment);
+    savePost("ordinary-post", author, null);
+
+    var posts =
+        postQueryRepository
+            .getRecruitmentPosts(
+                author.getId(),
+                RecruitmentStatus.OPEN,
+                EmploymentType.FULL_TIME,
+                WorkMode.HYBRID,
+                ExperienceLevel.MID,
+                "서울",
+                null,
+                "본문")
+            .fetch(DSL.trueCondition(), List.of(POSTS.CREATED_AT.desc(), POSTS.ID.desc()), 10);
+
+    assertThat(posts)
+        .singleElement()
+        .satisfies(
+            post -> {
+              assertThat(post.id()).isEqualTo(recruitment.getId());
+              assertThat(post.recruitmentStatus()).isEqualTo(RecruitmentStatus.OPEN);
+              assertThat(post.recruitmentEmploymentType()).isEqualTo(EmploymentType.FULL_TIME);
+            });
+  }
+
   private User saveUser(String key) {
     return userRepository.saveAndFlush(
         User.builder().email(key + "@example.com").fullName("사용자").build());
@@ -152,5 +212,11 @@ class PostQueryRepositoryTests {
     post.updateJsonContent("본문", "본문", 0);
 
     return postRepository.saveAndFlush(post);
+  }
+
+  private void saveRecruitment(Post post) {
+    postRecruitmentRepository.saveAndFlush(
+        new PostRecruitment(
+            post, EmploymentType.FULL_TIME, WorkMode.HYBRID, "서울", ExperienceLevel.MID, null));
   }
 }

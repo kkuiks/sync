@@ -8,6 +8,7 @@ import type { GetCollectionPostsResponsePostsNodesItemContentPostAccessLevel } f
 import type { GetCollectionPostsResponsePostsNodesItemContentPostAuthor } from './GetCollectionPostsResponsePostsNodesItemContentPostAuthor';
 import type { GetCollectionPostsResponsePostsNodesItemContentPostPreviewMediaItem } from './GetCollectionPostsResponsePostsNodesItemContentPostPreviewMediaItem';
 import type { GetCollectionPostsResponsePostsNodesItemContentPostProject } from './GetCollectionPostsResponsePostsNodesItemContentPostProject';
+import type { GetCollectionPostsResponsePostsNodesItemContentPostRecruitment } from './GetCollectionPostsResponsePostsNodesItemContentPostRecruitment';
 import type { GetCollectionPostsResponsePostsNodesItemContentPostScope } from './GetCollectionPostsResponsePostsNodesItemContentPostScope';
 import type { GetCollectionPostsResponsePostsNodesItemContentPostStatus } from './GetCollectionPostsResponsePostsNodesItemContentPostStatus';
 import type { GetCollectionPostsResponsePostsNodesItemContentPostTagsItem } from './GetCollectionPostsResponsePostsNodesItemContentPostTagsItem';
@@ -64,6 +65,8 @@ export type GetCollectionPostsResponsePostsNodesItemContentPost = {
    * @nullable
    */
   createdAt?: string | null;
+  /** 구인글 메타데이터 (일반 게시글에는 없음) */
+  recruitment?: GetCollectionPostsResponsePostsNodesItemContentPostRecruitment;
   /**
    * 게시글 공개 범위
    * @nullable

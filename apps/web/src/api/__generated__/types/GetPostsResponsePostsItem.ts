@@ -8,6 +8,7 @@ import type { GetPostsResponsePostsItemAccessLevel } from './GetPostsResponsePos
 import type { GetPostsResponsePostsItemAuthor } from './GetPostsResponsePostsItemAuthor';
 import type { GetPostsResponsePostsItemPreviewMediaItem } from './GetPostsResponsePostsItemPreviewMediaItem';
 import type { GetPostsResponsePostsItemProject } from './GetPostsResponsePostsItemProject';
+import type { GetPostsResponsePostsItemRecruitment } from './GetPostsResponsePostsItemRecruitment';
 import type { GetPostsResponsePostsItemScope } from './GetPostsResponsePostsItemScope';
 import type { GetPostsResponsePostsItemStatus } from './GetPostsResponsePostsItemStatus';
 import type { GetPostsResponsePostsItemTagsItem } from './GetPostsResponsePostsItemTagsItem';
@@ -43,6 +44,8 @@ export type GetPostsResponsePostsItem = {
   pinnedAt?: string | null;
   /** Creation Timestamp */
   createdAt: string;
+  /** 구인글 메타데이터 (일반 게시글에는 없음) */
+  recruitment?: GetPostsResponsePostsItemRecruitment;
   /** 게시글 공개 범위 */
   scope: GetPostsResponsePostsItemScope;
   /** 게시물에 첨부된 전체 미디어 수 */

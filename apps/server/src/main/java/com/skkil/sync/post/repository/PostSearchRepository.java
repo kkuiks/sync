@@ -22,6 +22,7 @@ public interface PostSearchRepository extends Repository<PostEmbedding, Long> {
           LEFT JOIN projects pr ON pr.id = p.project_id
           WHERE p.visibility = 'VISIBLE'
           AND p.status = 'PUBLISHED'
+          AND NOT EXISTS (SELECT 1 FROM post_recruitments r WHERE r.post_id = p.id)
           AND ((:projectHandle IS NULL AND p.project_id IS NULL)
             OR (:projectHandle IS NOT NULL AND p.project_id IS NOT NULL AND pr.handle = :projectHandle))
           ORDER BY pe.embedding <=> :embedding
@@ -40,6 +41,7 @@ public interface PostSearchRepository extends Repository<PostEmbedding, Long> {
           LEFT JOIN projects pr ON pr.id = r.project_id
           WHERE r.visibility = 'VISIBLE'
           AND r.status = 'PUBLISHED'
+          AND NOT EXISTS (SELECT 1 FROM post_recruitments recruitment WHERE recruitment.post_id = r.id)
           AND ((:projectHandle IS NULL AND r.project_id IS NULL)
             OR (:projectHandle IS NOT NULL AND r.project_id IS NOT NULL AND pr.handle = :projectHandle))
           AND NOT EXISTS (
@@ -60,6 +62,7 @@ public interface PostSearchRepository extends Repository<PostEmbedding, Long> {
           JOIN posts p ON p.id = pe.post_id
           WHERE p.visibility = 'VISIBLE'
           AND p.status = 'PUBLISHED'
+          AND NOT EXISTS (SELECT 1 FROM post_recruitments r WHERE r.post_id = p.id)
           AND pe.post_id <> :postId
           ORDER BY pe.embedding <=> :embedding
           LIMIT :n

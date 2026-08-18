@@ -5,12 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.skkil.sync.common.config.TestcontainersConfig;
 import com.skkil.sync.config.JpaConfig;
+import com.skkil.sync.post.model.EmploymentType;
+import com.skkil.sync.post.model.ExperienceLevel;
 import com.skkil.sync.post.model.Post;
+import com.skkil.sync.post.model.PostRecruitment;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostTag;
 import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.model.PostVisibility;
 import com.skkil.sync.post.model.Tag;
+import com.skkil.sync.post.model.WorkMode;
 import com.skkil.sync.user.model.User;
 import com.skkil.sync.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -31,6 +35,8 @@ class TagRepositoryTests {
   @Autowired private TagRepository tagRepository;
 
   @Autowired private PostRepository postRepository;
+
+  @Autowired private PostRecruitmentRepository postRecruitmentRepository;
 
   @Autowired private PostQueryRepository postQueryRepository;
 
@@ -63,6 +69,27 @@ class TagRepositoryTests {
     assertThat(taggedPosts)
         .singleElement()
         .satisfies(taggedPost -> assertThat(taggedPost.slug()).isEqualTo(savedPost.getSlug()));
+  }
+
+  @Test
+  @DisplayName("구인글에서 처음 생성된 미인증 태그는 검색되지만 일반 태그 게시글 목록에는 구인글이 노출되지 않는다")
+  void searchTags_unverifiedTagWithRecruitmentPost_returnsTagOnly() {
+    Post savedPost = savePostWithTag("구인태그", PostStatus.PUBLISHED, PostType.LONG);
+    postRecruitmentRepository.save(
+        new PostRecruitment(
+            savedPost, EmploymentType.FULL_TIME, WorkMode.REMOTE, null, ExperienceLevel.ANY, null));
+
+    entityManager.flush();
+    entityManager.clear();
+
+    var tags = tagRepository.searchTags("구인태그", PostStatus.PUBLISHED, PostVisibility.VISIBLE);
+    var taggedPosts =
+        postQueryRepository
+            .getPostsByTag(null, savedPost.getTags().getFirst().getTag().getId(), null)
+            .fetch(DSL.noCondition(), List.of(POSTS.ID.asc()), 10);
+
+    assertThat(tags).extracting(Tag::getName).containsExactly("구인태그");
+    assertThat(taggedPosts).isEmpty();
   }
 
   @Test

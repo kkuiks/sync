@@ -3,6 +3,7 @@ package com.skkil.sync.post.mapper;
 import com.skkil.sync.media.dto.MediaDto;
 import com.skkil.sync.post.dto.data.PostDto;
 import com.skkil.sync.post.dto.response.GetPostResponse;
+import com.skkil.sync.post.dto.summary.PostRecruitmentSummary;
 import com.skkil.sync.post.dto.summary.PostSummary;
 import com.skkil.sync.post.dto.summary.TagSummary;
 import com.skkil.sync.post.security.PostAccessLevel;
@@ -20,6 +21,7 @@ public interface PostMapper {
       target = "scope",
       expression =
           "java(com.skkil.sync.post.model.PostScope.fromProjectHandle(post.projectHandle()))")
+  @Mapping(target = "status", source = "post.status")
   PostSummary toPostSummary(
       PostDto post,
       PostAccessLevel accessLevel,
@@ -30,7 +32,8 @@ public interface PostMapper {
       boolean canComment,
       List<TagSummary> tags,
       List<GetPostResponse.Media> previewMedia,
-      @Nullable String coverImageUrl);
+      @Nullable String coverImageUrl,
+      @Nullable PostRecruitmentSummary recruitment);
 
   List<GetPostResponse.Media> toPreviewMedia(List<MediaDto> media);
 

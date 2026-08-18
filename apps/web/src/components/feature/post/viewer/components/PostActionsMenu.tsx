@@ -69,7 +69,11 @@ export function PostActionsMenu({
   const isPreview = variant === 'preview';
   const report = useReportPostDialog();
   const deleteDialog = useDeletePostDialog(summary.id, {
-    redirectTo: isPreview ? undefined : ROUTES.HOME(),
+    redirectTo: isPreview
+      ? undefined
+      : summary.recruitment
+        ? ROUTES.RECRUITMENT()
+        : ROUTES.HOME(),
   });
   const { exportMarkdown, isExporting } = useExportPostMarkdown({
     slug: summary.slug,
@@ -114,27 +118,31 @@ export function PostActionsMenu({
             <DownloadSimpleIcon />
             {tExport('trigger')}
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => {
-              if (!requireAuth({ intent: 'collection' })) {
-                return;
-              }
-              setAddToCollectionOpen(true);
-            }}
-          >
-            <StackSimpleIcon />
-            {tCollection('add-to-collection.trigger')}
-          </DropdownMenuItem>
+          {!summary.recruitment && (
+            <DropdownMenuItem
+              onSelect={() => {
+                if (!requireAuth({ intent: 'collection' })) {
+                  return;
+                }
+                setAddToCollectionOpen(true);
+              }}
+            >
+              <StackSimpleIcon />
+              {tCollection('add-to-collection.trigger')}
+            </DropdownMenuItem>
+          )}
           {summary.isAuthor && (
             <DropdownMenuItem
               onSelect={() =>
                 router.push(
-                  summary.project?.handle
-                    ? ROUTES.PROJECT_POST_EDIT(
-                        summary.project.handle,
-                        summary.slug,
-                      )
-                    : ROUTES.POST_EDIT(summary.slug),
+                  summary.recruitment
+                    ? ROUTES.RECRUITMENT_POST_EDIT(summary.slug)
+                    : summary.project?.handle
+                      ? ROUTES.PROJECT_POST_EDIT(
+                          summary.project.handle,
+                          summary.slug,
+                        )
+                      : ROUTES.POST_EDIT(summary.slug),
                 )
               }
             >

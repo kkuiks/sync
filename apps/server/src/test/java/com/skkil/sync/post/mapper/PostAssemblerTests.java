@@ -87,6 +87,7 @@ class PostAssemblerTests {
             anyBoolean(),
             any(),
             any(),
+            any(),
             any()))
         .thenAnswer(
             invocation ->
@@ -209,6 +210,12 @@ class PostAssemblerTests {
         100,
         null,
         false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
         null,
         now);
   }

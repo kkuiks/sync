@@ -6,9 +6,13 @@ import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.common.util.time.DateTimeTestUtils;
 import com.skkil.sync.post.dto.response.GetPostResponse;
 import com.skkil.sync.post.dto.summary.PostSummary;
+import com.skkil.sync.post.model.EmploymentType;
+import com.skkil.sync.post.model.ExperienceLevel;
 import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
+import com.skkil.sync.post.model.RecruitmentStatus;
+import com.skkil.sync.post.model.WorkMode;
 import com.skkil.sync.post.security.PostAccessLevel;
 import com.skkil.sync.project.snippets.ProjectSummarySnippets;
 import com.skkil.sync.user.snippets.UserSummarySnippets;
@@ -193,6 +197,45 @@ public class PostSummarySnippets {
         fieldWithPath(prefix + "coverImageUrl")
             .type(JsonFieldType.STRING)
             .description("게시물 커버 이미지 URL (없으면 없음)")
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment")
+            .type(JsonFieldType.OBJECT)
+            .description("구인글 메타데이터 (일반 게시글에는 없음)")
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.status")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("모집 상태")
+            .attributes(RestDocsUtils.getEnumAttributes(RecruitmentStatus.class))
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.employmentType")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("고용 형태")
+            .attributes(RestDocsUtils.getEnumAttributes(EmploymentType.class))
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.workMode")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("근무 방식")
+            .attributes(RestDocsUtils.getEnumAttributes(WorkMode.class))
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.location")
+            .type(JsonFieldType.STRING)
+            .description("근무 지역")
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.experienceLevel")
+            .type(RestDocsUtils.ENUM_TYPE)
+            .description("경력 수준")
+            .attributes(RestDocsUtils.getEnumAttributes(ExperienceLevel.class))
+            .optional());
+    fields.add(
+        fieldWithPath(prefix + "recruitment.closesAt")
+            .type(JsonFieldType.STRING)
+            .description("모집 마감 시각")
             .optional());
     fields.add(
         fieldWithPath(prefix + "createdViaClientName")

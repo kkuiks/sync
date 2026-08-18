@@ -5,10 +5,12 @@ import com.skkil.sync.media.service.domain.MediaDomainService;
 import com.skkil.sync.post.constants.PostConstants;
 import com.skkil.sync.post.dto.request.CreatePostRequest;
 import com.skkil.sync.post.dto.request.CreateProjectPostRequest;
+import com.skkil.sync.post.dto.request.CreateRecruitmentPostRequest;
 import com.skkil.sync.post.dto.request.PostContentRequest;
 import com.skkil.sync.post.dto.request.UpdatePostRequest;
 import com.skkil.sync.post.dto.request.UpdatePostSummaryRequest;
 import com.skkil.sync.post.dto.request.UpdateProjectPostRequest;
+import com.skkil.sync.post.dto.request.UpdateRecruitmentPostRequest;
 import com.skkil.sync.post.dto.response.CreatePostResponse;
 import com.skkil.sync.post.event.PostContentChangedEvent;
 import com.skkil.sync.post.event.PostPublishedEvent;
@@ -18,6 +20,7 @@ import com.skkil.sync.post.exception.PostPinLimitExceededException;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
+import com.skkil.sync.post.repository.PostRecruitmentRepository;
 import com.skkil.sync.post.repository.PostRepository;
 import com.skkil.sync.post.util.PostSlugGenerator;
 import com.skkil.sync.project.model.Project;
@@ -46,6 +49,7 @@ public class PostService {
   private final ApplicationEventPublisher eventPublisher;
 
   private final PostRepository postRepository;
+  private final PostRecruitmentRepository postRecruitmentRepository;
 
   public PostService(
       UserDomainService userDomainService,
@@ -55,6 +59,7 @@ public class PostService {
       PostReferenceService postReferenceService,
       PostContentMediaService contentMediaService,
       PostRepository postRepository,
+      PostRecruitmentRepository postRecruitmentRepository,
       ApplicationEventPublisher eventPublisher) {
     this.userDomainService = userDomainService;
     this.projectDomainService = projectDomainService;
@@ -63,22 +68,25 @@ public class PostService {
     this.postReferenceService = postReferenceService;
     this.contentMediaService = contentMediaService;
     this.postRepository = postRepository;
+    this.postRecruitmentRepository = postRecruitmentRepository;
     this.eventPublisher = eventPublisher;
   }
 
   @Transactional
   public CreatePostResponse createPost(Long authorId, CreatePostRequest request) {
-    return createPost(
-        authorId,
-        request.title(),
-        request.type(),
-        request.status(),
-        request.content(),
-        request.tags(),
-        List.of(),
-        request.referencedPostIds(),
-        request.coverMediaId(),
-        null);
+    return new CreatePostResponse(
+        createPost(
+                authorId,
+                request.title(),
+                request.type(),
+                request.status(),
+                request.content(),
+                request.tags(),
+                List.of(),
+                request.referencedPostIds(),
+                request.coverMediaId(),
+                null)
+            .getSlug());
   }
 
   @Transactional
@@ -87,20 +95,22 @@ public class PostService {
       Long authorId, String handle, CreateProjectPostRequest request) {
     Project project = projectDomainService.getProjectByHandle(handle);
 
-    return createPost(
-        authorId,
-        request.title(),
-        request.type(),
-        request.status(),
-        request.content(),
-        request.tags(),
-        request.projectTags(),
-        request.referencedPostIds(),
-        request.coverMediaId(),
-        project);
+    return new CreatePostResponse(
+        createPost(
+                authorId,
+                request.title(),
+                request.type(),
+                request.status(),
+                request.content(),
+                request.tags(),
+                request.projectTags(),
+                request.referencedPostIds(),
+                request.coverMediaId(),
+                project)
+            .getSlug());
   }
 
-  private CreatePostResponse createPost(
+  private Post createPost(
       Long authorId,
       String title,
       PostType type,
@@ -138,10 +148,22 @@ public class PostService {
 
     post.updateJsonContent(content.json(), content.text(), mediaFiles.size());
 
-    return new CreatePostResponse(
-        persistNewPost(
-                post, project, tags, projectTags, referencedPostIds, mediaFiles, content.text())
-            .getSlug());
+    return persistNewPost(
+        post, project, tags, projectTags, referencedPostIds, mediaFiles, content.text());
+  }
+
+  Post createRecruitmentPost(Long authorId, CreateRecruitmentPostRequest request) {
+    return createPost(
+        authorId,
+        request.title(),
+        PostType.LONG,
+        PostStatus.PUBLISHED,
+        request.content(),
+        request.tags(),
+        List.of(),
+        request.referencedPostIds(),
+        request.coverMediaId(),
+        null);
   }
 
   @Transactional
@@ -201,6 +223,9 @@ public class PostService {
   @Transactional
   @PreAuthorize("hasPermission(#postId, 'POST', 'EDIT')")
   public void updatePost(Long postId, UpdatePostRequest request) {
+    if (postRecruitmentRepository.existsById(postId)) {
+      throw new InvalidPostPublishRequestException("구인글은 구인글 전용 API에서 수정해야 합니다.");
+    }
     Post post = requirePost(postId, null);
 
     applyUpdate(
@@ -240,10 +265,8 @@ public class PostService {
   }
 
   /**
-   * Loads a post and enforces that it belongs to {@code expectedProject} ({@code null} meaning a
-   * global, non-project post) — the same distinction {@code createPost}/{@code createProjectPost}
-   * enforce via separate DTOs, so an author can't edit a project post's tags through the global
-   * endpoint (which has no project-tag field and would silently strip them) or vice versa.
+   * 게시글을 불러오면서 {@code expectedProject} 소속인지 확인한다. {@code null}이면 개인 글이어야 한다. 생성 API처럼 수정 API도 개인 글과
+   * 프로젝트 글을 구분해야, 프로젝트 태그 필드가 없는 개인 글 API로 프로젝트 글을 수정하면서 태그가 사라지는 일을 막을 수 있다.
    */
   private Post requirePost(Long postId, @Nullable Project expectedProject) {
     Post post = getPostById(postId);
@@ -292,6 +315,21 @@ public class PostService {
     applyPublishSideEffects(post, wasPublished, content.text());
   }
 
+  void updateRecruitmentPostContent(Long postId, UpdateRecruitmentPostRequest request) {
+    Post post = requirePost(postId, null);
+    applyUpdate(
+        post,
+        request.title(),
+        PostType.LONG,
+        PostStatus.PUBLISHED,
+        request.content(),
+        request.tags(),
+        List.of(),
+        request.referencedPostIds(),
+        request.coverMediaId(),
+        request.removeCover());
+  }
+
   private @Nullable Media resolveCover(Long requesterId, @Nullable String coverMediaId) {
     if (coverMediaId == null) {
       return null;
@@ -310,11 +348,7 @@ public class PostService {
     return post.getCoverMedia();
   }
 
-  /**
-   * Publishes the events that follow from a post becoming published (activity count) or having its
-   * content changed while published and public (summary/embedding refresh), for both creation and
-   * update.
-   */
+  /** 새로 발행된 글에는 활동 집계 이벤트를 보내고, 발행된 공개 글의 본문이 바뀌면 요약과 임베딩 갱신 이벤트를 보낸다. 생성과 수정 경로가 이 처리를 공유한다. */
   private void applyPublishSideEffects(Post post, boolean wasPublished, String contentText) {
     if (!wasPublished && post.isPublished()) {
       eventPublisher.publishEvent(

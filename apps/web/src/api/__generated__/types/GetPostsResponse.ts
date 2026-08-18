@@ -7,6 +7,6 @@
 import type { GetPostsResponsePostsItem } from './GetPostsResponsePostsItem';
 
 export interface GetPostsResponse {
-  /** 관련 게시글 목록 (최대 N개) */
+  /** 프로젝트에 고정된 게시글 목록 */
   posts: GetPostsResponsePostsItem[];
 }

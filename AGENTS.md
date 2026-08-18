@@ -121,8 +121,11 @@ decision to reverse this:
 - Voting on posts, answers, or comments
 - Creator monetization (paid posts, subscriptions, credits, payouts)
 - Advertising
-- Careers surfaces (companies, job postings, applications, contests, schools,
-  reviews) — a dead product direction, see _Dead code_ below
+- Full careers-platform surfaces (companies, applications, applicant tracking,
+  contests, schools, reviews) — a dead product direction, see _Dead code_
+  below. The deliberate exception is a dedicated recruitment-post channel
+  built on personal `LONG` posts. It must not revive or depend on the excluded
+  careers code.
 
 ---
 
@@ -163,6 +166,10 @@ Consequences to be aware of while working:
 - `apps/web/src/types/{experience,message,provider,review}.ts` are orphaned.
 - **Notifications do not exist in the running product.** The bell in the top nav
   (`NotificationsButton.tsx`) renders a static placeholder.
+
+The live recruitment-post channel is unrelated to this dead code. Its model,
+API, and UI stay inside the live post domain and must not import, copy, or
+extend anything from the excluded `recruitment` or `provider` packages.
 
 ---
 

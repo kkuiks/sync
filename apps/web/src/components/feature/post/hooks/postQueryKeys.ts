@@ -21,6 +21,7 @@ export function isPostRelatedQueryKey(queryKey: readonly unknown[]) {
     path === '/posts/drafts' ||
     path === '/posts/likes' ||
     path === '/posts/recommendations' ||
+    path === '/recruitment-posts' ||
     path.startsWith('/posts/') ||
     path === '/bookmarks/posts' ||
     path === '/search/posts' ||

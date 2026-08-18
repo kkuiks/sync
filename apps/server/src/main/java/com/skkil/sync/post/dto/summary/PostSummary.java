@@ -41,4 +41,5 @@ public record PostSummary(
     int mediaCount,
     int wordCount,
     @Nullable String coverImageUrl,
+    @Nullable PostRecruitmentSummary recruitment,
     @Nullable String createdViaClientName) {}

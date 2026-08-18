@@ -154,6 +154,12 @@ class PostModerationPolicyTests {
         null,
         false,
         null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
         now);
   }
 }

@@ -39,6 +39,7 @@ public class TagRecommendationQueryRepository {
         .on(PROJECTS.ID.eq(POSTS.PROJECT_ID))
         .where(POSTS.CREATED_AT.ge(since))
         .and(PostConditions.feedVisible())
+        .and(PostConditions.general())
         .and(isGlobalVerifiedTag(POST_TAGS.TAG_ID))
         .andNotExists(alreadyFollowing(userId, POST_TAGS.TAG_ID))
         .groupBy(POST_TAGS.TAG_ID)

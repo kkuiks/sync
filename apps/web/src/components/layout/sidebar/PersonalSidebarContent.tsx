@@ -2,6 +2,7 @@
 
 import {
   BookmarkSimpleIcon,
+  BriefcaseIcon,
   CompassIcon,
   FileTextIcon,
   HouseIcon,
@@ -54,6 +55,12 @@ const nav = [
     href: ROUTES.EXPLORE_PROJECTS(),
     icon: CompassIcon,
     authenticated: false,
+  },
+  {
+    labelKey: 'nav.recruitment',
+    href: ROUTES.RECRUITMENT(),
+    icon: BriefcaseIcon,
+    authenticated: true,
   },
   {
     labelKey: 'nav.tags',

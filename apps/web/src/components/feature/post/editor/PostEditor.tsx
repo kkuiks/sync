@@ -7,7 +7,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { GetPostResponseContent } from '@/api/__generated__/types';
@@ -76,6 +76,13 @@ interface PostEditorProps {
     seriesName: string;
   } | null;
   isSubmitting?: boolean;
+  fixedType?: boolean;
+  allowDraft?: boolean;
+  showSeries?: boolean;
+  showTemplates?: boolean;
+  sidebarContent?: ReactNode;
+  scopeLabelOverride?: string;
+  backHrefOverride?: string;
   onSubmit: (data: {
     title: string;
     type: PostType;
@@ -119,6 +126,13 @@ export default function PostEditor({
   project,
   initialSeries,
   isSubmitting = false,
+  fixedType = false,
+  allowDraft = true,
+  showSeries = true,
+  showTemplates = true,
+  sidebarContent,
+  scopeLabelOverride,
+  backHrefOverride,
   onSubmit,
 }: PostEditorProps) {
   const t = useTranslations('components.editor');
@@ -473,7 +487,7 @@ export default function PostEditor({
   // 글의 보기 페이지로, 임시저장(DRAFT) 이면 공개 보기 페이지가 없으므로
   // 임시저장 목록으로 돌아간다.
   const isDraft = initialStatus === PostStatus.DRAFT;
-  const backHref = isDraft
+  const defaultBackHref = isDraft
     ? project?.handle
       ? ROUTES.PROJECT_DRAFTS(project.handle)
       : session?.user.handle
@@ -494,12 +508,16 @@ export default function PostEditor({
     type === PostType.QUESTION
       ? t('placeholders.title-question')
       : t('placeholders.title-long');
-  const scopeLabel = project
-    ? t('scope.project', { project: project.name })
-    : initialScope === PostScope.WORKSPACE
-      ? t('scope.project-generic')
-      : t('scope.public');
-  const canSaveDraft = !isEditing || initialStatus === PostStatus.DRAFT;
+  const backHref = backHrefOverride ?? defaultBackHref;
+  const scopeLabel =
+    scopeLabelOverride ??
+    (project
+      ? t('scope.project', { project: project.name })
+      : initialScope === PostScope.WORKSPACE
+        ? t('scope.project-generic')
+        : t('scope.public'));
+  const canSaveDraft =
+    allowDraft && (!isEditing || initialStatus === PostStatus.DRAFT);
   const draftActionLabel = isEditing
     ? t('actions.update-draft')
     : t('actions.save-draft');
@@ -577,7 +595,7 @@ export default function PostEditor({
           onDelete={handleMathDelete}
           onClose={() => setMathTarget(null)}
         />
-        {isPlaceholderVisible && type === PostType.LONG && (
+        {showTemplates && isPlaceholderVisible && type === PostType.LONG && (
           <EditorTemplates
             locale={locale}
             onSelect={(template) => {
@@ -602,12 +620,16 @@ export default function PostEditor({
         {scopeLabel}
       </Badge>
 
-      <section className="flex flex-col gap-2">
-        <h3 className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t('sidebar.type')}
-        </h3>
-        <PostTypeSelector value={type} onChange={setType} />
-      </section>
+      {!fixedType && (
+        <section className="flex flex-col gap-2">
+          <h3 className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('sidebar.type')}
+          </h3>
+          <PostTypeSelector value={type} onChange={setType} />
+        </section>
+      )}
+
+      {sidebarContent}
 
       {project && (
         <section className="flex flex-col gap-2">
@@ -636,19 +658,24 @@ export default function PostEditor({
         />
       </section>
 
-      <section className="flex flex-col gap-2">
-        <h3 className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t('sidebar.series')}
-        </h3>
-        <div data-tag-commit-target="" onPointerDownCapture={commitPendingTag}>
-          <SeriesSelect
-            value={series}
-            onChange={setSeries}
-            projectHandle={project?.handle}
-            accentRing={ACCENT_RING[type]}
-          />
-        </div>
-      </section>
+      {showSeries && (
+        <section className="flex flex-col gap-2">
+          <h3 className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('sidebar.series')}
+          </h3>
+          <div
+            data-tag-commit-target=""
+            onPointerDownCapture={commitPendingTag}
+          >
+            <SeriesSelect
+              value={series}
+              onChange={setSeries}
+              projectHandle={project?.handle}
+              accentRing={ACCENT_RING[type]}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 

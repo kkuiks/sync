@@ -19,6 +19,7 @@ import com.skkil.sync.post.exception.PostPinLimitExceededException;
 import com.skkil.sync.post.model.Post;
 import com.skkil.sync.post.model.PostStatus;
 import com.skkil.sync.post.model.PostType;
+import com.skkil.sync.post.repository.PostRecruitmentRepository;
 import com.skkil.sync.post.repository.PostRepository;
 import com.skkil.sync.post.snippets.UpdatePostRequestSnippets;
 import com.skkil.sync.post.snippets.UpdateProjectPostRequestSnippets;
@@ -49,6 +50,8 @@ class PostServiceTests {
   @Mock private PostReferenceService postReferenceService;
 
   @Mock private PostRepository postRepository;
+
+  @Mock private PostRecruitmentRepository postRecruitmentRepository;
 
   @InjectMocks private PostService postService;
 
@@ -110,6 +113,19 @@ class PostServiceTests {
 
     assertThatThrownBy(() -> postService.updatePost(postId, request))
         .isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
+  @DisplayName("[updatePost] 구인글을 일반 글 API로 수정하려는 경우 예외 발생")
+  void updatePost_recruitmentPost_throwsException() {
+    Long postId = 1L;
+    UpdatePostRequest request = UpdatePostRequestSnippets.getUpdatePostRequest();
+
+    when(postRecruitmentRepository.existsById(postId)).thenReturn(true);
+
+    assertThatThrownBy(() -> postService.updatePost(postId, request))
+        .isInstanceOf(InvalidPostPublishRequestException.class);
+    verify(postRepository, never()).findById(any());
   }
 
   @Test

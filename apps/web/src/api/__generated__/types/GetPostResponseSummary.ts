@@ -8,6 +8,7 @@ import type { GetPostResponseSummaryAccessLevel } from './GetPostResponseSummary
 import type { GetPostResponseSummaryAuthor } from './GetPostResponseSummaryAuthor';
 import type { GetPostResponseSummaryPreviewMediaItem } from './GetPostResponseSummaryPreviewMediaItem';
 import type { GetPostResponseSummaryProject } from './GetPostResponseSummaryProject';
+import type { GetPostResponseSummaryRecruitment } from './GetPostResponseSummaryRecruitment';
 import type { GetPostResponseSummaryScope } from './GetPostResponseSummaryScope';
 import type { GetPostResponseSummaryStatus } from './GetPostResponseSummaryStatus';
 import type { GetPostResponseSummaryTagsItem } from './GetPostResponseSummaryTagsItem';
@@ -46,6 +47,8 @@ export type GetPostResponseSummary = {
   pinnedAt?: string | null;
   /** Creation Timestamp */
   createdAt: string;
+  /** 구인글 메타데이터 (일반 게시글에는 없음) */
+  recruitment?: GetPostResponseSummaryRecruitment;
   /** 게시글 공개 범위 */
   scope: GetPostResponseSummaryScope;
   /** 게시물에 첨부된 전체 미디어 수 */

@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { useGetPostBySlug, useUpdatePost } from '@/api/__generated__/post/post';
@@ -50,6 +51,10 @@ export default function EditPostPage() {
 
   const summary = toPostSummary(post.summary);
   const content = post.content;
+
+  if (summary.recruitment) {
+    return <RecruitmentEditRedirect slug={summary.slug} />;
+  }
 
   if (!summary.isAuthor) {
     return (
@@ -151,4 +156,14 @@ export default function EditPostPage() {
       }}
     />
   );
+}
+
+function RecruitmentEditRedirect({ slug }: { slug: string }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace(ROUTES.RECRUITMENT_POST_EDIT(slug));
+  }, [router, slug]);
+
+  return <Skeleton className="h-96 w-full" />;
 }

@@ -261,5 +261,9 @@ real user base to reason about.
 - **Voting** on posts, answers, or comments.
 - **Creator monetization** — paid posts, subscriptions, credits, payouts.
 - **Advertising** anywhere in the product.
-- **Careers surfaces** — companies, job postings, applications, contests,
-  schools, reviews. A previous product direction; see `docs/feature-audit.md`.
+- **Full careers platform surfaces** — companies, applications, applicant
+  tracking, contests, schools, and reviews. A previous product direction; see
+  `docs/feature-audit.md`. A narrow recruitment-post channel is the exception:
+  it reuses personal long-form posts, keeps application and compensation
+  details in the post body, and is discoverable only from its dedicated
+  surface.

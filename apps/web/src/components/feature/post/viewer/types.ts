@@ -1,4 +1,5 @@
 import type { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
+import type { RecruitmentDetails } from '@/components/feature/recruitment/types';
 
 import { PostScope, PostStatus, PostType } from '../types/post';
 
@@ -62,6 +63,8 @@ export interface PostSummary {
   coverImageUrl?: string | null;
   /** 이 글을 만든 에이전트 클라이언트의 이름. 사람이 직접 쓴 글에는 없다. */
   createdViaClientName?: string | null;
+  /** 전용 구인글에만 존재하는 구조화된 탐색 정보 */
+  recruitment?: RecruitmentDetails | null;
 }
 
 /**
@@ -86,13 +89,21 @@ export type PostCardVariant = 'preview' | 'detail';
 
 interface RawPostSummary extends Omit<
   PostSummary,
-  'type' | 'status' | 'scope' | 'author' | 'project'
+  'type' | 'status' | 'scope' | 'author' | 'project' | 'recruitment'
 > {
   type: string;
   status: string;
   scope: string;
   author: PostAuthorSummary;
   project?: PostProjectSummary;
+  recruitment?: {
+    status?: string | null;
+    employmentType?: string | null;
+    workMode?: string | null;
+    location?: string | null;
+    experienceLevel?: string | null;
+    closesAt?: string | null;
+  } | null;
 }
 
 /**
@@ -102,11 +113,19 @@ interface RawPostSummary extends Omit<
  * `PostSummary`.
  */
 export function toPostSummary(raw: RawPostSummary): PostSummary {
+  const recruitment = raw.recruitment;
   return {
     ...raw,
     type: raw.type as PostType,
     status: raw.status as PostStatus,
     scope: raw.scope as PostScope,
+    recruitment:
+      recruitment?.status &&
+      recruitment.employmentType &&
+      recruitment.workMode &&
+      recruitment.experienceLevel
+        ? (recruitment as RecruitmentDetails)
+        : undefined,
   };
 }
 

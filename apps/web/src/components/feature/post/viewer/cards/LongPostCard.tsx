@@ -1,3 +1,4 @@
+import { RecruitmentMeta } from '@/components/feature/recruitment/RecruitmentMeta';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +43,7 @@ export function LongPostCard({
 
       <CardContent className={cn(POST_DETAIL_PADDING_X, 'space-y-6')}>
         <PostCardTitle title={summary.title} variant="detail" />
+        <RecruitmentMeta summary={summary} />
         {/* 상세 화면이므로 본문을 자르지 않는다. 잘린 미리보기는 피드 카드
             (`LongPostPreviewCard`)의 역할이다. */}
         <PostBody editor={editor} lockedPreview={lockedPreview} />

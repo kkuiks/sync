@@ -5,6 +5,7 @@ import com.skkil.sync.media.dto.MediaDto;
 import com.skkil.sync.media.service.domain.MediaDomainService;
 import com.skkil.sync.post.dto.data.PostDto;
 import com.skkil.sync.post.dto.response.GetPostResponse;
+import com.skkil.sync.post.dto.summary.PostRecruitmentSummary;
 import com.skkil.sync.post.dto.summary.PostSummary;
 import com.skkil.sync.post.security.PostAccessLevel;
 import com.skkil.sync.post.security.PostAccessPolicy;
@@ -118,6 +119,16 @@ public class PostAssembler {
                       post.coverMediaId() == null
                           ? null
                           : coverUrlsByMediaId.get(post.coverMediaId());
+                  PostRecruitmentSummary recruitment =
+                      post.recruitmentStatus() == null
+                          ? null
+                          : new PostRecruitmentSummary(
+                              post.recruitmentStatus(),
+                              post.recruitmentEmploymentType(),
+                              post.recruitmentWorkMode(),
+                              post.recruitmentLocation(),
+                              post.recruitmentExperienceLevel(),
+                              post.recruitmentClosesAt());
                   return postMapper.toPostSummary(
                       post,
                       accessLevel,
@@ -128,7 +139,8 @@ public class PostAssembler {
                       commentableByPostId.getOrDefault(post.id(), false),
                       tags,
                       previewMedia,
-                      coverUrl == null ? null : coverUrl.toExternalForm());
+                      coverUrl == null ? null : coverUrl.toExternalForm(),
+                      recruitment);
                 }));
   }
 }
