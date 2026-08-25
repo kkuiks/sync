@@ -55,6 +55,9 @@ export function useReadOnlyPostEditor(
       ReadOnlyTableNode,
       ReadOnlyMathNode,
       TableOfContents.configure({
+        scrollParent: () =>
+          document.querySelector<HTMLElement>('[data-slot="sidebar-inset"]') ??
+          window,
         onUpdate: (items) =>
           setToc(
             items.map((item) => ({

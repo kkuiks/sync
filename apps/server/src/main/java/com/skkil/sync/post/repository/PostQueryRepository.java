@@ -24,6 +24,7 @@ import com.skkil.sync.post.model.PostType;
 import com.skkil.sync.post.model.RecruitmentStatus;
 import com.skkil.sync.post.model.WorkMode;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -220,6 +221,47 @@ public class PostQueryRepository {
         .where(pinnedCondition)
         .orderBy(POSTS.PINNED_AT.desc())
         .limit(PostConstants.MAX_PINNED_POSTS_PER_PROJECT)
+        .fetchInto(PostDto.class);
+  }
+
+  public List<PostDto> getTopPostsByProject(Long requesterId, String handle) {
+    OffsetDateTime since =
+        OffsetDateTime.now(ZoneOffset.UTC).minusDays(PostConstants.TOP_POSTS_WINDOW_DAYS);
+    Condition condition =
+        PROJECTS
+            .HANDLE
+            .eq(handle)
+            .and(PostConditions.workspacePublished())
+            .and(PostConditions.publicProject().or(PostConditions.teammate(requesterId)))
+            .and(POSTS.CREATED_AT.ge(since));
+
+    return dsl.select(post(requesterId))
+        .from(POSTS)
+        .join(PROJECTS)
+        .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
+        .where(condition)
+        .orderBy(POSTS.LIKE_COUNT.plus(POSTS.COMMENT_COUNT).desc(), POSTS.CREATED_AT.desc())
+        .limit(PostConstants.MAX_TOP_POSTS_PER_PROJECT)
+        .fetchInto(PostDto.class);
+  }
+
+  public List<PostDto> getUnansweredQuestionsByProject(Long requesterId, String handle) {
+    Condition condition =
+        PROJECTS
+            .HANDLE
+            .eq(handle)
+            .and(PostConditions.workspacePublished())
+            .and(PostConditions.publicProject().or(PostConditions.teammate(requesterId)))
+            .and(POSTS.POST_TYPE.eq(PostType.QUESTION.name()))
+            .and(POSTS.RESOLVED.isFalse());
+
+    return dsl.select(post(requesterId))
+        .from(POSTS)
+        .join(PROJECTS)
+        .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
+        .where(condition)
+        .orderBy(POSTS.CREATED_AT.desc())
+        .limit(PostConstants.MAX_UNANSWERED_QUESTIONS_PER_PROJECT)
         .fetchInto(PostDto.class);
   }
 

@@ -14,8 +14,7 @@ import { cn } from '@/lib/utils';
 
 interface TagListItemProps {
   name: string;
-  description: string;
-  noDescriptionLabel: string;
+  description?: string | null;
   postCountLabel: string;
   isProjectTag?: boolean;
   href?: string;
@@ -26,7 +25,6 @@ interface TagListItemProps {
 export function TagListItem({
   name,
   description,
-  noDescriptionLabel,
   postCountLabel,
   isProjectTag,
   href,
@@ -43,7 +41,7 @@ export function TagListItem({
       />
 
       <p className="flex-1 truncate text-sm text-muted-foreground">
-        {description || noDescriptionLabel}
+        {description}
       </p>
 
       <p className="shrink-0 text-xs text-muted-foreground">{postCountLabel}</p>

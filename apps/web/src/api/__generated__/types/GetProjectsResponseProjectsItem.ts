@@ -7,6 +7,8 @@
 import type { GetProjectsResponseProjectsItemJoinPolicy } from './GetProjectsResponseProjectsItemJoinPolicy';
 
 export type GetProjectsResponseProjectsItem = {
+  /** 생성 시각 */
+  createdAt: string;
   /**
    * 프로젝트 웹사이트
    * @nullable
@@ -21,6 +23,11 @@ export type GetProjectsResponseProjectsItem = {
    * @nullable
    */
   description?: string | null;
+  /**
+   * 프로젝트 규칙
+   * @nullable
+   */
+  rules?: string | null;
   /** 프로젝트 핸들 */
   handle: string;
   /**

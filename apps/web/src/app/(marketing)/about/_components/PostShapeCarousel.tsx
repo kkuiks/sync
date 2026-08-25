@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { CheckIcon, ResolvedPill, TypeTag } from '../../_components/primitives';
 import { useReveal } from './Reveal';
-import { CheckIcon, ResolvedPill, TypeTag } from './primitives';
 
 const DWELL_MS = 3200;
 

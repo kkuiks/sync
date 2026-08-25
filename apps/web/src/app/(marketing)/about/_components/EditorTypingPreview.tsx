@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
+import { CheckIcon, MONO } from '../../_components/primitives';
 import { useReveal } from './Reveal';
-import { CheckIcon, MONO } from './primitives';
 
 const TYPE_MS = 32;
 

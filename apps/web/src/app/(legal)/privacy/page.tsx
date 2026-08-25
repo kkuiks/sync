@@ -5,10 +5,16 @@ import path from 'node:path';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import { canonicalMetadata } from '@/lib/seo';
+import ROUTES from '@/util/routes';
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pages.legal.privacy');
 
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    ...canonicalMetadata(ROUTES.PRIVACY()),
+  };
 }
 
 export default async function Privacy() {

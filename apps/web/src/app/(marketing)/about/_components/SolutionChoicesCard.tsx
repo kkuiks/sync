@@ -2,7 +2,12 @@ import { getTranslations } from 'next-intl/server';
 
 import { cn } from '@/lib/utils';
 
-import { MONO, MonoLabel, ResolvedPill, TypeTag } from './primitives';
+import {
+  MONO,
+  MonoLabel,
+  ResolvedPill,
+  TypeTag,
+} from '../../_components/primitives';
 
 /** 글 유형과 게시 위치, 두 번의 선택과 그 결과 만들어지는 글. */
 export default async function SolutionChoicesCard() {

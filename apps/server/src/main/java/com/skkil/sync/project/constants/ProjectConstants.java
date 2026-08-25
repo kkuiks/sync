@@ -36,6 +36,8 @@ public class ProjectConstants {
 
   public static final int MAX_DESCRIPTION_LENGTH = 500;
 
+  public static final int MAX_RULES_LENGTH = 2000;
+
   public static final int INITIAL_TEAMMATE_LOAD_LIMIT = 5;
 
   public static final Duration PROJECT_INVITATION_TTL = Duration.ofDays(7);

@@ -191,7 +191,6 @@
           "error": "태그를 불러오는 중 오류가 발생했습니다."
         },
         "post-count": "게시물 {count}개",
-        "no-description": "설명이 없습니다.",
         "follow": "팔로우",
         "unfollow": "팔로잉"
       },
@@ -584,7 +583,6 @@
             "error": "태그를 불러오는 중 오류가 발생했습니다."
           },
           "post-count": "게시물 {count}개",
-          "no-description": "설명이 없습니다.",
           "manage-link": "태그 관리",
           "manage": {
             "back": "태그로 돌아가기",
@@ -679,17 +677,30 @@
         },
         "dashboard": {
           "feed": {
-            "heading": "피드"
+            "heading": "홈"
           },
           "pinned": {
+            "heading": "고정된 게시물",
             "badge": "고정",
-            "meta": "{author} · {minutes}분"
+            "meta": "{author} · {minutes}분",
+            "empty": "아직 고정된 게시물이 없어요."
+          },
+          "top-posts": {
+            "heading": "이번 주 인기 게시물",
+            "meta": "{author} · 좋아요 {likes} · 댓글 {comments}",
+            "empty": "아직 이번 주에 인기 있는 게시물이 없어요."
+          },
+          "unanswered-questions": {
+            "heading": "답변이 필요한 질문",
+            "empty": "답변을 기다리는 질문이 없어요."
           }
         },
         "sidebar": {
           "about": {
-            "heading": "소개",
             "description-empty": "설명이 없습니다.",
+            "show-more": "더 보기",
+            "show-less": "접기",
+            "created": "{date} 생성됨",
             "visibility": {
               "public": "공개",
               "private": "비공개"
@@ -699,20 +710,40 @@
               "request": "승인제",
               "invite": "초대 전용"
             },
+            "visibility-tooltip": {
+              "public": {
+                "open": "누구나 볼 수 있고, 누구나 자유롭게 가입할 수 있는 공개 프로젝트예요.",
+                "request": "누구나 볼 수 있지만, 가입하려면 운영진의 승인이 필요해요.",
+                "invite": "누구나 볼 수 있지만, 초대를 받아야만 가입할 수 있어요."
+              },
+              "private": {
+                "open": "초대받은 팀원만 볼 수 있는 비공개 프로젝트예요.",
+                "request": "초대받은 팀원만 볼 수 있고, 가입하려면 운영진의 승인이 필요해요.",
+                "invite": "초대받은 팀원만 볼 수 있고, 가입할 수 있는 비공개 프로젝트예요."
+              }
+            },
             "stats": {
               "followers": "팔로워",
               "members": "멤버"
+            },
+            "staff": {
+              "heading": "운영진"
             }
           },
           "contributors": {
             "heading": "멤버",
-            "invite": "초대"
+            "invite": "초대",
+            "view-all": "전체보기"
+          },
+          "rules": {
+            "heading": "규칙"
           }
         },
         "settings": {
           "tabs": {
             "project": "프로젝트",
-            "teammates": "팀원"
+            "teammates": "팀원",
+            "templates": "템플릿"
           },
           "project": {
             "heading": "프로젝트 설정",
@@ -745,6 +776,20 @@
               },
               "messages": {
                 "success": "프로젝트 이름이 변경되었습니다."
+              }
+            },
+            "rules": {
+              "heading": "규칙",
+              "description": "이 스페이스의 멤버가 지켜야 할 규칙입니다.",
+              "label": "규칙",
+              "save": "저장",
+              "errors": {
+                "invalid": "규칙은 2000자 이하로 입력해주세요.",
+                "network": "서버에 연결할 수 없습니다. 나중에 다시 시도하세요.",
+                "unknown": "규칙을 변경하지 못했습니다."
+              },
+              "messages": {
+                "success": "규칙이 변경되었습니다."
               }
             },
             "handle": {
@@ -889,6 +934,62 @@
                 "project-not-found": "프로젝트를 찾을 수 없습니다."
               }
             }
+          },
+          "templates": {
+            "heading": "템플릿",
+            "description": "프로젝트에서 글을 쓸 때 고를 수 있는 글 템플릿을 관리합니다.",
+            "create-link": "새 템플릿",
+            "empty": "자주 쓰는 글 양식을 템플릿으로 만들어 두면, 팀원이 글을 쓸 때 골라서 시작할 수 있습니다.",
+            "table": {
+              "columns": {
+                "name": "이름",
+                "title": "제목 접두어"
+              },
+              "no-title": "없음"
+            },
+            "delete": {
+              "trigger": "삭제",
+              "title": "템플릿을 삭제할까요?",
+              "description": "\"{name}\" 템플릿을 삭제합니다. 이미 작성된 글에는 영향이 없습니다.",
+              "cancel": "취소",
+              "submit": "삭제",
+              "messages": {
+                "success": "템플릿을 삭제했습니다.",
+                "error": "템플릿을 삭제하지 못했습니다. 잠시 후 다시 시도하세요."
+              }
+            },
+            "form": {
+              "heading-new": "새 템플릿",
+              "heading-edit": "템플릿 수정",
+              "not-found": "템플릿을 찾을 수 없습니다.",
+              "back": "목록으로",
+              "name-label": "이름",
+              "name-placeholder": "예: 트러블슈팅 리포트",
+              "title-label": "제목 접두어",
+              "title-placeholder": "예: 트러블슈팅: ",
+              "title-help": "템플릿을 고르면 글 제목 칸에 미리 채워지는 문구입니다. 비워 두면 제목을 건드리지 않습니다.",
+              "content-label": "본문 양식",
+              "content-placeholder": "/ 를 입력하여 명령어를 사용하거나 텍스트를 입력하세요",
+              "cancel": "취소",
+              "submit-create": "만들기",
+              "submit-update": "저장",
+              "errors": {
+                "name-required": "이름을 입력하세요.",
+                "name-too-long": "이름은 255자 이하로 입력해주세요.",
+                "title-too-long": "제목 접두어는 255자 이하로 입력해주세요."
+              },
+              "messages": {
+                "create-success": "템플릿을 만들었습니다.",
+                "update-success": "템플릿을 저장했습니다.",
+                "already-exists": "같은 이름의 템플릿이 이미 있습니다.",
+                "limit-exceeded": "템플릿은 프로젝트당 최대 20개까지 만들 수 있습니다.",
+                "not-found": "템플릿을 찾을 수 없습니다. 새로고침 후 다시 시도하세요.",
+                "empty-content": "본문 양식을 입력하세요.",
+                "content-too-long": "본문이 너무 깁니다. 내용을 줄여 주세요.",
+                "error": "템플릿을 저장하지 못했습니다. 잠시 후 다시 시도하세요."
+              }
+            },
+            "edit-link": "수정"
           }
         }
       },
@@ -1116,7 +1217,12 @@
       "nav": {
         "login": "로그인",
         "register": "가입하기",
-        "app": "앱으로 이동"
+        "app": "앱으로 이동",
+        "links": {
+          "features": "기능",
+          "pricing": "가격",
+          "faq": "자주 묻는 질문"
+        }
       },
       "hero": {
         "rotatingWords": [
@@ -1290,6 +1396,76 @@
           "cookies": "쿠키 정책"
         }
       }
+    },
+    "pricing": {
+      "metaTitle": "가격",
+      "heading": "우리 팀에 맞는 플랜을 선택하세요",
+      "sub": "기본 기능은 무료로 시작하고, 필요할 때 언제든 늘리세요.",
+      "plans": {
+        "free": {
+          "name": "Free",
+          "description": "혼자서도, 여러 명이 모인 공개 프로젝트에서도",
+          "priceLabel": "₩0",
+          "priceCaption": "평생 무료",
+          "action": "무료로 시작하기"
+        },
+        "team": {
+          "badge": "추천",
+          "name": "Team",
+          "description": "외부에 보이지 않는 비공개 프로젝트",
+          "priceLabel": "₩1,000",
+          "priceUnit": "인당 · 월",
+          "priceCaption": "첫 5명은 무료",
+          "action": "무료로 시작하기",
+          "inherit": "Free의 모든 기능 포함"
+        },
+        "enterprise": {
+          "badge": "준비 중",
+          "name": "Enterprise",
+          "description": "더 큰 조직을 위한 맞춤 플랜",
+          "priceLabel": "문의 후 안내",
+          "action": "문의하기",
+          "note": "엔터프라이즈 플랜은 아직 준비 중이에요.",
+          "inherit": "Team의 모든 기능 포함"
+        }
+      },
+      "features": {
+        "free": {
+          "publicUnlimited": {
+            "label": "공개 프로젝트 인원 수 제한 없음",
+            "tooltip": "커뮤니티·쇼케이스 프로젝트는 인원 수와 관계없이 무료로 이용할 수 있어요."
+          },
+          "privateFree": {
+            "label": "비공개 프로젝트 최대 5명까지 무료",
+            "tooltip": "외부에 보이지 않는 비공개 프로젝트를 5명까지 무료로 만들고 운영할 수 있어요."
+          },
+          "unlimitedPosts": {
+            "label": "게시글 개수 제한 없음",
+            "tooltip": "짧은 기록부터 긴 글까지, 개수 제한 없이 자유롭게 작성할 수 있어요."
+          }
+        },
+        "team": {
+          "invisible": {
+            "label": "외부에 보이지 않는 완전한 비공개 공간",
+            "tooltip": "비공개 프로젝트는 검색, 추천, 태그 목록 어디에도 노출되지 않아요."
+          },
+          "inviteOnly": {
+            "label": "초대한 팀원만 참여 가능",
+            "tooltip": "관리자가 직접 초대한 사람만 프로젝트에 참여할 수 있어요."
+          },
+          "cancelAnytime": {
+            "label": "언제든 직접 해지 가능",
+            "tooltip": "서비스 내 설정 화면에서 스스로 구독을 해지할 수 있어요."
+          }
+        },
+        "enterprise": {
+          "comingSoon": {
+            "label": "전담 지원 및 맞춤 계약 (준비 중)",
+            "tooltip": "조직 규모에 맞는 전담 지원과 맞춤 계약 조건은 아직 준비 중이에요."
+          }
+        }
+      },
+      "note": "표시된 금액은 부가세가 포함된 금액이며, 매월 자동으로 결제돼요. 자세한 내용은 이용약관을 확인해 주세요."
     },
     "onboarding": {
       "metaTitle": "온보딩",
@@ -2127,7 +2303,6 @@
     },
     "tag": {
       "detail": {
-        "description-empty": "설명이 없습니다.",
         "meta": "게시물 {postCount}개 · 팔로워 {followerCount}명",
         "follow": {
           "follow": "팔로우",
@@ -2222,6 +2397,9 @@
         "empty": "새로운 알림이 없습니다",
         "types": {
           "NEW_COMMENT": "{name}님이 {title} 글에 댓글을 남겼습니다.",
+          "NEW_COMMENT_UNTITLED": "{name}님이 회원님의 글에 댓글을 남겼습니다.",
+          "NEW_LIKE": "{name}님이 {title} 글을 좋아합니다.",
+          "NEW_LIKE_UNTITLED": "{name}님이 회원님의 글을 좋아합니다.",
           "NEW_FOLLOWER": "{name}님이 회원님을 팔로우하기 시작했습니다.",
           "PROJECT_INVITATION": "{name}님이 {project} 프로젝트에 회원님을 초대했습니다.",
           "PROJECT_INVITATION_ACCEPTED": "{name}님이 {project} 프로젝트 초대를 수락했습니다.",
@@ -2249,6 +2427,9 @@
             "declined": "가입 요청을 반려했습니다.",
             "already-handled": "이미 처리된 가입 요청입니다."
           }
+        },
+        "errors": {
+          "mark-read": "알림을 읽음 처리하지 못했습니다. 잠시 후 다시 시도해주세요."
         }
       }
     },

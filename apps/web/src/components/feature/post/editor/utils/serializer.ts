@@ -1,11 +1,10 @@
-import { Editor } from '@tiptap/react';
-import { JSONContent } from '@tiptap/react';
+import type { Editor, JSONContent } from '@tiptap/core';
 
-import { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
+import type { GetPostResponseContentMediaItem } from '@/api/__generated__/types';
 
 import { NodeType } from '../extensions/nodes';
-import { FileNodeAttributes } from '../extensions/nodes/file';
-import { ImageNodeAttributes } from '../extensions/nodes/image';
+import type { FileNodeAttributes } from '../extensions/nodes/file/schema';
+import type { ImageNodeAttributes } from '../extensions/nodes/image.schema';
 
 type Media = {
   id: string;

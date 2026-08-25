@@ -12,7 +12,6 @@ import lombok.Getter;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.domain.Vector;
 
 @Entity
 @Table(name = "post_embeddings")
@@ -26,17 +25,17 @@ public class PostEmbedding extends BaseEntity {
   @Column(name = "embedding", nullable = false, columnDefinition = "vector(1536)")
   @JdbcTypeCode(SqlTypes.VECTOR)
   @Array(length = 1536)
-  private Vector embedding;
+  private float[] embedding;
 
   protected PostEmbedding() {}
 
   @Builder
   public PostEmbedding(Post post, float[] embedding) {
     this.post = post;
-    this.embedding = Vector.of(embedding);
+    this.embedding = embedding;
   }
 
   public void updateEmbedding(float[] embedding) {
-    this.embedding = Vector.of(embedding);
+    this.embedding = embedding;
   }
 }

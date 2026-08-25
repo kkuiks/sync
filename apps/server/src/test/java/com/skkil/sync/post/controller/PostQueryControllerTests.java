@@ -405,6 +405,58 @@ class PostQueryControllerTests {
   }
 
   @Test
+  @DisplayName("[getTopPostsByProject] API 문서화 테스트")
+  void getTopPostsByProject() throws Exception {
+    String handle = "project";
+    GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
+
+    when(postQueryService.getTopPostsByProject(any(), eq(handle))).thenReturn(response);
+
+    mockMvc
+        .perform(get("/projects/{handle}/posts/top", handle))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "GetTopPostsByProject",
+                ResourceSnippetParameters.builder()
+                    .tag("post")
+                    .summary("Get Top Posts By Project")
+                    .description("최근 7일간 좋아요·댓글이 많은 프로젝트 게시글 목록을 조회합니다.")
+                    .responseSchema(schema(GetPostsResponse.class.getSimpleName())),
+                null,
+                null,
+                Function.identity(),
+                pathParameters(parameterWithName("handle").description("프로젝트 핸들")),
+                GetPostsResponseSnippets.getPostsResponseFields()));
+  }
+
+  @Test
+  @DisplayName("[getUnansweredQuestionsByProject] API 문서화 테스트")
+  void getUnansweredQuestionsByProject() throws Exception {
+    String handle = "project";
+    GetPostsResponse response = GetPostsResponseSnippets.getGetPostsResponse();
+
+    when(postQueryService.getUnansweredQuestionsByProject(any(), eq(handle))).thenReturn(response);
+
+    mockMvc
+        .perform(get("/projects/{handle}/posts/unanswered-questions", handle))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "GetUnansweredQuestionsByProject",
+                ResourceSnippetParameters.builder()
+                    .tag("post")
+                    .summary("Get Unanswered Questions By Project")
+                    .description("아직 답변이 채택되지 않은 프로젝트 질문 게시글 목록을 조회합니다.")
+                    .responseSchema(schema(GetPostsResponse.class.getSimpleName())),
+                null,
+                null,
+                Function.identity(),
+                pathParameters(parameterWithName("handle").description("프로젝트 핸들")),
+                GetPostsResponseSnippets.getPostsResponseFields()));
+  }
+
+  @Test
   @DisplayName("[getDrafts] 로그인하지 않은 사용자는 접근할 수 없다")
   void getDrafts_unauthenticatedUser_shouldReturnUnauthorized() throws Exception {
     mockMvc.perform(get("/posts/drafts")).andExpect(status().isUnauthorized());

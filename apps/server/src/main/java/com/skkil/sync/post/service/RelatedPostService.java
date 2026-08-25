@@ -8,6 +8,7 @@ import com.skkil.sync.post.repository.PostQueryRepository;
 import com.skkil.sync.post.repository.PostSearchRepository;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Vector;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,7 +42,7 @@ public class RelatedPostService {
 
     List<Long> candidateIds =
         postSearchRepository.findTopNRelatedByEmbedding(
-            embedding.get().getEmbedding(), postId, CANDIDATE_POOL_SIZE);
+            Vector.of(embedding.get().getEmbedding()), postId, CANDIDATE_POOL_SIZE);
 
     List<PostDto> topN =
         postQueryRepository.getPostsByIds(requesterId, candidateIds).stream()

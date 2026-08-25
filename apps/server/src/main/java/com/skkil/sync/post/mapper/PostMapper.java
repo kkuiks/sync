@@ -22,6 +22,7 @@ public interface PostMapper {
       expression =
           "java(com.skkil.sync.post.model.PostScope.fromProjectHandle(post.projectHandle()))")
   @Mapping(target = "status", source = "post.status")
+  @Mapping(target = "createdAt", source = "post.createdAt")
   PostSummary toPostSummary(
       PostDto post,
       PostAccessLevel accessLevel,
@@ -59,5 +60,7 @@ public interface PostMapper {
   @Mapping(target = "joinPolicy", source = "projectJoinPolicy")
   @Mapping(target = "followerCount", source = "projectFollowerCount")
   @Mapping(target = "iconUrl", ignore = true)
+  @Mapping(target = "rules", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
   ProjectSummary toProjectSummary(PostDto post);
 }

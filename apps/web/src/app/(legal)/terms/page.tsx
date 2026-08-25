@@ -5,10 +5,16 @@ import path from 'node:path';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import { canonicalMetadata } from '@/lib/seo';
+import ROUTES from '@/util/routes';
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pages.legal.terms');
 
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    ...canonicalMetadata(ROUTES.TERMS()),
+  };
 }
 
 export default async function Terms() {

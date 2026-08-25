@@ -3,6 +3,8 @@ import { getTranslations } from 'next-intl/server';
 
 import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import { requireOnboardedSession } from '@/lib/auth/guards';
+import { canonicalMetadata } from '@/lib/seo';
+import ROUTES from '@/util/routes';
 
 import AgentsCard from './_components/AgentsCard';
 import DiscoverCard from './_components/DiscoverCard';
@@ -12,7 +14,10 @@ import TrendingTags from './_components/TrendingTags';
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pages.home.feed');
 
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    ...canonicalMetadata(ROUTES.HOME()),
+  };
 }
 
 export default async function Home() {

@@ -120,4 +120,19 @@ public class PostQueryController {
       @AuthenticationPrincipal AuthenticatedUser user, @PathVariable String handle) {
     return postQueryService.getPinnedPostsByProject(user == null ? null : user.userId(), handle);
   }
+
+  @GetMapping("/projects/{handle}/posts/top")
+  @ResponseStatus(HttpStatus.OK)
+  public GetPostsResponse getTopPostsByProject(
+      @AuthenticationPrincipal AuthenticatedUser user, @PathVariable String handle) {
+    return postQueryService.getTopPostsByProject(user == null ? null : user.userId(), handle);
+  }
+
+  @GetMapping("/projects/{handle}/posts/unanswered-questions")
+  @ResponseStatus(HttpStatus.OK)
+  public GetPostsResponse getUnansweredQuestionsByProject(
+      @AuthenticationPrincipal AuthenticatedUser user, @PathVariable String handle) {
+    return postQueryService.getUnansweredQuestionsByProject(
+        user == null ? null : user.userId(), handle);
+  }
 }

@@ -94,7 +94,6 @@ export default function FollowingTags() {
           <TagListItem
             name={tag.name}
             description={tag.description}
-            noDescriptionLabel={t('no-description')}
             postCountLabel={t('post-count', { count: tag.postCount })}
             href={ROUTES.TAG(String(tag.id))}
             trailing={

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { CheckIcon } from '../../_components/primitives';
 import { useReveal } from './Reveal';
-import { CheckIcon } from './primitives';
 
 const SPEED_PX_PER_SEC = 11;
 

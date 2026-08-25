@@ -14,6 +14,7 @@ import { PostCard } from '@/components/feature/post/viewer/PostCard';
 import { PostProvider } from '@/components/feature/post/viewer/PostContext';
 import { PostViewerSidebar } from '@/components/feature/post/viewer/PostViewerSidebar';
 import { RelatedPosts } from '@/components/feature/post/viewer/RelatedPosts';
+import { renderPostBodyHtml } from '@/components/feature/post/viewer/renderPostBodyHtml';
 import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import SyncError, { ErrorCode } from '@/lib/error';
 import { getPostBySlugCached } from '@/lib/post-query';
@@ -60,6 +61,7 @@ export default async function Post({ params }: PostProps) {
   let canComment = false;
   let requiresMembership = false;
   let jsonLd: Record<string, unknown> | null = null;
+  let serverBodyHtml: string | null = null;
 
   try {
     const response = await getPostBySlugCached(slug);
@@ -85,6 +87,10 @@ export default async function Post({ params }: PostProps) {
     if (post.summary.project?.handle) {
       redirect(ROUTES.PROJECT_POST(post.summary.project.handle, slug));
     }
+
+    // 크롤러와 첫 화면을 위해 본문을 서버에서 미리 그려 둔다. 뷰어의 Tiptap 편집기는
+    // 브라우저에서만 만들어지므로, 이게 없으면 서버 마크업에 본문이 통째로 빠진다.
+    serverBodyHtml = renderPostBodyHtml(post.content);
 
     if (isPostIndexable(post.summary)) {
       jsonLd = buildPostJsonLd(post.summary, ROUTES.POST(slug));
@@ -127,7 +133,7 @@ export default async function Post({ params }: PostProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <PostProvider>
+      <PostProvider serverBodyHtml={serverBodyHtml}>
         <TwoColumnLayout
           main={<PostCard slug={slug} />}
           side={

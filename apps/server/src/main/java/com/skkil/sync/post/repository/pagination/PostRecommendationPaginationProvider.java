@@ -6,6 +6,7 @@ import com.skkil.sync.common.util.pagination.keyset.KeysetCursorPaginationProvid
 import com.skkil.sync.common.util.pagination.keyset.KeysetField;
 import com.skkil.sync.post.dto.data.PostRecommendationCandidate;
 import com.skkil.sync.post.dto.data.PostRecommendationCursor;
+import com.skkil.sync.post.repository.PostRecommendationQueryRepository;
 import java.util.List;
 
 /**
@@ -21,6 +22,12 @@ public class PostRecommendationPaginationProvider
   public static final PostRecommendationPaginationProvider LIKE_COUNT =
       new PostRecommendationPaginationProvider(
           KeysetField.desc(POSTS.LIKE_COUNT, PostRecommendationCursor::likeCount));
+
+  public static final PostRecommendationPaginationProvider TRENDING_SCORE =
+      new PostRecommendationPaginationProvider(
+          KeysetField.desc(
+              PostRecommendationQueryRepository.TRENDING_SCORE_FIELD,
+              PostRecommendationCursor::trendingScore));
 
   private final List<KeysetField<PostRecommendationCursor, ?>> keysetFields;
 
@@ -41,6 +48,7 @@ public class PostRecommendationPaginationProvider
 
   @Override
   public PostRecommendationCursor convert(PostRecommendationCandidate entity) {
-    return new PostRecommendationCursor(entity.createdAt(), entity.likeCount(), entity.id());
+    return new PostRecommendationCursor(
+        entity.createdAt(), entity.likeCount(), entity.trendingScore(), entity.id());
   }
 }

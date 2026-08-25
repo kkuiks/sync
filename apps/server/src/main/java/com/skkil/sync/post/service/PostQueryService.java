@@ -168,6 +168,20 @@ public class PostQueryService {
   }
 
   @Transactional(readOnly = true)
+  @PreAuthorize("hasPermission(#handle, 'PROJECT', 'READ')")
+  public GetPostsResponse getTopPostsByProject(Long requesterId, String handle) {
+    var topPosts = postQueryRepository.getTopPostsByProject(requesterId, handle);
+    return new GetPostsResponse(postAssembler.toPostResponses(topPosts, requesterId));
+  }
+
+  @Transactional(readOnly = true)
+  @PreAuthorize("hasPermission(#handle, 'PROJECT', 'READ')")
+  public GetPostsResponse getUnansweredQuestionsByProject(Long requesterId, String handle) {
+    var unanswered = postQueryRepository.getUnansweredQuestionsByProject(requesterId, handle);
+    return new GetPostsResponse(postAssembler.toPostResponses(unanswered, requesterId));
+  }
+
+  @Transactional(readOnly = true)
   @PreAuthorize("hasPermission(#userId, 'PROFILE', 'READ')")
   public PaginatedGetPostsResponse getCommentedPosts(
       Long requesterId, Long userId, String projectHandle, CursorPaginationRequest pagination) {

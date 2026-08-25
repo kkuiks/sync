@@ -36,9 +36,6 @@ export async function generateMetadata(): Promise<Metadata> {
     creator: 'sync',
     publisher: 'sync',
     robots: INDEXABLE_ROBOTS,
-    alternates: {
-      canonical: '/',
-    },
     openGraph: {
       type: 'website',
       locale: 'ko_KR',

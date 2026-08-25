@@ -4,7 +4,6 @@ import {
   NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
-  mergeAttributes,
 } from '@tiptap/react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -19,62 +18,10 @@ import { Spinner } from '@/components/ui/spinner';
 import SyncError, { ErrorCode } from '@/lib/error';
 import { MAX_FILE_SIZE, cn } from '@/lib/tiptap-utils';
 
-import { NodeType } from '.';
 import { hasSupportedFileTransfer, takePendingFile } from '../media-drop';
+import { type ImageNodeAttributes, imageNodeSchema } from './image.schema';
 
-export type ImageNodeAttributes = {
-  src: string | null;
-  status: 'none' | 'loaded' | 'uploading' | 'uploaded' | 'error';
-  mediaId: string | null;
-  pendingId: string | null;
-};
-
-const imageNodeSchema = {
-  name: NodeType.Image,
-  group: 'block',
-  content: '',
-  atom: true,
-  selectable: true,
-  draggable: true,
-  addAttributes() {
-    return {
-      src: {
-        default: null,
-      },
-      status: {
-        default: 'none',
-        rendered: false,
-      },
-      mediaId: {
-        default: null,
-        parseHTML: (element: Element) => element.getAttribute('data-media-id'),
-        renderHTML: (attributes: Record<string, unknown>) =>
-          attributes.mediaId ? { 'data-media-id': attributes.mediaId } : {},
-      },
-      pendingId: {
-        default: null,
-        rendered: false,
-      },
-    };
-  },
-  parseHTML() {
-    return [
-      {
-        tag: 'img[src]',
-        getAttrs: (element: Element) => ({
-          status: element.getAttribute('src') ? 'uploaded' : 'none',
-        }),
-      },
-    ];
-  },
-  renderHTML({
-    HTMLAttributes,
-  }: {
-    HTMLAttributes: Record<string, unknown>;
-  }): [string, Record<string, unknown>] {
-    return ['img', mergeAttributes(HTMLAttributes)];
-  },
-};
+export type { ImageNodeAttributes };
 
 export const ImageNode = Node.create<ImageNodeAttributes>({
   ...imageNodeSchema,

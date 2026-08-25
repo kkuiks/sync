@@ -8,6 +8,7 @@ import com.skkil.sync.post.dto.data.PostRecommendationCursor;
 import com.skkil.sync.post.model.PostRecommendationType;
 import com.skkil.sync.post.repository.PostRecommendationQueryRepository;
 import com.skkil.sync.post.repository.pagination.PostRecommendationPaginationProvider;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,13 +29,12 @@ public class TrendingPostRecommendationChannel implements PostRecommendationChan
   @Override
   public CursorPaginationDataFetcher<PostRecommendationCandidate> getCandidateFetcher(
       PostRecommendationContext context) {
-    return postRecommendationQueryRepository.getDiscoveryCandidates(
-        postRecommendationQueryRepository.trendingCondition(), context);
+    return postRecommendationQueryRepository.getDiscoveryCandidates(DSL.noCondition(), context);
   }
 
   @Override
   public KeysetCursorPaginationProvider<PostRecommendationCandidate, PostRecommendationCursor>
       getPaginationProvider() {
-    return PostRecommendationPaginationProvider.LIKE_COUNT;
+    return PostRecommendationPaginationProvider.TRENDING_SCORE;
   }
 }

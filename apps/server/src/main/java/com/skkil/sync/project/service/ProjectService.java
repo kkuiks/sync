@@ -179,7 +179,7 @@ public class ProjectService {
     Project project =
         projectRepository.findByHandle(handle).orElseThrow(ProjectNotFoundException::new);
 
-    project.update(request.name(), request.description(), request.website());
+    project.update(request.name(), request.description(), request.website(), request.rules());
     project.updateJoinPolicy(request.joinPolicy());
 
     if (request.handle() != null) {

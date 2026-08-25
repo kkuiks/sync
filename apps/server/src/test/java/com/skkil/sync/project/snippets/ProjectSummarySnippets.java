@@ -5,6 +5,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import com.skkil.sync.common.util.restdocs.RestDocsUtils;
 import com.skkil.sync.project.dto.summary.ProjectSummary;
 import com.skkil.sync.project.model.JoinPolicy;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -21,6 +22,8 @@ public class ProjectSummarySnippets {
         .joinPolicy(JoinPolicy.INVITE)
         .followerCount(42)
         .iconUrl("https://example.com/icon.png")
+        .rules("1. 서로 존중해주세요.\n2. 광고성 게시글은 금지합니다.")
+        .createdAt(Instant.parse("2025-01-01T00:00:00Z"))
         .build();
   }
 
@@ -47,6 +50,11 @@ public class ProjectSummarySnippets {
         fieldWithPath(prefix + "iconUrl")
             .type(JsonFieldType.STRING)
             .optional()
-            .description("프로젝트 아이콘 URL"));
+            .description("프로젝트 아이콘 URL"),
+        fieldWithPath(prefix + "rules")
+            .type(JsonFieldType.STRING)
+            .optional()
+            .description("프로젝트 규칙"),
+        fieldWithPath(prefix + "createdAt").type(JsonFieldType.STRING).description("생성 시각"));
   }
 }

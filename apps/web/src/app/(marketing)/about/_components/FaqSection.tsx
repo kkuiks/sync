@@ -15,7 +15,7 @@ export default async function FaqSection() {
   }));
 
   return (
-    <section className="border-t border-border py-20">
+    <section id="faq" className="scroll-mt-20 border-t border-border py-20">
       <FaqAccordion heading={t('heading')} items={items} />
     </section>
   );

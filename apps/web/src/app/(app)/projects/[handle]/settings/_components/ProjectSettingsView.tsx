@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import SyncError, { ErrorCode } from '@/lib/error';
 import ROUTES from '@/util/routes';
 
@@ -56,6 +57,7 @@ const PROJECT_NAME_MIN_LENGTH = 6;
 const PROJECT_NAME_MAX_LENGTH = 50;
 const PROJECT_HANDLE_MIN_LENGTH = 6;
 const PROJECT_HANDLE_MAX_LENGTH = 30;
+const PROJECT_RULES_MAX_LENGTH = 2000;
 
 export default function ProjectSettingsView() {
   const t = useTranslations('pages.projects.project.settings.project');
@@ -112,6 +114,18 @@ export default function ProjectSettingsView() {
           </p>
         </div>
         <ProjectHandleField handle={handle} isAdmin={isAdmin} />
+      </section>
+
+      <Separator />
+
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium">{t('rules.heading')}</h3>
+          <p className="text-xs text-muted-foreground">
+            {t('rules.description')}
+          </p>
+        </div>
+        <ProjectRulesField handle={handle} isAdmin={isAdmin} />
       </section>
 
       <Separator />
@@ -558,6 +572,86 @@ function ProjectNameField({
           value={name}
           onChange={(event) => setName(event.target.value)}
           disabled={!isAdmin || isPending}
+        />
+      </div>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+      <Button
+        size="sm"
+        disabled={!isAdmin || !isDirty || isPending}
+        onClick={handleSave}
+      >
+        {t('save')}
+      </Button>
+    </>
+  );
+}
+
+function ProjectRulesField({
+  handle,
+  isAdmin,
+}: {
+  handle: string;
+  isAdmin: boolean;
+}) {
+  const t = useTranslations('pages.projects.project.settings.project.rules');
+
+  const { data } = useGetProjectByHandle(handle);
+  const project = data?.data;
+
+  const [rules, setRules] = useState(project?.summary.rules ?? '');
+  const [error, setError] = useState<string | null>(null);
+
+  const { mutate: updateProject, isPending } = useUpdateProject({
+    mutation: {
+      onSuccess: async (_data, _variables, _onMutateResult, context) => {
+        await context.client.invalidateQueries(
+          getGetProjectByHandleQueryOptions(handle),
+        );
+        toast.success(t('messages.success'));
+      },
+      onError: (error) => {
+        if (
+          error instanceof SyncError &&
+          error.code === ErrorCode.NETWORK_ERROR
+        ) {
+          setError(t('errors.network'));
+        } else if (error instanceof SyncError) {
+          setError(error.message);
+        } else {
+          setError(t('errors.unknown'));
+        }
+      },
+    },
+  });
+
+  if (!project) {
+    return null;
+  }
+
+  const isValid = rules.length <= PROJECT_RULES_MAX_LENGTH;
+  const isDirty = rules !== (project.summary.rules ?? '');
+
+  const handleSave = () => {
+    setError(null);
+
+    if (!isValid) {
+      setError(t('errors.invalid'));
+      return;
+    }
+
+    updateProject({ handle, data: { rules } });
+  };
+
+  return (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="project-rules">{t('label')}</Label>
+        <Textarea
+          id="project-rules"
+          value={rules}
+          onChange={(event) => setRules(event.target.value)}
+          disabled={!isAdmin || isPending}
+          rows={6}
         />
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}

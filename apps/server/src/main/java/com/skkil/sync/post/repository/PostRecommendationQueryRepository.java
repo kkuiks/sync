@@ -13,10 +13,9 @@ import com.skkil.sync.post.dto.data.PostRecommendationCandidate;
 import com.skkil.sync.post.dto.data.PostRecommendationContext;
 import com.skkil.sync.post.model.PostScope;
 import com.skkil.sync.post.model.PostType;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
@@ -24,7 +23,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PostRecommendationQueryRepository {
 
-  private static final int TRENDING_WINDOW_DAYS = 7;
+  private static final double TRENDING_GRAVITY = 1.8;
+
+  /**
+   * 인기 정렬용 감쇠 점수(decay score). 좋아요 수를 게시 후 경과 시간의 거듭제곱으로 나누어, 오래된 게시글일수록 순위가 자연스럽게 낮아지도록 한다(Hacker
+   * News/Reddit "hot" 랭킹과 동일한 방식). 별도의 기간 제한(WHERE 절)이 없어 트래픽이 적은 시점에도 페이지네이션이 조기에 고갈되지 않는다.
+   * SELECT/ORDER BY/WHERE(seek 조건) 전체에서 동일한 표현식을 재사용해야 커서 값과 실제 정렬 결과가 어긋나지 않으므로, 이 상수 하나만 정의해
+   * 공유한다.
+   */
+  public static final Field<Double> TRENDING_SCORE_FIELD =
+      DSL.field(
+          "{0} / power(extract(epoch from (now() - {1})) / 3600 + 2, {2})",
+          Double.class, POSTS.LIKE_COUNT, POSTS.CREATED_AT, DSL.val(TRENDING_GRAVITY));
 
   private final DSLContext dsl;
 
@@ -61,7 +71,8 @@ public class PostRecommendationQueryRepository {
         dsl.select(
                 POSTS.ID.as("id"),
                 POSTS.CREATED_AT.as("createdAt"),
-                POSTS.LIKE_COUNT.as("likeCount"))
+                POSTS.LIKE_COUNT.as("likeCount"),
+                TRENDING_SCORE_FIELD.as("trendingScore"))
             .from(POSTS)
             .leftJoin(PROJECTS)
             .on(POSTS.PROJECT_ID.eq(PROJECTS.ID))
@@ -103,11 +114,6 @@ public class PostRecommendationQueryRepository {
                         POST_TAGS.POST_ID.eq(POSTS.ID),
                         TAG_FOLLOW_RELATIONSHIPS.FOLLOWER_ID.eq(requesterId),
                         TAGS.PROJECT_ID.isNull())));
-  }
-
-  public Condition trendingCondition() {
-    OffsetDateTime since = OffsetDateTime.now(ZoneOffset.UTC).minusDays(TRENDING_WINDOW_DAYS);
-    return POSTS.CREATED_AT.ge(since);
   }
 
   private Condition scopeCondition(@Nullable PostScope scope) {

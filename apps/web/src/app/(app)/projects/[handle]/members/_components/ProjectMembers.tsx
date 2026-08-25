@@ -28,49 +28,49 @@ export default function ProjectMembers() {
 
   const teammates = data?.data.teammates ?? [];
 
-  if (isPending) {
-    return <ProjectMembersSkeleton />;
-  }
-
-  if (isError) {
-    return <p className="text-muted-foreground text-sm">{t('list.error')}</p>;
-  }
-
-  if (teammates.length === 0) {
-    return <p className="text-muted-foreground text-sm">{t('list.empty')}</p>;
-  }
-
   return (
-    <ul className="divide-y">
-      {teammates.map((teammate) => (
-        <li key={teammate.user.handle}>
-          <Link
-            href={ROUTES.PROFILE(teammate.user.handle)}
-            className="flex items-center gap-3 py-3"
-          >
-            <ProfileAvatar
-              name={teammate.user.name}
-              seed={teammate.user.handle}
-              imageUrl={teammate.user.profileImageUrl}
-            />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">
-                {teammate.user.name}
-              </p>
-              <p className="text-muted-foreground truncate text-xs">
-                @{teammate.user.handle}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              {teammate.isOwner && (
-                <Badge variant="outline">{t('role.owner')}</Badge>
-              )}
-              <Badge variant="outline">{roleLabel[teammate.role]}</Badge>
-            </div>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <section className="space-y-4">
+      <h1 className="text-xl font-semibold">{t('label')}</h1>
+
+      {isPending ? (
+        <ProjectMembersSkeleton />
+      ) : isError ? (
+        <p className="text-muted-foreground text-sm">{t('list.error')}</p>
+      ) : teammates.length === 0 ? (
+        <p className="text-muted-foreground text-sm">{t('list.empty')}</p>
+      ) : (
+        <ul className="divide-y">
+          {teammates.map((teammate) => (
+            <li key={teammate.user.handle}>
+              <Link
+                href={ROUTES.PROFILE(teammate.user.handle)}
+                className="flex items-center gap-3 py-3"
+              >
+                <ProfileAvatar
+                  name={teammate.user.name}
+                  seed={teammate.user.handle}
+                  imageUrl={teammate.user.profileImageUrl}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
+                    {teammate.user.name}
+                  </p>
+                  <p className="text-muted-foreground truncate text-xs">
+                    @{teammate.user.handle}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {teammate.isOwner && (
+                    <Badge variant="outline">{t('role.owner')}</Badge>
+                  )}
+                  <Badge variant="outline">{roleLabel[teammate.role]}</Badge>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

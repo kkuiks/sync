@@ -3838,6 +3838,378 @@ export function useGetPinnedPostsByProject<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type getTopPostsByProjectResponse200 = {
+  data: GetPostsResponse;
+  status: 200;
+};
+
+export type getTopPostsByProjectResponseSuccess =
+  getTopPostsByProjectResponse200 & {
+    headers: Headers;
+  };
+export type getTopPostsByProjectResponse = getTopPostsByProjectResponseSuccess;
+
+export const getGetTopPostsByProjectUrl = (handle: string) => {
+  return `/projects/${handle}/posts/top`;
+};
+
+/**
+ * 최근 7일간 좋아요·댓글이 많은 프로젝트 게시글 목록을 조회합니다.
+ * @summary Get Top Posts By Project
+ */
+export const getTopPostsByProject = async (
+  handle: string,
+  options?: RequestInit,
+): Promise<getTopPostsByProjectResponse> => {
+  return api<getTopPostsByProjectResponse>(getGetTopPostsByProjectUrl(handle), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getGetTopPostsByProjectQueryKey = (handle: string) => {
+  return [`/projects/${handle}/posts/top`] as const;
+};
+
+export const getGetTopPostsByProjectQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTopPostsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTopPostsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetTopPostsByProjectQueryKey(handle);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTopPostsByProject>>
+  > = ({ signal }) =>
+    getTopPostsByProject(handle, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: handle !== null && handle !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTopPostsByProject>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTopPostsByProjectQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTopPostsByProject>>
+>;
+export type GetTopPostsByProjectQueryError = ErrorType<unknown>;
+
+export function useGetTopPostsByProject<
+  TData = Awaited<ReturnType<typeof getTopPostsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTopPostsByProject>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopPostsByProject>>,
+          TError,
+          Awaited<ReturnType<typeof getTopPostsByProject>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTopPostsByProject<
+  TData = Awaited<ReturnType<typeof getTopPostsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTopPostsByProject>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopPostsByProject>>,
+          TError,
+          Awaited<ReturnType<typeof getTopPostsByProject>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTopPostsByProject<
+  TData = Awaited<ReturnType<typeof getTopPostsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTopPostsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Top Posts By Project
+ */
+
+export function useGetTopPostsByProject<
+  TData = Awaited<ReturnType<typeof getTopPostsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTopPostsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTopPostsByProjectQueryOptions(handle, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getUnansweredQuestionsByProjectResponse200 = {
+  data: GetPostsResponse;
+  status: 200;
+};
+
+export type getUnansweredQuestionsByProjectResponseSuccess =
+  getUnansweredQuestionsByProjectResponse200 & {
+    headers: Headers;
+  };
+export type getUnansweredQuestionsByProjectResponse =
+  getUnansweredQuestionsByProjectResponseSuccess;
+
+export const getGetUnansweredQuestionsByProjectUrl = (handle: string) => {
+  return `/projects/${handle}/posts/unanswered-questions`;
+};
+
+/**
+ * 아직 답변이 채택되지 않은 프로젝트 질문 게시글 목록을 조회합니다.
+ * @summary Get Unanswered Questions By Project
+ */
+export const getUnansweredQuestionsByProject = async (
+  handle: string,
+  options?: RequestInit,
+): Promise<getUnansweredQuestionsByProjectResponse> => {
+  return api<getUnansweredQuestionsByProjectResponse>(
+    getGetUnansweredQuestionsByProjectUrl(handle),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetUnansweredQuestionsByProjectQueryKey = (handle: string) => {
+  return [`/projects/${handle}/posts/unanswered-questions`] as const;
+};
+
+export const getGetUnansweredQuestionsByProjectQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetUnansweredQuestionsByProjectQueryKey(handle);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>
+  > = ({ signal }) =>
+    getUnansweredQuestionsByProject(handle, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: handle !== null && handle !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetUnansweredQuestionsByProjectQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>
+>;
+export type GetUnansweredQuestionsByProjectQueryError = ErrorType<unknown>;
+
+export function useGetUnansweredQuestionsByProject<
+  TData = Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+          TError,
+          Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUnansweredQuestionsByProject<
+  TData = Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+          TError,
+          Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUnansweredQuestionsByProject<
+  TData = Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Unanswered Questions By Project
+ */
+
+export function useGetUnansweredQuestionsByProject<
+  TData = Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+  TError = ErrorType<unknown>,
+>(
+  handle: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUnansweredQuestionsByProject>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof api>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetUnansweredQuestionsByProjectQueryOptions(
+    handle,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type updateProjectPostResponse204 = {
   data: void;
   status: 204;

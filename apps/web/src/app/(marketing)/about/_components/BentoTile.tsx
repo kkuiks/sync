@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-import { MONO } from './primitives';
+import { MONO } from '../../_components/primitives';
 
 const BENTO_TONES = {
   deepest: 'from-primary/12',

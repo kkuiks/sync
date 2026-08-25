@@ -85,9 +85,9 @@ export default function TagDetailHeader({ tagId }: TagDetailHeaderProps) {
             className="w-fit text-base"
           />
 
-          <p className="text-muted-foreground text-sm">
-            {tag.description || t('description-empty')}
-          </p>
+          {tag.description && (
+            <p className="text-muted-foreground text-sm">{tag.description}</p>
+          )}
 
           <p className="text-muted-foreground text-xs">
             {t('meta', {

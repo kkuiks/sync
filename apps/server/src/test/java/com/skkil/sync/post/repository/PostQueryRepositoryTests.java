@@ -94,6 +94,50 @@ class PostQueryRepositoryTests {
   }
 
   @Test
+  @DisplayName("[getTopPostsByProject] 비공개 프로젝트는 팀원에게만 노출한다")
+  void getTopPostsByProject_respectsVisibility() {
+    User author = saveUser("top-post-author");
+    User outsider = saveUser("top-post-outsider");
+    Project project = saveProject("top-post-project", false);
+    teammateRepository.saveAndFlush(Teammate.owner(project, author));
+
+    Post post = savePost("top-post", author, project);
+
+    assertThat(postQueryRepository.getTopPostsByProject(author.getId(), project.getHandle()))
+        .extracting(dto -> dto.id())
+        .containsExactly(post.getId());
+    assertThat(postQueryRepository.getTopPostsByProject(outsider.getId(), project.getHandle()))
+        .isEmpty();
+  }
+
+  @Test
+  @DisplayName("[getUnansweredQuestionsByProject] 미해결 질문만 포함하고, 비공개 프로젝트는 팀원에게만 노출한다")
+  void getUnansweredQuestionsByProject_returnsOnlyUnresolvedQuestions() {
+    User author = saveUser("question-author");
+    User outsider = saveUser("question-outsider");
+    Project project = saveProject("question-project", false);
+    teammateRepository.saveAndFlush(Teammate.owner(project, author));
+
+    Post unresolvedQuestion = savePost("unresolved-question", author, project, PostType.QUESTION);
+
+    Post resolvedQuestion = savePost("resolved-question", author, project, PostType.QUESTION);
+    resolvedQuestion.resolve();
+    postRepository.saveAndFlush(resolvedQuestion);
+
+    savePost("non-question-post", author, project);
+
+    assertThat(
+            postQueryRepository.getUnansweredQuestionsByProject(
+                author.getId(), project.getHandle()))
+        .extracting(dto -> dto.id())
+        .containsExactly(unresolvedQuestion.getId());
+    assertThat(
+            postQueryRepository.getUnansweredQuestionsByProject(
+                outsider.getId(), project.getHandle()))
+        .isEmpty();
+  }
+
+  @Test
   @DisplayName("[getPostBySlug] 프로젝트 초안은 팀원인 작성자 본인에게만 조회된다")
   void getPostBySlug_projectDraft_visibleToAuthorOnly() {
     User author = saveUser("project-draft-author");
@@ -219,12 +263,21 @@ class PostQueryRepositoryTests {
   }
 
   private Post savePost(String slug, User author, @Nullable Project project, PostStatus status) {
+    return savePost(slug, author, project, status, PostType.SHORT);
+  }
+
+  private Post savePost(String slug, User author, @Nullable Project project, PostType type) {
+    return savePost(slug, author, project, PostStatus.PUBLISHED, type);
+  }
+
+  private Post savePost(
+      String slug, User author, @Nullable Project project, PostStatus status, PostType type) {
     Post post =
         Post.builder()
             .slug(slug)
             .author(author)
             .project(project)
-            .type(PostType.SHORT)
+            .type(type)
             .status(status)
             .jsonContent("본문")
             .build();

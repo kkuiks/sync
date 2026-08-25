@@ -11,6 +11,11 @@ import type { GetPostsResponsePostsItemProjectJoinPolicy } from './GetPostsRespo
  */
 export type GetPostsResponsePostsItemProject = {
   /**
+   * 생성 시각
+   * @nullable
+   */
+  createdAt?: string | null;
+  /**
    * 프로젝트 웹사이트
    * @nullable
    */
@@ -30,6 +35,11 @@ export type GetPostsResponsePostsItemProject = {
    * @nullable
    */
   description?: string | null;
+  /**
+   * 프로젝트 규칙
+   * @nullable
+   */
+  rules?: string | null;
   /**
    * 프로젝트 핸들
    * @nullable

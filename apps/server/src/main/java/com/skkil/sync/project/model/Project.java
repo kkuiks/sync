@@ -35,6 +35,9 @@ public class Project extends BaseEntity {
   @Column(name = "website_url")
   private String website;
 
+  @Column(name = "rules", columnDefinition = "TEXT")
+  private String rules;
+
   @ManyToOne
   @JoinColumn(name = "icon_media_id")
   private Media icon;
@@ -81,7 +84,7 @@ public class Project extends BaseEntity {
     teammate.setProject(this);
   }
 
-  public void update(String name, String description, String website) {
+  public void update(String name, String description, String website, String rules) {
     if (name != null) {
       this.name = name;
     }
@@ -92,6 +95,10 @@ public class Project extends BaseEntity {
 
     if (website != null) {
       this.website = website;
+    }
+
+    if (rules != null) {
+      this.rules = rules;
     }
   }
 

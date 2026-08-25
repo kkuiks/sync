@@ -14,6 +14,8 @@ interface TwoColumnLayoutProps {
   sideViewportScrollable?: boolean;
   hideSideOnMobile?: boolean;
   reverseSideOnMobile?: boolean;
+  /** 사이드 컬럼과 높이를 맞춰 메인 컬럼이 남는 세로 공간을 채우게 한다. */
+  stretchMain?: boolean;
 }
 
 export function TwoColumnLayout({
@@ -23,11 +25,13 @@ export function TwoColumnLayout({
   sideViewportScrollable,
   hideSideOnMobile,
   reverseSideOnMobile,
+  stretchMain,
 }: TwoColumnLayoutProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-1 items-start gap-6',
+        'grid grid-cols-1 gap-6',
+        stretchMain ? 'lg:items-stretch' : 'items-start',
         side && 'lg:grid-cols-3',
       )}
     >
@@ -35,6 +39,7 @@ export function TwoColumnLayout({
         className={cn(
           side && 'lg:col-span-2',
           reverseSideOnMobile && 'order-2 lg:order-1',
+          stretchMain && 'lg:h-full',
         )}
       >
         {main}

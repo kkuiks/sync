@@ -10,6 +10,8 @@ import type { GetMyProjectJoinRequestsResponseJoinRequestsItemProjectJoinPolicy 
  * 프로젝트 정보
  */
 export type GetMyProjectJoinRequestsResponseJoinRequestsItemProject = {
+  /** 생성 시각 */
+  createdAt: string;
   /**
    * 프로젝트 웹사이트
    * @nullable
@@ -24,6 +26,11 @@ export type GetMyProjectJoinRequestsResponseJoinRequestsItemProject = {
    * @nullable
    */
   description?: string | null;
+  /**
+   * 프로젝트 규칙
+   * @nullable
+   */
+  rules?: string | null;
   /** 프로젝트 핸들 */
   handle: string;
   /**

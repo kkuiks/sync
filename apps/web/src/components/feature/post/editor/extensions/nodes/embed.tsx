@@ -10,7 +10,6 @@ import {
   NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
-  mergeAttributes,
   nodePasteRule,
 } from '@tiptap/react';
 import { useTranslations } from 'next-intl';
@@ -20,7 +19,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-import { NodeType } from '.';
+import { type EmbedNodeAttributes, embedNodeSchema } from './embed.schema';
+
+export type { EmbedNodeAttributes };
 
 type EmbedProviderId =
   | 'youtube'
@@ -352,55 +353,11 @@ function clampEmbedHeight(height: number): number {
   );
 }
 
-export type EmbedNodeAttributes = {
-  url: string | null;
-  height: number | null;
-};
-
 const IFRAME_SANDBOX =
   'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation';
 
 const IFRAME_ALLOW =
   'accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture';
-
-const embedNodeSchema = {
-  name: NodeType.Embed,
-  group: 'block',
-  content: '',
-  atom: true,
-  selectable: true,
-  draggable: true,
-  addAttributes() {
-    return {
-      url: {
-        default: null,
-        parseHTML: (element: HTMLElement) => element.getAttribute('data-url'),
-        renderHTML: (attributes: EmbedNodeAttributes) =>
-          attributes.url ? { 'data-url': attributes.url } : {},
-      },
-      height: {
-        default: null,
-        parseHTML: (element: HTMLElement) =>
-          Number(element.getAttribute('data-height')) || null,
-        renderHTML: (attributes: EmbedNodeAttributes) =>
-          attributes.height ? { 'data-height': String(attributes.height) } : {},
-      },
-    };
-  },
-  parseHTML() {
-    return [{ tag: `div[data-type="${NodeType.Embed}"]` }];
-  },
-  renderHTML({
-    HTMLAttributes,
-  }: {
-    HTMLAttributes: Record<string, unknown>;
-  }): [string, Record<string, unknown>] {
-    return [
-      'div',
-      mergeAttributes(HTMLAttributes, { 'data-type': NodeType.Embed }),
-    ];
-  },
-};
 
 export const EmbedNode = Node.create({
   ...embedNodeSchema,

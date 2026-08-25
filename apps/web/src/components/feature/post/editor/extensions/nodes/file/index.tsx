@@ -10,7 +10,6 @@ import {
   NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
-  mergeAttributes,
 } from '@tiptap/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect } from 'react';
@@ -31,7 +30,6 @@ import {
   isPreviewableMediaType,
 } from '@/lib/tiptap-utils';
 
-import { NodeType } from '..';
 import {
   getLocalFile,
   hasSupportedFileTransfer,
@@ -39,93 +37,13 @@ import {
   takePendingFile,
 } from '../../media-drop';
 import { FilePreview } from './preview';
+import {
+  type FileNodeAttributes,
+  type FileNodeOptions,
+  fileNodeSchema,
+} from './schema';
 
-export type FileNodeAttributes = {
-  mediaId: string | null;
-  /** 본문에 미리보기를 펼친 채로 둘지. 작성자가 정하고 저장된다. */
-  showPreview: boolean;
-  status: 'none' | 'uploading' | 'uploaded' | 'error';
-  url: string | null;
-  fileName: string | null;
-  fileSize: number | null;
-  mediaType: string | null;
-  pendingId: string | null;
-};
-
-export type FileNodeOptions = {
-  /** 만료된 프리사인 URL을 새로 받아오기 위해 필요한 게시물 슬러그. */
-  slug: string | null;
-};
-
-const fileNodeSchema = {
-  name: NodeType.File,
-  group: 'block',
-  content: '',
-  atom: true,
-  selectable: true,
-  draggable: true,
-  addAttributes() {
-    return {
-      mediaId: {
-        default: null,
-        parseHTML: (element: Element) => element.getAttribute('data-media-id'),
-        renderHTML: (attributes: Record<string, unknown>) =>
-          attributes.mediaId ? { 'data-media-id': attributes.mediaId } : {},
-      },
-      showPreview: {
-        default: false,
-        parseHTML: (element: Element) =>
-          element.getAttribute('data-show-preview') === 'true',
-        renderHTML: (attributes: Record<string, unknown>) =>
-          attributes.showPreview ? { 'data-show-preview': 'true' } : {},
-      },
-      status: {
-        default: 'none',
-        rendered: false,
-      },
-      url: {
-        default: null,
-        rendered: false,
-      },
-      fileName: {
-        default: null,
-        rendered: false,
-      },
-      fileSize: {
-        default: null,
-        rendered: false,
-      },
-      mediaType: {
-        default: null,
-        rendered: false,
-      },
-      pendingId: {
-        default: null,
-        rendered: false,
-      },
-    };
-  },
-  parseHTML() {
-    return [
-      {
-        tag: 'div[data-media-id][data-node-type="file"]',
-        getAttrs: (element: Element) => ({
-          status: element.getAttribute('data-media-id') ? 'uploaded' : 'none',
-        }),
-      },
-    ];
-  },
-  renderHTML({
-    HTMLAttributes,
-  }: {
-    HTMLAttributes: Record<string, unknown>;
-  }): [string, Record<string, unknown>] {
-    return [
-      'div',
-      mergeAttributes(HTMLAttributes, { 'data-node-type': 'file' }),
-    ];
-  },
-};
+export type { FileNodeAttributes, FileNodeOptions };
 
 export const FileNode = Node.create<FileNodeOptions>({
   ...fileNodeSchema,

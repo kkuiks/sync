@@ -15,4 +15,5 @@ public record UpdateProjectRequest(
     @Size(min = ProjectConstants.MIN_HANDLE_LENGTH, max = ProjectConstants.MAX_HANDLE_LENGTH)
         @NotReservedHandle
         String handle,
-    JoinPolicy joinPolicy) {}
+    JoinPolicy joinPolicy,
+    @Size(max = ProjectConstants.MAX_RULES_LENGTH) String rules) {}

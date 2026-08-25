@@ -1,14 +1,12 @@
 'use client';
 
 import { CheckIcon, CopyIcon } from '@phosphor-icons/react';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import {
   NodeViewContent,
   type NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
 } from '@tiptap/react';
-import { common, createLowlight } from 'lowlight';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
@@ -28,13 +26,9 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-/**
- * `common` 언어 셋(약 35개: js, ts, python, java, sql, bash, json, ...)만 등록한다.
- * 전체 190여 개를 등록하면 번들이 크게 늘어나므로 자주 쓰는 언어로 제한한다.
- */
-const lowlight = createLowlight(common);
+import { DEFAULT_CODE_LANGUAGE, baseCodeBlock, lowlight } from './code.schema';
 
-export const DEFAULT_CODE_LANGUAGE = 'plaintext';
+export { DEFAULT_CODE_LANGUAGE };
 
 const LANGUAGES: { id: string; label: string }[] = [
   { id: DEFAULT_CODE_LANGUAGE, label: 'Plain Text' },
@@ -135,11 +129,6 @@ function CodeBlockView({ node, updateAttributes }: NodeViewProps) {
     </NodeViewWrapper>
   );
 }
-
-const baseCodeBlock = CodeBlockLowlight.configure({
-  lowlight,
-  defaultLanguage: DEFAULT_CODE_LANGUAGE,
-});
 
 /**
  * Notion 스타일 코드 블록 (편집 모드).

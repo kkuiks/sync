@@ -91,6 +91,19 @@ export function toAbsoluteUrl(pathOrUrl: string): string {
   return getSiteUrl(pathOrUrl).toString();
 }
 
+/**
+ * 페이지의 정규 URL만 담은 메타데이터 조각.
+ * 루트 레이아웃은 canonical 을 선언하지 않으므로(선언하면 모든 하위 페이지가 홈을
+ * 정규 URL 로 상속받아 색인에서 빠진다), 색인 대상 페이지가 각자 자기 경로를 밝힌다.
+ */
+export function canonicalMetadata(path: string): Metadata {
+  return {
+    alternates: {
+      canonical: getSiteUrl(path),
+    },
+  };
+}
+
 export function getPostCanonicalPath(post: PostSeoSource): string {
   const projectHandle = post.project?.handle;
 

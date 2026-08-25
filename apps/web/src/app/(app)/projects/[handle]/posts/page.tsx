@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { getGetProjectByHandleQueryOptions } from '@/api/__generated__/project/project';
 import SyncError, { ErrorCode } from '@/lib/error';
 import { getQueryClient } from '@/lib/query';
+import { canonicalMetadata } from '@/lib/seo';
+import ROUTES from '@/util/routes';
 
 import ProjectPosts from './_components/ProjectPosts';
 
@@ -19,10 +21,16 @@ interface ProjectPostsPageProps {
   }>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProjectPostsPageProps): Promise<Metadata> {
+  const { handle } = await params;
   const t = await getTranslations('pages.projects.project.posts');
 
-  return { title: t('label') };
+  return {
+    title: t('label'),
+    ...canonicalMetadata(ROUTES.PROJECT_POSTS(handle)),
+  };
 }
 
 export default async function ProjectPostsPage({

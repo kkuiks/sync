@@ -19,7 +19,8 @@ public class UpdateProjectRequestSnippets {
         null,
         "프로젝트 이름",
         "project-handle",
-        JoinPolicy.REQUEST);
+        JoinPolicy.REQUEST,
+        "1. 서로 존중해주세요.");
   }
 
   public static RequestFieldsSnippet getUpdateProjectRequestFields() {
@@ -40,6 +41,7 @@ public class UpdateProjectRequestSnippets {
             .type(RestDocsUtils.ENUM_TYPE)
             .optional()
             .description("프로젝트 참여 정책")
-            .attributes(RestDocsUtils.getEnumAttributes(JoinPolicy.class)));
+            .attributes(RestDocsUtils.getEnumAttributes(JoinPolicy.class)),
+        fieldWithPath("rules").type(JsonFieldType.STRING).optional().description("프로젝트 규칙"));
   }
 }

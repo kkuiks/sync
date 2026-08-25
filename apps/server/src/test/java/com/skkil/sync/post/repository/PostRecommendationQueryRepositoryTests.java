@@ -243,7 +243,7 @@ class PostRecommendationQueryRepositoryTests {
   private List<PostRecommendationCandidate> getDiscoveryCandidates(
       PostRecommendationContext context) {
     return postRecommendationQueryRepository
-        .getDiscoveryCandidates(postRecommendationQueryRepository.trendingCondition(), context)
+        .getDiscoveryCandidates(DSL.noCondition(), context)
         .fetch(DSL.noCondition(), List.of(POSTS.LIKE_COUNT.desc(), POSTS.ID.desc()), 10);
   }
 

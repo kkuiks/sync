@@ -28,6 +28,11 @@ export interface UpdateProjectRequest {
    */
   description?: string | null;
   /**
+   * 프로젝트 규칙
+   * @nullable
+   */
+  rules?: string | null;
+  /**
    * 프로젝트 핸들
    * @nullable
    */
